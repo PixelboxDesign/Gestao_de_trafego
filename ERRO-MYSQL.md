@@ -15,14 +15,13 @@ O Render não consegue conectar ao MySQL via Tailscale porque:
 
 No Render Dashboard → Web Service → Environment:
 
+**Configuração Correta:**
 ```
 DB_HOST=162.240.228.36
+DB_NAME=hawktec_alpha-ecommerce
 ```
 
-**Remover:**
-```
-❌ DB_HOST=desktop-e6jr4dk.tailc1230a.ts.net
-```
+**IMPORTANTE:** O database no VPS se chama `hawktec_alpha-ecommerce`, não `historico_alphahall`!
 
 ---
 

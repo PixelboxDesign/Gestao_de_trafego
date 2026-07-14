@@ -29,15 +29,24 @@ O Render não consegue conectar ao MySQL porque tentou usar Tailscale, mas **Ren
 1. Acesse: https://dashboard.render.com
 2. Abra seu Web Service: `luna-trafego-backend`
 3. Vá em **Environment**
-4. **Editar** a variável `DB_HOST`:
+4. **Editar** as variáveis:
    
+   **DB_HOST:**
    ```
    ❌ Remover: desktop-e6jr4dk.tailc1230a.ts.net
    ✅ Colocar: 162.240.228.36
    ```
+   
+   **DB_NAME:**
+   ```
+   ❌ Remover: historico_alphahall
+   ✅ Colocar: hawktec_alpha-ecommerce
+   ```
 
 5. Clicar **Save Changes**
 6. Aguardar redeploy automático (~2 minutos)
+
+**⚠️ IMPORTANTE:** O database no VPS é `hawktec_alpha-ecommerce`!
 
 ---
 
