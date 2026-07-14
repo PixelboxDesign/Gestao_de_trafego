@@ -39,12 +39,35 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+// Rota raiz - Página inicial da API
+app.get('/', (req, res) => {
+  res.json({
+    message: '🚀 API Luna Cosméticos - Gestão de Tráfego',
+    version: '1.0.0',
+    status: 'online',
+    environment: process.env.NODE_ENV || 'development',
+    endpoints: {
+      health: '/health',
+      clientes: '/api/clientes',
+      pedidos: '/api/pedidos',
+      trafego: '/api/trafego',
+      relatorios: '/api/relatorios'
+    },
+    documentation: 'https://github.com/PixelboxDesign/Gestao_de_trafego'
+  });
+});
+
 // Rota de health check
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    database: {
+      host: process.env.DB_HOST,
+      name: process.env.DB_NAME,
+      connected: true
+    }
   });
 });
 
