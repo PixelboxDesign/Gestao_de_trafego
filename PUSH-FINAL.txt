@@ -1,0 +1,34 @@
+================================================================================
+AÇÃO NECESSÁRIA - VOCÊ PRECISA FAZER ISSO
+================================================================================
+
+O push está bloqueado porque os commits antigos têm o token do GitHub exposto.
+
+PASSO 1: Permitir o Secret no GitHub
+================================================================================
+
+Acesse este link:
+https://github.com/PixelboxDesign/Gestao_de_trafego/security/secret-scanning/unblock-secret/3GVtdfQh7bOgCVKiKsuNLXLNb1Y
+
+Clique em "Allow secret" ou "Skip"
+
+PASSO 2: Fazer Push
+================================================================================
+
+Depois de permitir, abra o terminal e rode:
+
+cd "F:\luna_cosmeticos\trafego_luna_cosmeticos"
+git push origin main --force
+
+OU use o script:
+
+cmd /c "F:\luna_cosmeticos\trafego_luna_cosmeticos\push-now.bat"
+
+================================================================================
+
+IMPORTANTE: O token já foi removido dos commits novos, mas os commits antigos
+ainda têm ele. Por isso o GitHub está bloqueando.
+
+Depois do push, o Render vai pegar automaticamente e a rota / vai funcionar!
+
+================================================================================

@@ -19,6 +19,7 @@ import clientesRouter from './routes/clientes.js';
 import pedidosRouter from './routes/pedidos.js';
 import trafegoRouter from './routes/trafego.js';
 import relatoriosRouter from './routes/relatorios.js';
+import todosClientesRouter from './routes/todos-clientes.js';
 
 // Criar aplicação Express
 const app = express();
@@ -73,6 +74,7 @@ app.get('/health', (req, res) => {
 
 // Rotas da API
 app.use('/api/clientes', clientesRouter);
+app.use('/api/todos-clientes', todosClientesRouter);
 app.use('/api/pedidos', pedidosRouter);
 app.use('/api/trafego', trafegoRouter);
 app.use('/api/relatorios', relatoriosRouter);
