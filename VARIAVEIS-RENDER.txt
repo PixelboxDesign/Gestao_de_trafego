@@ -1,0 +1,63 @@
+====================================================================
+VARIÁVEIS DE AMBIENTE PARA COPIAR NO RENDER
+====================================================================
+
+INSTRUÇÕES:
+1. Acesse: https://dashboard.render.com
+2. Abra: Web Service → luna-trafego-backend
+3. Vá em: Environment
+4. Para cada linha abaixo, adicione uma variável:
+   - Clique em "Add Environment Variable"
+   - Cole o Key (nome da variável)
+   - Cole o Value (valor da variável)
+   - Repita para todas as 8 variáveis
+
+====================================================================
+COPIE AS VARIÁVEIS ABAIXO (uma por uma):
+====================================================================
+
+Key: NODE_ENV
+Value: production
+
+Key: PORT
+Value: 10000
+
+Key: DB_HOST
+Value: 162.240.228.36
+
+Key: DB_PORT
+Value: 3306
+
+Key: DB_USER
+Value: hawktec_alpha_log
+
+Key: DB_PASSWORD
+Value: Alpha@3030
+
+Key: DB_NAME
+Value: hawktec_alpha-ecommerce
+
+Key: FRONTEND_URL
+Value: https://seu-frontend.onrender.com
+
+====================================================================
+IMPORTANTE:
+====================================================================
+- NÃO copie os comentários (#)
+- NÃO copie as palavras "Key:" e "Value:"
+- Copie APENAS o texto depois de "Key:" e "Value:"
+- Depois de adicionar todas, clique em "Save Changes"
+- Aguarde ~2 minutos para o redeploy automático
+
+====================================================================
+VERIFICAR SE FUNCIONOU:
+====================================================================
+Acesse os logs do Render e procure por:
+✅ Conectado ao MySQL: hawktec_alpha-ecommerce
+
+Ou acesse:
+https://luna-trafego-backend.onrender.com/health
+
+Deve retornar: {"status":"ok"}
+
+====================================================================
