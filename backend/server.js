@@ -50,11 +50,18 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       clientes: '/api/clientes',
+      todosClientes: '/api/todos-clientes (NOVO - Busca em 15+ tabelas!)',
+      todosClientesUnicos: '/api/todos-clientes/sem-duplicatas',
       pedidos: '/api/pedidos',
       trafego: '/api/trafego',
       relatorios: '/api/relatorios'
     },
-    documentation: 'https://github.com/PixelboxDesign/Gestao_de_trafego'
+    documentation: 'https://github.com/PixelboxDesign/Gestao_de_trafego',
+    novidades: [
+      '✅ Nova rota /api/todos-clientes que varre 15+ tabelas',
+      '✅ Não deixa NENHUM cliente de fora!',
+      '✅ Inclui dados de Bling, Tray, NFe, Pedidos'
+    ]
   });
 });
 
