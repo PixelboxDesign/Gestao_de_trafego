@@ -17,8 +17,8 @@ router.get('/', async (req, res) => {
     const offset = (page - 1) * limit;
     const search = req.query.search || '';
 
-    // SQL COMPLETO que busca de TODAS as tabelas (mesmo do /todos-clientes)
-    const sql = `
+    // SQL BASE sem paginação
+    const baseSql = `
       SELECT DISTINCT 
         TRIM(nome) as nome,
         fonte,
@@ -98,21 +98,28 @@ router.get('/', async (req, res) => {
       WHERE nome IS NOT NULL 
         AND TRIM(nome) != ''
         AND LENGTH(TRIM(nome)) > 2
-        ${search ? 'AND nome LIKE ?' : ''}
-      ORDER BY nome ASC
-      LIMIT ? OFFSET ?
     `;
 
-    const params = search ? [`%${search}%`, limit, offset] : [limit, offset];
-    const clientes = await query(sql, params);
+    // Adicionar filtro de busca se necessário
+    let whereCond = '';
+    let params = [];
     
-    console.log(`✅ Encontrados ${clientes.length} clientes`);
+    if (search) {
+      whereCond = ' AND nome LIKE ?';
+      params.push(`%${search}%`);
+    }
 
-    // Contar total (mesma query sem LIMIT)
-    const countSql = sql.replace(/LIMIT \? OFFSET \?/, '').replace(/ORDER BY nome ASC/, '');
-    const countParams = search ? [`%${search}%`] : [];
-    const allClientes = await query(countSql, countParams);
+    // Query para contar total
+    const countSql = baseSql + whereCond;
+    const allClientes = await query(countSql, params);
     const total = allClientes.length;
+
+    // Query com paginação
+    const sql = baseSql + whereCond + ' ORDER BY nome ASC LIMIT ? OFFSET ?';
+    const paginatedParams = [...params, limit, offset];
+    const clientes = await query(sql, paginatedParams);
+    
+    console.log(`✅ Encontrados ${clientes.length} clientes de ${total} totais`);
 
     res.json({
       data: clientes,
