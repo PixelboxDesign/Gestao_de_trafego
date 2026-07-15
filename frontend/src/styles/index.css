@@ -233,6 +233,20 @@ tr:hover {
   background: #7b1fa2;
 }
 
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #388e3c;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Loading */
 .loading {
   display: flex;

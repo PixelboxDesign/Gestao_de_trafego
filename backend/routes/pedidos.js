@@ -3,130 +3,86 @@ import { query } from '../config/database.js';
 
 const router = express.Router();
 
-/**
- * GET /api/pedidos
- * Lista pedidos com filtros
- */
+// GET /api/pedidos — lista paginada
 router.get('/', async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50;
+    const page   = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit  = Math.min(200, Math.max(1, parseInt(req.query.limit) || 50));
     const offset = (page - 1) * limit;
-    const origem = req.query.origem; // 'ecommerce' ou 'distribuicao'
+    const origem = req.query.origem || 'todos'; // 'ecommerce' | 'distribuicao' | 'todos'
 
-    let sql = '';
-    let countSql = '';
+    let table = '';
+    let label = '';
 
     if (origem === 'ecommerce') {
-      countSql = `SELECT COUNT(*) as total FROM bling_pedidos_venda_ecommerce`;
-      sql = `
-        SELECT 
-          id,
-          contato_nome as cliente,
-          data,
-          total,
-          situacao_valor as status,
-          'E-commerce' as origem
-        FROM bling_pedidos_venda_ecommerce
-        ORDER BY data DESC
-        LIMIT ? OFFSET ?
-      `;
+      table = 'bling_pedidos_venda_ecommerce';
+      label = 'E-commerce';
     } else if (origem === 'distribuicao') {
-      countSql = `SELECT COUNT(*) as total FROM bling_pedidos_venda_distribuicao`;
-      sql = `
-        SELECT 
-          id,
-          contato_nome as cliente,
-          data,
-          total,
-          situacao_valor as status,
-          'Distribuição' as origem
-        FROM bling_pedidos_venda_distribuicao
-        ORDER BY data DESC
-        LIMIT ? OFFSET ?
-      `;
-    } else {
-      countSql = `
-        SELECT 
-          (SELECT COUNT(*) FROM bling_pedidos_venda_ecommerce) +
-          (SELECT COUNT(*) FROM bling_pedidos_venda_distribuicao) as total
-      `;
-      sql = `
-        SELECT 
-          id,
-          contato_nome as cliente,
-          data,
-          total,
-          situacao_valor as status,
-          'E-commerce' as origem
-        FROM bling_pedidos_venda_ecommerce
-        
-        UNION ALL
-        
-        SELECT 
-          id,
-          contato_nome as cliente,
-          data,
-          total,
-          situacao_valor as status,
-          'Distribuição' as origem
-        FROM bling_pedidos_venda_distribuicao
-        
-        ORDER BY data DESC
-        LIMIT ? OFFSET ?
-      `;
+      table = 'bling_pedidos_venda_distribuicao';
+      label = 'Distribuição';
     }
 
-    const totalResult = await query(countSql);
-    const total = totalResult[0]?.total || 0;
+    if (table) {
+      const [[{ total }]] = await Promise.all([query(`SELECT COUNT(*) AS total FROM ${table}`)]);
+      const rows = await query(
+        `SELECT id, contato_nome AS cliente, data, total, situacao_valor AS status, ? AS origem
+           FROM ${table} ORDER BY data DESC LIMIT ? OFFSET ?`,
+        [label, limit, offset]
+      );
+      return res.json({ data: rows, pagination: { page, limit, total: Number(total), totalPages: Math.ceil(Number(total) / limit) } });
+    }
 
-    const pedidos = await query(sql, [limit, offset]);
+    // Ambos combinados
+    const countSql = `
+      SELECT
+        (SELECT COUNT(*) FROM bling_pedidos_venda_ecommerce) +
+        (SELECT COUNT(*) FROM bling_pedidos_venda_distribuicao) AS total
+    `;
+    const listSql = `
+      SELECT id, contato_nome AS cliente, data, total, situacao_valor AS status, 'E-commerce' AS origem
+        FROM bling_pedidos_venda_ecommerce
+      UNION ALL
+      SELECT id, contato_nome, data, total, situacao_valor, 'Distribuição'
+        FROM bling_pedidos_venda_distribuicao
+      ORDER BY data DESC
+      LIMIT ? OFFSET ?
+    `;
 
-    res.json({
-      data: pedidos,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit)
-      }
-    });
-  } catch (error) {
-    console.error('Erro ao buscar pedidos:', error);
-    res.status(500).json({ error: 'Erro ao buscar pedidos' });
+    const [[{ total }], rows] = await Promise.all([
+      query(countSql),
+      query(listSql, [limit, offset]),
+    ]);
+
+    res.json({ data: rows, pagination: { page, limit, total: Number(total), totalPages: Math.ceil(Number(total) / limit) } });
+  } catch (err) {
+    console.error('GET /api/pedidos erro:', err.message);
+    res.status(500).json({ error: 'Erro ao buscar pedidos', message: err.message });
   }
 });
 
-/**
- * GET /api/pedidos/stats
- * Estatísticas de pedidos
- */
+// GET /api/pedidos/stats
 router.get('/stats', async (req, res) => {
   try {
-    const statsSql = `
-      SELECT 
-        COUNT(*) as total_pedidos,
-        SUM(total) as valor_total,
-        AVG(total) as ticket_medio,
-        'E-commerce' as origem
-      FROM bling_pedidos_venda_ecommerce
-      
-      UNION ALL
-      
-      SELECT 
-        COUNT(*) as total_pedidos,
-        SUM(total) as valor_total,
-        AVG(total) as ticket_medio,
-        'Distribuição' as origem
-      FROM bling_pedidos_venda_distribuicao
+    const sql = `
+      SELECT origem, total_pedidos, valor_total, ticket_medio FROM (
+        SELECT 'E-commerce' AS origem,
+          COUNT(*)   AS total_pedidos,
+          SUM(total) AS valor_total,
+          AVG(total) AS ticket_medio
+        FROM bling_pedidos_venda_ecommerce
+        UNION ALL
+        SELECT 'Distribuição',
+          COUNT(*),
+          SUM(total),
+          AVG(total)
+        FROM bling_pedidos_venda_distribuicao
+      ) t
     `;
-
-    const stats = await query(statsSql);
-
+    const stats = await query(sql);
     res.json({ stats });
-  } catch (error) {
-    console.error('Erro ao buscar stats de pedidos:', error);
-    res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+  } catch (err) {
+    console.error('GET /api/pedidos/stats erro:', err.message);
+    res.status(500).json({ error: 'Erro ao buscar stats de pedidos', message: err.message });
   }
 });
 

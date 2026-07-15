@@ -2,137 +2,76 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
-import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
-// Configurar __dirname para ES modules
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname  = dirname(__filename);
 
-// Carregar variáveis de ambiente
+// .env fica na raiz do projeto (um nível acima de /backend)
 dotenv.config({ path: join(__dirname, '..', '.env') });
 
-// Importar rotas
-import clientesRouter from './routes/clientes.js';
-import pedidosRouter from './routes/pedidos.js';
-import trafegoRouter from './routes/trafego.js';
-import relatoriosRouter from './routes/relatorios.js';
+import clientesRouter     from './routes/clientes.js';
 import todosClientesRouter from './routes/todos-clientes.js';
+import pedidosRouter      from './routes/pedidos.js';
+import trafegoRouter      from './routes/trafego.js';
+import relatoriosRouter   from './routes/relatorios.js';
 
-// Criar aplicação Express
-const app = express();
+const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares globais
-app.use(helmet()); // Segurança headers HTTP
-app.use(compression()); // Compressão gzip
-app.use(morgan('combined')); // Logs de requisições
-app.use(express.json()); // Parse JSON body
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded body
+// Middlewares
+app.use(helmet());
+app.use(compression());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// CORS configurado - aceitar frontend em qualquer origem (temporariamente)
-const corsOptions = {
-  origin: true, // Aceita qualquer origem por enquanto
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
+// CORS — aceitar qualquer origem (ajustar para domínio específico em produção se necessário)
+app.use(cors({ origin: true, credentials: true }));
 
-// Rota raiz - Página inicial da API
-app.get('/', (req, res) => {
+// Health check — sem consulta ao banco para responder rápido
+app.get('/health', (_req, res) => {
   res.json({
-    message: '🚀 API Luna Cosméticos - Gestão de Tráfego',
-    version: '1.0.0',
-    status: 'online',
-    environment: process.env.NODE_ENV || 'development',
-    endpoints: {
-      health: '/health',
-      clientes: '/api/clientes',
-      todosClientes: '/api/todos-clientes (NOVO - Busca em 15+ tabelas!)',
-      todosClientesUnicos: '/api/todos-clientes/sem-duplicatas',
-      pedidos: '/api/pedidos',
-      trafego: '/api/trafego',
-      relatorios: '/api/relatorios'
-    },
-    documentation: 'https://github.com/PixelboxDesign/Gestao_de_trafego',
-    novidades: [
-      '✅ Nova rota /api/todos-clientes que varre 15+ tabelas',
-      '✅ Não deixa NENHUM cliente de fora!',
-      '✅ Inclui dados de Bling, Tray, NFe, Pedidos'
-    ]
-  });
-});
-
-// Rota de health check
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+    status: 'ok',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
-    database: {
-      host: process.env.DB_HOST,
-      name: process.env.DB_NAME,
-      connected: true
-    }
+    database: { host: process.env.DB_HOST, name: process.env.DB_NAME },
   });
 });
 
 // Rotas da API
-app.use('/api/clientes', clientesRouter);
+app.use('/api/clientes',      clientesRouter);
 app.use('/api/todos-clientes', todosClientesRouter);
-app.use('/api/pedidos', pedidosRouter);
-app.use('/api/trafego', trafegoRouter);
-app.use('/api/relatorios', relatoriosRouter);
+app.use('/api/pedidos',       pedidosRouter);
+app.use('/api/trafego',       trafegoRouter);
+app.use('/api/relatorios',    relatoriosRouter);
 
-// Rota 404
-app.use((req, res) => {
-  res.status(404).json({ 
-    error: 'Rota não encontrada',
-    path: req.path,
-    method: req.method
+// Rota raiz
+app.get('/', (_req, res) => {
+  res.json({
+    name: 'API Gestão de Tráfego - Luna Cosméticos',
+    version: '2.0.0',
+    status: 'online',
+    endpoints: ['/health', '/api/clientes', '/api/todos-clientes', '/api/pedidos', '/api/trafego', '/api/relatorios'],
   });
+});
+
+// 404
+app.use((req, res) => {
+  res.status(404).json({ error: 'Rota não encontrada', path: req.path });
 });
 
 // Error handler global
-app.use((err, req, res, next) => {
-  console.error('❌ Erro:', err);
-  res.status(err.status || 500).json({
-    error: err.message || 'Erro interno do servidor',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
+app.use((err, _req, res, _next) => {
+  console.error('Erro global:', err.message);
+  res.status(err.status || 500).json({ error: err.message || 'Erro interno do servidor' });
 });
 
-// Iniciar servidor
 app.listen(PORT, () => {
-  console.log('='.repeat(60));
-  console.log('🚀 Servidor Backend - Gestão de Tráfego Luna Cosméticos');
-  console.log('='.repeat(60));
-  console.log(`📡 Rodando em: http://localhost:${PORT}`);
-  console.log(`🌍 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
-  console.log(`💾 Banco de Dados: ${process.env.DB_NAME}@${process.env.DB_HOST}`);
-  console.log('='.repeat(60));
-  console.log('');
-  console.log('📋 Rotas disponíveis:');
-  console.log(`   GET  /health`);
-  console.log(`   GET  /api/clientes`);
-  console.log(`   GET  /api/pedidos`);
-  console.log(`   GET  /api/trafego/*`);
-  console.log(`   GET  /api/relatorios/*`);
-  console.log('');
-  console.log('✅ Servidor pronto para receber requisições!');
-  console.log('');
+  console.log(`🚀 Backend rodando na porta ${PORT} [${process.env.NODE_ENV || 'development'}]`);
+  console.log(`💾 DB: ${process.env.DB_NAME}@${process.env.DB_HOST}`);
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('⚠️ SIGTERM recebido, encerrando servidor gracefully...');
-  process.exit(0);
-});
-
-process.on('SIGINT', () => {
-  console.log('\n⚠️ SIGINT recebido, encerrando servidor...');
-  process.exit(0);
-});
+process.on('SIGTERM', () => process.exit(0));
+process.on('SIGINT',  () => process.exit(0));

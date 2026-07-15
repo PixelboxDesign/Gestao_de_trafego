@@ -3,267 +3,63 @@ import { query } from '../config/database.js';
 
 const router = express.Router();
 
-/**
- * ⚠️ IMPORTANTE: SEMPRE CONSULTE O CATÁLOGO ANTES DE MODIFICAR QUERIES!
- * 
- * Arquivo de referência: backend/DATABASE-REFERENCE.js
- * 
- * NOMES CORRETOS DAS COLUNAS:
- * - clientes_tray_ecommerce: "name" (não customer_name)
- * - pedidos_ecommerce_tray: "nome" (não customer_name)
- * - tray_ecommerce_pedidos_detalhes: "nome_cliente" (não customer_name)
- * - tray_customers_attributes: "first_name" + "last_name" (não name)
- * 
- * Total: 72 tabelas catalogadas
- * Consulte: DATABASE-CATALOG.json para estrutura completa
- */
-
-/**
- * GET /api/todos-clientes
- * BUSCA ABSOLUTAMENTE TODOS OS CLIENTES DE TODAS AS TABELAS
- * Varre TODAS as tabelas do database para não deixar nenhum cliente de fora
- */
+// GET /api/todos-clientes — todos os clientes de todas as fontes confirmadas
 router.get('/', async (req, res) => {
   try {
-    console.log('🔍 Buscando TODOS os clientes de TODAS as tabelas...');
+    console.log('🔍 /api/todos-clientes iniciado');
 
-    // SQL SIMPLIFICADO - busca apenas de tabelas que TÊM nomes de clientes
     const sql = `
-      SELECT DISTINCT 
-        TRIM(nome) as nome,
-        fonte,
-        email,
-        cidade,
-        estado
+      SELECT DISTINCT nome, fonte, email, cidade, estado
       FROM (
-        -- ============================================
-        -- BLING E-COMMERCE - PEDIDOS
-        -- ============================================
-        SELECT DISTINCT
-          contato_nome as nome,
-          'Bling E-commerce - Pedidos' as fonte,
-          NULL as email,
-          NULL as cidade,
-          NULL as estado
-        FROM bling_pedidos_venda_ecommerce
-        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        
+        SELECT DISTINCT TRIM(contato_nome) AS nome, 'Bling E-commerce - Pedidos'    AS fonte, NULL  AS email, NULL AS cidade, NULL AS estado
+          FROM bling_pedidos_venda_ecommerce
+         WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         UNION
-        
-        SELECT DISTINCT
-          contato_nome as nome,
-          'Bling E-commerce - Pedidos Detalhes' as fonte,
-          NULL as email,
-          NULL as cidade,
-          NULL as estado
-        FROM bling_pedidos_venda_detalhes_ecommerce
-        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        
+        SELECT DISTINCT TRIM(contato_nome), 'Bling E-commerce - NFe',          NULL, NULL, NULL
+          FROM bling_nfe_saida_detalhes_ecommerce
+         WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         UNION
-        
-        SELECT DISTINCT
-          contato_nome as nome,
-          'Bling E-commerce - NFe Saída' as fonte,
-          NULL as email,
-          NULL as cidade,
-          NULL as estado
-        FROM bling_nfe_saida_detalhes_ecommerce
-        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        
-        -- ============================================
-        -- BLING DISTRIBUIÇÃO - PEDIDOS
-        -- ============================================
+        SELECT DISTINCT TRIM(contato_nome), 'Bling Distribuição - Pedidos',    NULL, NULL, NULL
+          FROM bling_pedidos_venda_distribuicao
+         WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         UNION
-        
-        SELECT DISTINCT
-          contato_nome as nome,
-          'Bling Distribuição - Pedidos' as fonte,
-          NULL as email,
-          NULL as cidade,
-          NULL as estado
-        FROM bling_pedidos_venda_distribuicao
-        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        
+        SELECT DISTINCT TRIM(contato_nome), 'Bling Distribuição - NFe',        NULL, NULL, NULL
+          FROM bling_nfe_saida_detalhes_distribuicao
+         WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         UNION
-        
-        SELECT DISTINCT
-          contato_nome as nome,
-          'Bling Distribuição - Pedidos Detalhes' as fonte,
-          NULL as email,
-          NULL as cidade,
-          NULL as estado
-        FROM bling_pedidos_venda_detalhes_distribuicao
-        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        
+        SELECT DISTINCT TRIM(name), 'Tray E-commerce', email, city, state
+          FROM clientes_tray_ecommerce
+         WHERE name IS NOT NULL AND TRIM(name) != ''
         UNION
-        
-        SELECT DISTINCT
-          contato_nome as nome,
-          'Bling Distribuição - NFe Saída' as fonte,
-          NULL as email,
-          NULL as cidade,
-          NULL as estado
-        FROM bling_nfe_saida_detalhes_distribuicao
-        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        
-        -- ============================================
-        -- TRAY E-COMMERCE - CLIENTES
-        -- ============================================
-        UNION
-        
-        SELECT DISTINCT
-          name as nome,
-          'Tray E-commerce' as fonte,
-          email,
-          city as cidade,
-          state as estado
-        FROM clientes_tray_ecommerce
-        WHERE name IS NOT NULL AND TRIM(name) != ''
-        
-        -- ============================================
-        -- TRAY DISTRIBUIÇÃO - CLIENTES
-        -- ============================================
-        UNION
-        
-        SELECT DISTINCT
-          name as nome,
-          'Tray Distribuição' as fonte,
-          email,
-          city as cidade,
-          state as estado
-        FROM clientes_tray_distribuicao
-        WHERE name IS NOT NULL AND TRIM(name) != ''
-        
-        -- ============================================
-        -- TRAY CUSTOMERS - ATRIBUTOS
-        -- ============================================
-        UNION
-        
-        SELECT DISTINCT
-          CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as nome,
-          'Tray Customers Distribuição' as fonte,
-          NULL as email,
-          NULL as cidade,
-          NULL as estado
-        FROM tray_customers_attributesdist
-        WHERE first_name IS NOT NULL AND TRIM(first_name) != ''
-        
-        UNION
-        
-        SELECT DISTINCT
-          CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as nome,
-          'Tray Customers E-commerce' as fonte,
-          NULL as email,
-          NULL as cidade,
-          NULL as estado
-        FROM tray_customers_attributes
-        WHERE first_name IS NOT NULL AND TRIM(first_name) != ''
-        
-      ) todos_clientes
-      WHERE nome IS NOT NULL 
-        AND TRIM(nome) != ''
-        AND LENGTH(TRIM(nome)) > 2
+        SELECT DISTINCT TRIM(name), 'Tray Distribuição', email, city, state
+          FROM clientes_tray_distribuicao
+         WHERE name IS NOT NULL AND TRIM(name) != ''
+      ) todos
+      WHERE LENGTH(nome) > 2
       ORDER BY nome ASC
     `;
 
-    console.log('📊 Executando query...');
     const clientes = await query(sql);
-    
-    console.log(`✅ Encontrados ${clientes.length} clientes únicos!`);
+    console.log(`✅ /api/todos-clientes: ${clientes.length} clientes`);
 
-    // Agrupar por fonte
-    const porFonte = clientes.reduce((acc, cliente) => {
-      if (!acc[cliente.fonte]) {
-        acc[cliente.fonte] = 0;
-      }
-      acc[cliente.fonte]++;
-      return acc;
-    }, {});
+    // Agrupar por fonte para o resumo
+    const porFonte = {};
+    for (const c of clientes) {
+      porFonte[c.fonte] = (porFonte[c.fonte] || 0) + 1;
+    }
 
     res.json({
       total: clientes.length,
-      clientes: clientes,
+      clientes,
       resumo: {
         totalClientes: clientes.length,
-        porFonte: porFonte,
-        fontes: Object.keys(porFonte).length
-      }
+        porFonte,
+        fontes: Object.keys(porFonte).length,
+      },
     });
-
-  } catch (error) {
-    console.error('❌ Erro ao buscar todos os clientes:', error);
-    res.status(500).json({ 
-      error: 'Erro ao buscar clientes',
-      message: error.message 
-    });
-  }
-});
-
-/**
- * GET /api/todos-clientes/sem-duplicatas
- * Retorna lista única de nomes (remove duplicatas entre fontes)
- */
-router.get('/sem-duplicatas', async (req, res) => {
-  try {
-    console.log('🔍 Buscando clientes únicos (sem duplicatas)...');
-
-    const sql = `
-      SELECT 
-        nome,
-        COUNT(DISTINCT fonte) as total_fontes,
-        GROUP_CONCAT(DISTINCT fonte SEPARATOR ' | ') as fontes,
-        MAX(email) as email,
-        MAX(telefone) as telefone,
-        MAX(cidade) as cidade,
-        MAX(estado) as estado
-      FROM (
-        -- Mesma query gigante aqui (copiar do endpoint acima)
-        SELECT DISTINCT
-          TRIM(contato_nome) as nome,
-          'Bling E-commerce' as fonte,
-          NULL as email,
-          NULL as telefone,
-          NULL as cidade,
-          NULL as estado
-        FROM bling_pedidos_venda_ecommerce
-        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        
-        UNION
-        
-        SELECT DISTINCT
-          TRIM(name) as nome,
-          'Tray E-commerce' as fonte,
-          email,
-          NULL as telefone,
-          city as cidade,
-          state as estado
-        FROM clientes_tray_ecommerce
-        WHERE name IS NOT NULL AND TRIM(name) != ''
-        
-        -- ... (adicionar todas as outras sources)
-      ) todos
-      WHERE nome IS NOT NULL 
-        AND TRIM(nome) != ''
-        AND LENGTH(TRIM(nome)) > 2
-      GROUP BY nome
-      ORDER BY nome ASC
-    `;
-
-    const clientes = await query(sql);
-    
-    console.log(`✅ ${clientes.length} clientes únicos (sem duplicatas)!`);
-
-    res.json({
-      total: clientes.length,
-      clientes: clientes
-    });
-
-  } catch (error) {
-    console.error('❌ Erro:', error);
-    res.status(500).json({ 
-      error: 'Erro ao buscar clientes únicos',
-      message: error.message 
-    });
+  } catch (err) {
+    console.error('/api/todos-clientes erro:', err.message);
+    res.status(500).json({ error: 'Erro ao buscar clientes', message: err.message });
   }
 });
 
