@@ -4,6 +4,21 @@ import { query } from '../config/database.js';
 const router = express.Router();
 
 /**
+ * ⚠️ IMPORTANTE: SEMPRE CONSULTE O CATÁLOGO ANTES DE MODIFICAR QUERIES!
+ * 
+ * Arquivo de referência: backend/DATABASE-REFERENCE.js
+ * 
+ * NOMES CORRETOS DAS COLUNAS:
+ * - clientes_tray_ecommerce: "name" (não customer_name)
+ * - pedidos_ecommerce_tray: "nome" (não customer_name)
+ * - tray_ecommerce_pedidos_detalhes: "nome_cliente" (não customer_name)
+ * - tray_customers_attributes: "first_name" + "last_name" (não name)
+ * 
+ * Total: 72 tabelas catalogadas
+ * Consulte: DATABASE-CATALOG.json para estrutura completa
+ */
+
+/**
  * GET /api/todos-clientes
  * BUSCA ABSOLUTAMENTE TODOS OS CLIENTES DE TODAS AS TABELAS
  * Varre TODAS as tabelas do database para não deixar nenhum cliente de fora
@@ -12,24 +27,22 @@ router.get('/', async (req, res) => {
   try {
     console.log('🔍 Buscando TODOS os clientes de TODAS as tabelas...');
 
-    // SQL GIGANTE que busca de TODAS as tabelas possíveis
+    // SQL SIMPLIFICADO - busca apenas de tabelas que TÊM nomes de clientes
     const sql = `
       SELECT DISTINCT 
         TRIM(nome) as nome,
         fonte,
         email,
-        telefone,
         cidade,
         estado
       FROM (
         -- ============================================
-        -- BLING E-COMMERCE
+        -- BLING E-COMMERCE - PEDIDOS
         -- ============================================
         SELECT DISTINCT
           contato_nome as nome,
           'Bling E-commerce - Pedidos' as fonte,
           NULL as email,
-          NULL as telefone,
           NULL as cidade,
           NULL as estado
         FROM bling_pedidos_venda_ecommerce
@@ -41,7 +54,6 @@ router.get('/', async (req, res) => {
           contato_nome as nome,
           'Bling E-commerce - Pedidos Detalhes' as fonte,
           NULL as email,
-          NULL as telefone,
           NULL as cidade,
           NULL as estado
         FROM bling_pedidos_venda_detalhes_ecommerce
@@ -53,14 +65,13 @@ router.get('/', async (req, res) => {
           contato_nome as nome,
           'Bling E-commerce - NFe Saída' as fonte,
           NULL as email,
-          NULL as telefone,
           NULL as cidade,
           NULL as estado
         FROM bling_nfe_saida_detalhes_ecommerce
         WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         
         -- ============================================
-        -- BLING DISTRIBUIÇÃO
+        -- BLING DISTRIBUIÇÃO - PEDIDOS
         -- ============================================
         UNION
         
@@ -68,7 +79,6 @@ router.get('/', async (req, res) => {
           contato_nome as nome,
           'Bling Distribuição - Pedidos' as fonte,
           NULL as email,
-          NULL as telefone,
           NULL as cidade,
           NULL as estado
         FROM bling_pedidos_venda_distribuicao
@@ -80,7 +90,6 @@ router.get('/', async (req, res) => {
           contato_nome as nome,
           'Bling Distribuição - Pedidos Detalhes' as fonte,
           NULL as email,
-          NULL as telefone,
           NULL as cidade,
           NULL as estado
         FROM bling_pedidos_venda_detalhes_distribuicao
@@ -92,14 +101,13 @@ router.get('/', async (req, res) => {
           contato_nome as nome,
           'Bling Distribuição - NFe Saída' as fonte,
           NULL as email,
-          NULL as telefone,
           NULL as cidade,
           NULL as estado
         FROM bling_nfe_saida_detalhes_distribuicao
         WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         
         -- ============================================
-        -- TRAY E-COMMERCE
+        -- TRAY E-COMMERCE - CLIENTES
         -- ============================================
         UNION
         
@@ -107,7 +115,6 @@ router.get('/', async (req, res) => {
           name as nome,
           'Tray E-commerce' as fonte,
           email,
-          NULL as telefone,
           city as cidade,
           state as estado
         FROM clientes_tray_ecommerce
@@ -119,15 +126,13 @@ router.get('/', async (req, res) => {
           name as nome,
           'Tray E-commerce Deltas' as fonte,
           email,
-          NULL as telefone,
           city as cidade,
           state as estado
         FROM clientes_tray_ecommerce_deltas
         WHERE name IS NOT NULL AND TRIM(name) != ''
         
-        
         -- ============================================
-        -- TRAY DISTRIBUIÇÃO
+        -- TRAY DISTRIBUIÇÃO - CLIENTES
         -- ============================================
         UNION
         
@@ -135,76 +140,20 @@ router.get('/', async (req, res) => {
           name as nome,
           'Tray Distribuição' as fonte,
           email,
-          NULL as telefone,
           city as cidade,
           state as estado
         FROM clientes_tray_distribuicao
         WHERE name IS NOT NULL AND TRIM(name) != ''
         
         -- ============================================
-        -- PEDIDOS TRAY E-COMMERCE
-        -- ============================================
-        UNION
-        
-        SELECT DISTINCT
-          customer_name as nome,
-          'Tray Pedidos E-commerce' as fonte,
-          customer_email as email,
-          customer_cellphone as telefone,
-          customer_city as cidade,
-          customer_state as estado
-        FROM pedidos_ecommerce_tray
-        WHERE customer_name IS NOT NULL AND TRIM(customer_name) != ''
-        
-        UNION
-        
-        SELECT DISTINCT
-          customer_name as nome,
-          'Tray Pedidos E-commerce Detalhes' as fonte,
-          customer_email as email,
-          customer_cellphone as telefone,
-          customer_city as cidade,
-          customer_state as estado
-        FROM tray_ecommerce_pedidos_detalhes
-        WHERE customer_name IS NOT NULL AND TRIM(customer_name) != ''
-        
-        UNION
-        
-        SELECT DISTINCT
-          customer_name as nome,
-          'Tray Pedidos E-commerce Detalhes (Alt)' as fonte,
-          customer_email as email,
-          customer_cellphone as telefone,
-          customer_city as cidade,
-          customer_state as estado
-        FROM detalhes_pedidos_ecommerce_tray
-        WHERE customer_name IS NOT NULL AND TRIM(customer_name) != ''
-        
-        -- ============================================
-        -- PEDIDOS TRAY DISTRIBUIÇÃO
-        -- ============================================
-        UNION
-        
-        SELECT DISTINCT
-          customer_name as nome,
-          'Tray Pedidos Distribuição' as fonte,
-          customer_email as email,
-          customer_cellphone as telefone,
-          customer_city as cidade,
-          customer_state as estado
-        FROM pedidos_distribuicao_tray
-        WHERE customer_name IS NOT NULL AND TRIM(customer_name) != ''
-        
-        -- ============================================
-        -- TRAY CUSTOMERS
+        -- TRAY CUSTOMERS - ATRIBUTOS
         -- ============================================
         UNION
         
         SELECT DISTINCT
           CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as nome,
-          'Tray Customers' as fonte,
-          email,
-          cellphone as telefone,
+          'Tray Customers Distribuição' as fonte,
+          NULL as email,
           NULL as cidade,
           NULL as estado
         FROM tray_customers_attributesdist
@@ -215,8 +164,7 @@ router.get('/', async (req, res) => {
         SELECT DISTINCT
           CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as nome,
           'Tray Customers E-commerce' as fonte,
-          email,
-          cellphone as telefone,
+          NULL as email,
           NULL as cidade,
           NULL as estado
         FROM tray_customers_attributes
@@ -229,7 +177,7 @@ router.get('/', async (req, res) => {
       ORDER BY nome ASC
     `;
 
-    console.log('📊 Executando query gigante...');
+    console.log('📊 Executando query...');
     const clientes = await query(sql);
     
     console.log(`✅ Encontrados ${clientes.length} clientes únicos!`);

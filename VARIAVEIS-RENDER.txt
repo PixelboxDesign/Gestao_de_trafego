@@ -38,7 +38,7 @@ Key: DB_NAME
 Value: hawktec_alpha-ecommerce
 
 Key: FRONTEND_URL
-Value: https://seu-frontend.onrender.com
+Value: https://gestao-de-trafego-1.onrender.com
 
 ====================================================================
 IMPORTANTE:
