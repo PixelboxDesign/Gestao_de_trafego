@@ -82,17 +82,6 @@ router.get('/', async (req, res) => {
         FROM clientes_tray_ecommerce
         WHERE name IS NOT NULL AND TRIM(name) != ''
         
-        UNION
-        
-        SELECT DISTINCT
-          name as nome,
-          'Tray E-commerce Deltas' as fonte,
-          email,
-          city as cidade,
-          state as estado
-        FROM clientes_tray_ecommerce_deltas
-        WHERE name IS NOT NULL AND TRIM(name) != ''
-        
         -- TRAY DISTRIBUIÇÃO
         UNION
         
@@ -174,8 +163,6 @@ router.get('/stats', async (req, res) => {
         UNION
         SELECT DISTINCT name as nome FROM clientes_tray_ecommerce WHERE name IS NOT NULL
         UNION
-        SELECT DISTINCT name as nome FROM clientes_tray_ecommerce_deltas WHERE name IS NOT NULL
-        UNION
         SELECT DISTINCT name as nome FROM clientes_tray_distribuicao WHERE name IS NOT NULL
         UNION
         SELECT DISTINCT CONCAT(first_name, ' ', last_name) as nome FROM tray_customers_attributes WHERE first_name IS NOT NULL
@@ -198,8 +185,6 @@ router.get('/stats', async (req, res) => {
         SELECT 'Bling Distribuição - NFe' as fonte FROM bling_nfe_saida_detalhes_distribuicao WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         UNION ALL
         SELECT 'Tray E-commerce' as fonte FROM clientes_tray_ecommerce WHERE name IS NOT NULL AND TRIM(name) != ''
-        UNION ALL
-        SELECT 'Tray E-commerce Deltas' as fonte FROM clientes_tray_ecommerce_deltas WHERE name IS NOT NULL AND TRIM(name) != ''
         UNION ALL
         SELECT 'Tray Distribuição' as fonte FROM clientes_tray_distribuicao WHERE name IS NOT NULL AND TRIM(name) != ''
         UNION ALL

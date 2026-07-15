@@ -120,17 +120,6 @@ router.get('/', async (req, res) => {
         FROM clientes_tray_ecommerce
         WHERE name IS NOT NULL AND TRIM(name) != ''
         
-        UNION
-        
-        SELECT DISTINCT
-          name as nome,
-          'Tray E-commerce Deltas' as fonte,
-          email,
-          city as cidade,
-          state as estado
-        FROM clientes_tray_ecommerce_deltas
-        WHERE name IS NOT NULL AND TRIM(name) != ''
-        
         -- ============================================
         -- TRAY DISTRIBUIÇÃO - CLIENTES
         -- ============================================
