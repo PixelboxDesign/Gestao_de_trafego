@@ -6,78 +6,136 @@ const router = express.Router();
 /**
  * GET /api/clientes
  * Lista todos os clientes com paginação
+ * REDIRECIONA para a query completa que varre TODAS as tabelas
  */
 router.get('/', async (req, res) => {
   try {
+    console.log('📥 GET /api/clientes - Buscando TODOS os clientes...');
+    
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50;
+    const limit = parseInt(req.query.limit) || 100;
     const offset = (page - 1) * limit;
     const search = req.query.search || '';
 
-    // Query para contar total
-    const countSql = `
-      SELECT COUNT(DISTINCT nome) as total
+    // SQL COMPLETO que busca de TODAS as tabelas (mesmo do /todos-clientes)
+    const sql = `
+      SELECT DISTINCT 
+        TRIM(nome) as nome,
+        fonte,
+        email,
+        cidade,
+        estado
       FROM (
-        SELECT DISTINCT contato_nome as nome
-        FROM bling_pedidos_venda_ecommerce
-        WHERE contato_nome IS NOT NULL AND contato_nome != ''
-        
-        UNION
-        
-        SELECT DISTINCT contato_nome as nome
-        FROM bling_pedidos_venda_distribuicao
-        WHERE contato_nome IS NOT NULL AND contato_nome != ''
-        
-        UNION
-        
-        SELECT DISTINCT name as nome
-        FROM clientes_tray_distribuicao
-        WHERE name IS NOT NULL AND name != ''
-      ) clientes_unicos
-      ${search ? 'WHERE nome LIKE ?' : ''}
-    `;
-
-    const totalResult = await query(countSql, search ? [`%${search}%`] : []);
-    const total = totalResult[0]?.total || 0;
-
-    // Query para buscar clientes
-    const clientesSql = `
-      SELECT DISTINCT nome, fonte
-      FROM (
-        SELECT DISTINCT 
+        -- BLING E-COMMERCE
+        SELECT DISTINCT
           contato_nome as nome,
-          'Bling E-commerce' as fonte,
-          MAX(data) as ultima_compra
+          'Bling E-commerce - Pedidos' as fonte,
+          NULL as email,
+          NULL as cidade,
+          NULL as estado
         FROM bling_pedidos_venda_ecommerce
-        WHERE contato_nome IS NOT NULL AND contato_nome != ''
-        GROUP BY contato_nome
+        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         
         UNION
         
-        SELECT DISTINCT 
+        SELECT DISTINCT
           contato_nome as nome,
-          'Bling Distribuição' as fonte,
-          MAX(data) as ultima_compra
+          'Bling E-commerce - NFe Saída' as fonte,
+          NULL as email,
+          NULL as cidade,
+          NULL as estado
+        FROM bling_nfe_saida_detalhes_ecommerce
+        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+        
+        -- BLING DISTRIBUIÇÃO
+        UNION
+        
+        SELECT DISTINCT
+          contato_nome as nome,
+          'Bling Distribuição - Pedidos' as fonte,
+          NULL as email,
+          NULL as cidade,
+          NULL as estado
         FROM bling_pedidos_venda_distribuicao
-        WHERE contato_nome IS NOT NULL AND contato_nome != ''
-        GROUP BY contato_nome
+        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         
         UNION
         
-        SELECT DISTINCT 
+        SELECT DISTINCT
+          contato_nome as nome,
+          'Bling Distribuição - NFe Saída' as fonte,
+          NULL as email,
+          NULL as cidade,
+          NULL as estado
+        FROM bling_nfe_saida_detalhes_distribuicao
+        WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+        
+        -- TRAY E-COMMERCE
+        UNION
+        
+        SELECT DISTINCT
+          name as nome,
+          'Tray E-commerce' as fonte,
+          email,
+          city as cidade,
+          state as estado
+        FROM clientes_tray_ecommerce
+        WHERE name IS NOT NULL AND TRIM(name) != ''
+        
+        UNION
+        
+        SELECT DISTINCT
+          name as nome,
+          'Tray E-commerce Deltas' as fonte,
+          email,
+          city as cidade,
+          state as estado
+        FROM clientes_tray_ecommerce_deltas
+        WHERE name IS NOT NULL AND TRIM(name) != ''
+        
+        -- TRAY DISTRIBUIÇÃO
+        UNION
+        
+        SELECT DISTINCT
           name as nome,
           'Tray Distribuição' as fonte,
-          created as ultima_compra
+          email,
+          city as cidade,
+          state as estado
         FROM clientes_tray_distribuicao
-        WHERE name IS NOT NULL AND name != ''
-      ) clientes_unicos
-      ${search ? 'WHERE nome LIKE ?' : ''}
-      ORDER BY nome
+        WHERE name IS NOT NULL AND TRIM(name) != ''
+        
+        -- TRAY CUSTOMERS
+        UNION
+        
+        SELECT DISTINCT
+          CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as nome,
+          'Tray Customers E-commerce' as fonte,
+          NULL as email,
+          NULL as cidade,
+          NULL as estado
+        FROM tray_customers_attributes
+        WHERE first_name IS NOT NULL AND TRIM(first_name) != ''
+        
+      ) todos_clientes
+      WHERE nome IS NOT NULL 
+        AND TRIM(nome) != ''
+        AND LENGTH(TRIM(nome)) > 2
+        ${search ? 'AND nome LIKE ?' : ''}
+      ORDER BY nome ASC
       LIMIT ? OFFSET ?
     `;
 
     const params = search ? [`%${search}%`, limit, offset] : [limit, offset];
-    const clientes = await query(clientesSql, params);
+    const clientes = await query(sql, params);
+    
+    console.log(`✅ Encontrados ${clientes.length} clientes`);
+
+    // Contar total (mesma query sem LIMIT)
+    const countSql = sql.replace(/LIMIT \? OFFSET \?/, '').replace(/ORDER BY nome ASC/, '');
+    const countParams = search ? [`%${search}%`] : [];
+    const allClientes = await query(countSql, countParams);
+    const total = allClientes.length;
 
     res.json({
       data: clientes,
@@ -89,52 +147,79 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Erro ao buscar clientes:', error);
-    res.status(500).json({ error: 'Erro ao buscar clientes' });
+    console.error('❌ Erro ao buscar clientes:', error);
+    res.status(500).json({ error: 'Erro ao buscar clientes', message: error.message });
   }
 });
 
 /**
  * GET /api/clientes/stats
- * Estatísticas gerais de clientes
+ * Estatísticas gerais de clientes - TODAS AS TABELAS
  */
 router.get('/stats', async (req, res) => {
   try {
-    // Total de clientes únicos
+    console.log('📊 GET /api/clientes/stats - Calculando estatísticas...');
+
+    // Total de clientes únicos de TODAS as fontes
     const totalSql = `
-      SELECT COUNT(DISTINCT nome) as total
+      SELECT COUNT(DISTINCT TRIM(nome)) as total
       FROM (
         SELECT DISTINCT contato_nome as nome FROM bling_pedidos_venda_ecommerce WHERE contato_nome IS NOT NULL
         UNION
         SELECT DISTINCT contato_nome as nome FROM bling_pedidos_venda_distribuicao WHERE contato_nome IS NOT NULL
         UNION
+        SELECT DISTINCT contato_nome as nome FROM bling_nfe_saida_detalhes_ecommerce WHERE contato_nome IS NOT NULL
+        UNION
+        SELECT DISTINCT contato_nome as nome FROM bling_nfe_saida_detalhes_distribuicao WHERE contato_nome IS NOT NULL
+        UNION
+        SELECT DISTINCT name as nome FROM clientes_tray_ecommerce WHERE name IS NOT NULL
+        UNION
+        SELECT DISTINCT name as nome FROM clientes_tray_ecommerce_deltas WHERE name IS NOT NULL
+        UNION
         SELECT DISTINCT name as nome FROM clientes_tray_distribuicao WHERE name IS NOT NULL
+        UNION
+        SELECT DISTINCT CONCAT(first_name, ' ', last_name) as nome FROM tray_customers_attributes WHERE first_name IS NOT NULL
       ) clientes
+      WHERE TRIM(nome) != '' AND LENGTH(TRIM(nome)) > 2
     `;
     const totalResult = await query(totalSql);
     const totalClientes = totalResult[0]?.total || 0;
 
-    // Clientes por origem
+    // Clientes por origem (detalhado)
     const origemSql = `
       SELECT fonte, COUNT(*) as total
       FROM (
-        SELECT 'E-commerce' as fonte FROM bling_pedidos_venda_ecommerce WHERE contato_nome IS NOT NULL
+        SELECT 'Bling E-commerce - Pedidos' as fonte FROM bling_pedidos_venda_ecommerce WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         UNION ALL
-        SELECT 'Distribuição' as fonte FROM bling_pedidos_venda_distribuicao WHERE contato_nome IS NOT NULL
+        SELECT 'Bling E-commerce - NFe' as fonte FROM bling_nfe_saida_detalhes_ecommerce WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
         UNION ALL
-        SELECT 'Tray' as fonte FROM clientes_tray_distribuicao WHERE name IS NOT NULL
+        SELECT 'Bling Distribuição - Pedidos' as fonte FROM bling_pedidos_venda_distribuicao WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+        UNION ALL
+        SELECT 'Bling Distribuição - NFe' as fonte FROM bling_nfe_saida_detalhes_distribuicao WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+        UNION ALL
+        SELECT 'Tray E-commerce' as fonte FROM clientes_tray_ecommerce WHERE name IS NOT NULL AND TRIM(name) != ''
+        UNION ALL
+        SELECT 'Tray E-commerce Deltas' as fonte FROM clientes_tray_ecommerce_deltas WHERE name IS NOT NULL AND TRIM(name) != ''
+        UNION ALL
+        SELECT 'Tray Distribuição' as fonte FROM clientes_tray_distribuicao WHERE name IS NOT NULL AND TRIM(name) != ''
+        UNION ALL
+        SELECT 'Tray Customers' as fonte FROM tray_customers_attributes WHERE first_name IS NOT NULL AND TRIM(first_name) != ''
       ) origens
       GROUP BY fonte
+      ORDER BY total DESC
     `;
     const origemResult = await query(origemSql);
 
+    console.log(`✅ Total: ${totalClientes} clientes únicos`);
+
     res.json({
       totalClientes,
-      porOrigem: origemResult
+      porOrigem: origemResult,
+      ultimaAtualizacao: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Erro ao buscar stats de clientes:', error);
-    res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+    console.error('❌ Erro ao buscar stats de clientes:', error);
+    res.status(500).json({ error: 'Erro ao buscar estatísticas', message: error.message });
   }
 });
 
