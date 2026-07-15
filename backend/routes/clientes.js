@@ -152,8 +152,6 @@ router.get('/stats', async (req, res) => {
         SELECT DISTINCT name as nome FROM clientes_tray_ecommerce WHERE name IS NOT NULL
         UNION
         SELECT DISTINCT name as nome FROM clientes_tray_distribuicao WHERE name IS NOT NULL
-        UNION
-        SELECT DISTINCT CONCAT(first_name, ' ', last_name) as nome FROM tray_customers_attributes WHERE first_name IS NOT NULL
       ) clientes
       WHERE TRIM(nome) != '' AND LENGTH(TRIM(nome)) > 2
     `;
