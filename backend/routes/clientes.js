@@ -94,18 +94,6 @@ router.get('/', async (req, res) => {
         FROM clientes_tray_distribuicao
         WHERE name IS NOT NULL AND TRIM(name) != ''
         
-        -- TRAY CUSTOMERS
-        UNION
-        
-        SELECT DISTINCT
-          CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) as nome,
-          'Tray Customers E-commerce' as fonte,
-          NULL as email,
-          NULL as cidade,
-          NULL as estado
-        FROM tray_customers_attributes
-        WHERE first_name IS NOT NULL AND TRIM(first_name) != ''
-        
       ) todos_clientes
       WHERE nome IS NOT NULL 
         AND TRIM(nome) != ''
@@ -187,8 +175,6 @@ router.get('/stats', async (req, res) => {
         SELECT 'Tray E-commerce' as fonte FROM clientes_tray_ecommerce WHERE name IS NOT NULL AND TRIM(name) != ''
         UNION ALL
         SELECT 'Tray Distribuição' as fonte FROM clientes_tray_distribuicao WHERE name IS NOT NULL AND TRIM(name) != ''
-        UNION ALL
-        SELECT 'Tray Customers' as fonte FROM tray_customers_attributes WHERE first_name IS NOT NULL AND TRIM(first_name) != ''
       ) origens
       GROUP BY fonte
       ORDER BY total DESC
