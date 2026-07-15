@@ -32,9 +32,9 @@ app.use(morgan('combined')); // Logs de requisições
 app.use(express.json()); // Parse JSON body
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded body
 
-// CORS configurado
+// CORS configurado - aceitar frontend em qualquer origem (temporariamente)
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: true, // Aceita qualquer origem por enquanto
   credentials: true,
   optionsSuccessStatus: 200
 };
