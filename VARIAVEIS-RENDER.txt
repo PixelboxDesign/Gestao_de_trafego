@@ -2,9 +2,13 @@
 VARIÁVEIS DE AMBIENTE PARA COPIAR NO RENDER
 ====================================================================
 
+╔══════════════════════════════════════════════════════════════════╗
+║                         BACKEND SERVICE                          ║
+╚══════════════════════════════════════════════════════════════════╝
+
 INSTRUÇÕES:
 1. Acesse: https://dashboard.render.com
-2. Abra: Web Service → luna-trafego-backend
+2. Abra: Web Service → gestao-de-trafego (BACKEND)
 3. Vá em: Environment
 4. Para cada linha abaixo, adicione uma variável:
    - Clique em "Add Environment Variable"
@@ -56,8 +60,52 @@ Acesse os logs do Render e procure por:
 ✅ Conectado ao MySQL: hawktec_alpha-ecommerce
 
 Ou acesse:
-https://luna-trafego-backend.onrender.com/health
+https://gestao-de-trafego.onrender.com/health
 
 Deve retornar: {"status":"ok"}
+
+====================================================================
+
+
+╔══════════════════════════════════════════════════════════════════╗
+║                      FRONTEND STATIC SITE                        ║
+╚══════════════════════════════════════════════════════════════════╝
+
+INSTRUÇÕES:
+1. Acesse: https://dashboard.render.com
+2. Abra: Static Site → gestao-de-trafego-1 (FRONTEND)
+3. Vá em: Environment
+4. Adicione a variável abaixo:
+
+====================================================================
+COPIE A VARIÁVEL ABAIXO:
+====================================================================
+
+Key: VITE_API_URL
+Value: https://gestao-de-trafego.onrender.com/api
+
+====================================================================
+CONFIGURAÇÕES DO BUILD (FRONTEND):
+====================================================================
+
+Verifique se o frontend tem estas configurações:
+- Build Command: npm install && npm run build
+- Publish Directory: dist
+- Auto-Deploy: Yes
+
+====================================================================
+IMPORTANTE:
+====================================================================
+- Depois de adicionar a variável, clique em "Save Changes"
+- O frontend vai fazer redeploy automático
+- Aguarde ~3-5 minutos para o build completar
+
+====================================================================
+VERIFICAR SE FUNCIONOU:
+====================================================================
+Acesse:
+https://gestao-de-trafego-1.onrender.com
+
+Você deve ver o dashboard do sistema carregando
 
 ====================================================================
