@@ -3,27 +3,27 @@ import { query } from '../config/database.js';
 
 const router = express.Router();
 
-// GET /api/todos-clientes — paginado para não explodir com 190k registros
+// GET /api/todos-clientes — paginado, com telefone
 router.get('/', async (req, res) => {
   try {
-    const page   = Math.max(1, parseInt(req.query.page)  || 1);
-    const limit  = Math.min(500, Math.max(1, parseInt(req.query.limit) || 200));
-    const offset = (page - 1) * limit;
-    const search = (req.query.search || '').trim();
-    const whereCond  = search ? 'AND nome LIKE ?' : '';
+    const page        = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit       = Math.min(500, Math.max(1, parseInt(req.query.limit) || 200));
+    const offset      = (page - 1) * limit;
+    const search      = (req.query.search || '').trim();
+    const whereCond   = search ? 'AND nome LIKE ?' : '';
     const searchParam = search ? [`%${search}%`] : [];
 
-    console.log(`🔍 /api/todos-clientes page=${page} limit=${limit}`);
+    console.log(`🔍 /api/todos-clientes page=${page} limit=${limit} search="${search}"`);
 
-    // Contagem total (COUNT no banco)
+    // ── Contagem total ───────────────────────────────────────────────────────
     const countSql = `
       SELECT COUNT(*) AS total FROM (
         SELECT DISTINCT nome FROM (
-          SELECT DISTINCT TRIM(contato_nome) AS nome FROM bling_pedidos_venda_ecommerce    WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+          SELECT DISTINCT TRIM(contato_nome) AS nome FROM bling_pedidos_venda_ecommerce      WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
           UNION
-          SELECT DISTINCT TRIM(contato_nome)          FROM bling_nfe_saida_detalhes_ecommerce  WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+          SELECT DISTINCT TRIM(contato_nome)          FROM bling_nfe_saida_detalhes_ecommerce    WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
           UNION
-          SELECT DISTINCT TRIM(contato_nome)          FROM bling_pedidos_venda_distribuicao    WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+          SELECT DISTINCT TRIM(contato_nome)          FROM bling_pedidos_venda_distribuicao      WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
           UNION
           SELECT DISTINCT TRIM(contato_nome)          FROM bling_nfe_saida_detalhes_distribuicao WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
           UNION
@@ -34,23 +34,45 @@ router.get('/', async (req, res) => {
       ) counted
     `;
 
+    // ── Lista paginada com telefone ──────────────────────────────────────────
+    // Telefone vem das NFe (únicas tabelas que têm contato_telefone).
+    // Fazemos LEFT JOIN por nome para pegar o telefone quando disponível.
+    // O UNION já garante distinção; o telefone é agregado fora por MAX().
     const listSql = `
-      SELECT DISTINCT nome, fonte, email, cidade, estado
+      SELECT
+        t.nome,
+        t.fonte,
+        t.email,
+        t.cidade,
+        t.estado,
+        (
+          SELECT TRIM(contato_telefone)
+          FROM (
+            SELECT contato_nome, contato_telefone FROM bling_nfe_saida_detalhes_ecommerce    WHERE contato_telefone IS NOT NULL AND TRIM(contato_telefone) != ''
+            UNION ALL
+            SELECT contato_nome, contato_telefone FROM bling_nfe_saida_detalhes_distribuicao WHERE contato_telefone IS NOT NULL AND TRIM(contato_telefone) != ''
+          ) fone_src
+          WHERE TRIM(fone_src.contato_nome) = t.nome
+          LIMIT 1
+        ) AS telefone
       FROM (
-        SELECT DISTINCT TRIM(contato_nome) AS nome, 'Bling E-commerce - Pedidos'     AS fonte, NULL AS email, NULL AS cidade, NULL AS estado FROM bling_pedidos_venda_ecommerce      WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        UNION
-        SELECT DISTINCT TRIM(contato_nome), 'Bling E-commerce - NFe',                  NULL, NULL, NULL FROM bling_nfe_saida_detalhes_ecommerce  WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        UNION
-        SELECT DISTINCT TRIM(contato_nome), 'Bling Distribuição - Pedidos',             NULL, NULL, NULL FROM bling_pedidos_venda_distribuicao    WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        UNION
-        SELECT DISTINCT TRIM(contato_nome), 'Bling Distribuição - NFe',                 NULL, NULL, NULL FROM bling_nfe_saida_detalhes_distribuicao WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-        UNION
-        SELECT DISTINCT TRIM(name), 'Tray E-commerce', email, city, state FROM clientes_tray_ecommerce   WHERE name IS NOT NULL AND TRIM(name) != ''
-        UNION
-        SELECT DISTINCT TRIM(name), 'Tray Distribuição', email, city, state FROM clientes_tray_distribuicao WHERE name IS NOT NULL AND TRIM(name) != ''
-      ) todos
-      WHERE LENGTH(nome) > 2 ${whereCond}
-      ORDER BY nome ASC
+        SELECT DISTINCT nome, fonte, email, cidade, estado
+        FROM (
+          SELECT DISTINCT TRIM(contato_nome) AS nome, 'Bling E-commerce - Pedidos'  AS fonte, NULL  AS email, NULL AS cidade, NULL AS estado FROM bling_pedidos_venda_ecommerce      WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+          UNION
+          SELECT DISTINCT TRIM(contato_nome), 'Bling E-commerce - NFe',                 NULL, NULL, NULL                                       FROM bling_nfe_saida_detalhes_ecommerce    WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+          UNION
+          SELECT DISTINCT TRIM(contato_nome), 'Bling Distribuição - Pedidos',           NULL, NULL, NULL                                       FROM bling_pedidos_venda_distribuicao      WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+          UNION
+          SELECT DISTINCT TRIM(contato_nome), 'Bling Distribuição - NFe',               NULL, NULL, NULL                                       FROM bling_nfe_saida_detalhes_distribuicao WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+          UNION
+          SELECT DISTINCT TRIM(name),         'Tray E-commerce',                        email, city, state                                     FROM clientes_tray_ecommerce              WHERE name IS NOT NULL AND TRIM(name) != ''
+          UNION
+          SELECT DISTINCT TRIM(name),         'Tray Distribuição',                      email, city, state                                     FROM clientes_tray_distribuicao            WHERE name IS NOT NULL AND TRIM(name) != ''
+        ) todos
+        WHERE LENGTH(nome) > 2 ${whereCond}
+      ) t
+      ORDER BY t.nome ASC
       LIMIT ? OFFSET ?
     `;
 
@@ -61,7 +83,6 @@ router.get('/', async (req, res) => {
 
     const total = Number(countResult[0]?.total || 0);
 
-    // Resumo por fonte para a página atual
     const porFonte = {};
     for (const c of clientes) {
       porFonte[c.fonte] = (porFonte[c.fonte] || 0) + 1;

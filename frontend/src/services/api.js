@@ -18,9 +18,10 @@ api.interceptors.response.use(
 );
 
 // Clientes
-export const getClientes      = (params = {}) => api.get('/clientes', { params });
-export const getClienteStats  = ()             => api.get('/clientes/stats');
-export const getTodosClientes = (params = {})  => api.get('/todos-clientes', { params });
+export const getClientes         = (params = {}) => api.get('/clientes', { params });
+export const getClienteStats     = ()             => api.get('/clientes/stats');
+export const getTodosClientes    = (params = {})  => api.get('/todos-clientes', { params });
+export const getClientePedidos   = (nome)         => api.get(`/clientes/${encodeURIComponent(nome)}/pedidos`);
 
 // Pedidos
 export const getPedidos      = (params = {}) => api.get('/pedidos', { params });
