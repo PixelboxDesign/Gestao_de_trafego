@@ -105,6 +105,32 @@ router.get('/', async (req, res) => {
               AND n.contato_telefone IS NOT NULL AND TRIM(n.contato_telefone) != ''
               AND t.email IS NOT NULL AND TRIM(t.email) != ''
             LIMIT 1
+          )), ''),
+          -- Fonte 7: CPF do pedido ecommerce → NFe distribuição (cross-canal)
+          NULLIF(TRIM((
+            SELECT nd.contato_telefone
+            FROM bling_pedidos_venda_ecommerce pe
+            JOIN bling_nfe_saida_detalhes_distribuicao nd
+              ON REPLACE(REPLACE(REPLACE(nd.contato_numerodocumento,'.',''),'-',''),'/','')
+               = REPLACE(REPLACE(REPLACE(pe.contato_numerodocumento,'.',''),'-',''),'/','')
+            WHERE TRIM(pe.contato_nome) = t.nome
+              AND nd.contato_telefone IS NOT NULL AND TRIM(nd.contato_telefone) != ''
+              AND pe.contato_numerodocumento IS NOT NULL
+              AND LENGTH(REPLACE(REPLACE(REPLACE(pe.contato_numerodocumento,'.',''),'-',''),'/','')) >= 11
+            LIMIT 1
+          )), ''),
+          -- Fonte 8: CPF do pedido distribuição → NFe ecommerce (cross-canal)
+          NULLIF(TRIM((
+            SELECT ne.contato_telefone
+            FROM bling_pedidos_venda_distribuicao pd
+            JOIN bling_nfe_saida_detalhes_ecommerce ne
+              ON REPLACE(REPLACE(REPLACE(ne.contato_numerodocumento,'.',''),'-',''),'/','')
+               = REPLACE(REPLACE(REPLACE(pd.contato_numerodocumento,'.',''),'-',''),'/','')
+            WHERE TRIM(pd.contato_nome) = t.nome
+              AND ne.contato_telefone IS NOT NULL AND TRIM(ne.contato_telefone) != ''
+              AND pd.contato_numerodocumento IS NOT NULL
+              AND LENGTH(REPLACE(REPLACE(REPLACE(pd.contato_numerodocumento,'.',''),'-',''),'/','')) >= 11
+            LIMIT 1
           )), '')
         ) AS telefone
       FROM (
