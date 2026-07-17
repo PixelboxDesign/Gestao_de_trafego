@@ -3,7 +3,7 @@ import { query } from '../config/database.js';
 
 const router = express.Router();
 
-// GET /api/todos-clientes — paginado, com telefone via cascata (nome → email → null)
+// GET /api/todos-clientes — paginado, com telefone via 4 fontes em cascata
 router.get('/', async (req, res) => {
   try {
     const page        = Math.max(1, parseInt(req.query.page)  || 1);
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 
     console.log(`🔍 /api/todos-clientes page=${page} limit=${limit} search="${search}"`);
 
-    // ── Contagem total ───────────────────────────────────────────────────────
+    // ── Contagem ─────────────────────────────────────────────────────────────
     const countSql = `
       SELECT COUNT(*) AS total FROM (
         SELECT DISTINCT nome FROM (
@@ -34,13 +34,16 @@ router.get('/', async (req, res) => {
       ) counted
     `;
 
-    // ── Lista paginada ────────────────────────────────────────────────────────
-    // Telefone em cascata:
-    //   1. NFe ecommerce por nome (mais direta)
-    //   2. NFe distribuição por nome
-    //   3. NFe ecommerce por email (para clientes Tray que têm email)
-    //   4. NFe distribuição por email
-    // COALESCE pega o primeiro não-nulo
+    // ── Lista paginada com telefone em cascata (4 fontes) ────────────────────
+    //
+    // Prioridade de busca de telefone:
+    //   1. NFe ecommerce pelo contato_id do pedido (mais preciso — mesmo ID)
+    //   2. NFe distribuição pelo contato_id do pedido
+    //   3. NFe ecommerce pelo nome (match direto)
+    //   4. NFe distribuição pelo nome
+    //   5. NFe ecommerce pelo email (para clientes Tray)
+    //   6. NFe distribuição pelo email
+    //
     const listSql = `
       SELECT
         t.nome,
@@ -49,6 +52,27 @@ router.get('/', async (req, res) => {
         t.cidade,
         t.estado,
         COALESCE(
+          -- Fonte 1: contato_id do pedido ecommerce → NFe ecommerce
+          NULLIF(TRIM((
+            SELECT n.contato_telefone
+            FROM bling_pedidos_venda_ecommerce p
+            JOIN bling_nfe_saida_detalhes_ecommerce n ON n.contato_id = p.contato_id
+            WHERE TRIM(p.contato_nome) = t.nome
+              AND p.contato_id IS NOT NULL AND p.contato_id != '0'
+              AND n.contato_telefone IS NOT NULL AND TRIM(n.contato_telefone) != ''
+            LIMIT 1
+          )), ''),
+          -- Fonte 2: contato_id do pedido distribuição → NFe distribuição
+          NULLIF(TRIM((
+            SELECT n.contato_telefone
+            FROM bling_pedidos_venda_distribuicao p
+            JOIN bling_nfe_saida_detalhes_distribuicao n ON n.contato_id = p.contato_id
+            WHERE TRIM(p.contato_nome) = t.nome
+              AND p.contato_id IS NOT NULL AND p.contato_id != '0'
+              AND n.contato_telefone IS NOT NULL AND TRIM(n.contato_telefone) != ''
+            LIMIT 1
+          )), ''),
+          -- Fonte 3: nome direto → NFe ecommerce
           NULLIF(TRIM((
             SELECT contato_telefone
             FROM bling_nfe_saida_detalhes_ecommerce
@@ -56,6 +80,7 @@ router.get('/', async (req, res) => {
               AND contato_telefone IS NOT NULL AND TRIM(contato_telefone) != ''
             LIMIT 1
           )), ''),
+          -- Fonte 4: nome direto → NFe distribuição
           NULLIF(TRIM((
             SELECT contato_telefone
             FROM bling_nfe_saida_detalhes_distribuicao
@@ -63,6 +88,7 @@ router.get('/', async (req, res) => {
               AND contato_telefone IS NOT NULL AND TRIM(contato_telefone) != ''
             LIMIT 1
           )), ''),
+          -- Fonte 5: email → NFe ecommerce (cobre clientes Tray)
           NULLIF(TRIM((
             SELECT n.contato_telefone
             FROM bling_nfe_saida_detalhes_ecommerce n
@@ -71,6 +97,7 @@ router.get('/', async (req, res) => {
               AND t.email IS NOT NULL AND TRIM(t.email) != ''
             LIMIT 1
           )), ''),
+          -- Fonte 6: email → NFe distribuição
           NULLIF(TRIM((
             SELECT n.contato_telefone
             FROM bling_nfe_saida_detalhes_distribuicao n
@@ -106,14 +133,14 @@ router.get('/', async (req, res) => {
       query(listSql,  [...searchParam, limit, offset]),
     ]);
 
-    const total = Number(countResult[0]?.total || 0);
+    const total       = Number(countResult[0]?.total || 0);
+    const comTelefone = clientes.filter(c => c.telefone).length;
 
     const porFonte = {};
     for (const c of clientes) {
       porFonte[c.fonte] = (porFonte[c.fonte] || 0) + 1;
     }
 
-    const comTelefone = clientes.filter(c => c.telefone).length;
     console.log(`✅ /api/todos-clientes: ${clientes.length} retornados (${comTelefone} com telefone) de ${total} total`);
 
     res.json({
