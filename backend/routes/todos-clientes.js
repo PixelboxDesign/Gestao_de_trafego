@@ -165,18 +165,14 @@ router.get('/', async (req, res) => {
       countSql = `
         SELECT COUNT(*) AS total FROM (
           SELECT DISTINCT nome FROM (
-            SELECT DISTINCT TRIM(contato_nome) AS nome FROM bling_pedidos_venda_ecommerce      WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+            SELECT TRIM(contato_nome) AS nome FROM bling_pedidos_venda_ecommerce      WHERE contato_nome IS NOT NULL AND LENGTH(TRIM(contato_nome)) > 2
             UNION
-            SELECT DISTINCT TRIM(contato_nome)          FROM bling_nfe_saida_detalhes_ecommerce    WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+            SELECT TRIM(contato_nome)          FROM bling_pedidos_venda_distribuicao  WHERE contato_nome IS NOT NULL AND LENGTH(TRIM(contato_nome)) > 2
             UNION
-            SELECT DISTINCT TRIM(contato_nome)          FROM bling_pedidos_venda_distribuicao      WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
+            SELECT TRIM(name)                  FROM clientes_tray_ecommerce           WHERE name IS NOT NULL AND LENGTH(TRIM(name)) > 2
             UNION
-            SELECT DISTINCT TRIM(contato_nome)          FROM bling_nfe_saida_detalhes_distribuicao WHERE contato_nome IS NOT NULL AND TRIM(contato_nome) != ''
-            UNION
-            SELECT DISTINCT TRIM(name)                  FROM clientes_tray_ecommerce              WHERE name IS NOT NULL AND TRIM(name) != ''
-            UNION
-            SELECT DISTINCT TRIM(name)                  FROM clientes_tray_distribuicao            WHERE name IS NOT NULL AND TRIM(name) != ''
-          ) base WHERE LENGTH(nome) > 2 ${searchCond}
+            SELECT TRIM(name)                  FROM clientes_tray_distribuicao        WHERE name IS NOT NULL AND LENGTH(TRIM(name)) > 2
+          ) base ${searchCond ? `WHERE nome LIKE ?` : ''}
         ) counted
       `;
 
