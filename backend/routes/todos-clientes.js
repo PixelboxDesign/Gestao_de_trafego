@@ -8,9 +8,10 @@ const router = express.Router();
 function limparNomeJS(nome) {
   if (!nome) return '';
   let n = String(nome).trim();
-  n = n.replace(/&#[0-9]+;?/g, '');           // entidades HTML
-  n = n.replace(/^[\d][\d. \-/]*/, '').trim(); // CPF/CNPJ prefixado
-  n = n.replace(/\s*\([^)]*\)\s*$/, '').trim();// sufixo login Tray
+  n = n.replace(/&#[0-9]+;?/g, '');            // entidades HTML
+  n = n.replace(/^\(\d+\)\s*/, '').trim();      // prefixo (DDD) ex: "(14)Maiara"
+  n = n.replace(/^[\d][\d. \-/]*/, '').trim();  // CPF/CNPJ prefixado
+  n = n.replace(/\s*\([^)]*\)\s*$/, '').trim(); // sufixo login Tray
   return n;
 }
 
@@ -19,6 +20,15 @@ function nomeValido(nome) {
   if (/^[\d .\/\-]+$/.test(nome)) return false;
   if (nome.startsWith('&#')) return false;
   return true;
+}
+
+// Normaliza nome para deduplicação: minúsculo + sem acentos + sem espaços duplos
+function normalizarNome(nome) {
+  return nome
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remover acentos
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 // ── SQL: clientes do banco remoto ─────────────────────────────────────────────
@@ -155,15 +165,19 @@ function construirMapaTelefonesMesclado(fonesRows) {
 }
 
 // ── Deduplicar clientes ───────────────────────────────────────────────────────
+// Chave de deduplicação: nome normalizado (sem acento, minúsculo)
+// Mantém o nome com melhor capitalização (título case preferido sobre MAIÚSCULO)
 function deduplicarClientes(rows) {
+  // chave_norm → { nome_exibir, fonte, email, cidade, estado }
   const mapa = new Map();
 
   for (const r of rows) {
     const nomeLimpo = limparNomeJS(r.nome);
     if (!nomeValido(nomeLimpo)) continue;
+    const chave = normalizarNome(nomeLimpo);
 
-    if (!mapa.has(nomeLimpo)) {
-      mapa.set(nomeLimpo, {
+    if (!mapa.has(chave)) {
+      mapa.set(chave, {
         nome:   nomeLimpo,
         fonte:  r.fonte,
         email:  r.email  || null,
@@ -171,11 +185,15 @@ function deduplicarClientes(rows) {
         estado: r.estado || null,
       });
     } else {
-      const ex = mapa.get(nomeLimpo);
+      const ex = mapa.get(chave);
+      // Preferir nome com capitalização mista (título) sobre MAIÚSCULO
+      if (ex.nome === ex.nome.toUpperCase() && nomeLimpo !== nomeLimpo.toUpperCase()) {
+        ex.nome = nomeLimpo;
+      }
       if (!ex.email  && r.email)  ex.email  = r.email;
       if (!ex.cidade && r.cidade) ex.cidade = r.cidade;
       if (!ex.estado && r.estado) ex.estado = r.estado;
-      // Agregar fontes únicas no campo fonte
+      // Agregar fontes únicas
       if (r.fonte && !ex.fonte.includes(r.fonte)) {
         ex.fonte = [...new Set([...ex.fonte.split(', '), r.fonte])].sort().join(', ');
       }
