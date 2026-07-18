@@ -132,6 +132,8 @@ export default function Clientes() {
   const [fontes,      setFontes]      = useState([]);
   const [uf,          setUf]          = useState('todas');
   const [cidade,      setCidade]      = useState('todas');
+  const [ufsDisp,     setUfsDisp]     = useState([]);
+  const [cidadesDisp, setCidadesDisp] = useState([]);
   const [clienteSel,  setClienteSel]  = useState(null);
   // Checkbox — ativado por padrão
   const [somenteTel,  setSomenteTel]  = useState(true);
@@ -139,7 +141,7 @@ export default function Clientes() {
   // Ref para evitar race conditions em mudanças rápidas
   const reqId = useRef(0);
 
-  const carregar = useCallback(async (pg, busca, apenasTel, ps) => {
+  const carregar = useCallback(async (pg, busca, apenasTel, ps, ufVal, cidadeVal) => {
     const id = ++reqId.current;
     setLoading(true);
     setErro(null);
@@ -147,8 +149,10 @@ export default function Clientes() {
       const params = { page: pg, limit: ps };
       if (busca)    params.search = busca;
       if (apenasTel) params.somente_com_telefone = 'true';
+      if (ufVal && ufVal !== 'todas')     params.uf     = ufVal;
+      if (cidadeVal && cidadeVal !== 'todas') params.cidade = cidadeVal;
       const r = await getTodosClientes(params);
-      if (id !== reqId.current) return; // resposta desatualizada
+      if (id !== reqId.current) return;
       const data = r.data;
       setClientes(data?.clientes || []);
       setTotal(data?.total || 0);
@@ -158,6 +162,9 @@ export default function Clientes() {
       if (data?.resumo?.porFonte) {
         setFontes(prev => Array.from(new Set([...prev, ...Object.keys(data.resumo.porFonte)])).sort());
       }
+      // UFs e cidades vindas do backend (já filtradas corretamente)
+      if (data?.ufsDisponiveis)     setUfsDisp(data.ufsDisponiveis);
+      if (data?.cidadesDisponiveis) setCidadesDisp(data.cidadesDisponiveis);
     } catch (e) {
       if (id !== reqId.current) return;
       setErro(e.response?.data?.message || e.response?.data?.error || e.message || 'Erro desconhecido');
@@ -197,42 +204,34 @@ export default function Clientes() {
   function mudarPageSize(novoPS) {
     setPageSize(novoPS);
     setFonte('todas');
-    carregar(1, search, somenteTel, novoPS);
+    carregar(1, search, somenteTel, novoPS, uf, cidade);
   }
 
   // Navegar para página digitada
   function irParaPagina() {
     const pg = Math.max(1, Math.min(totalPages, parseInt(pageInput) || 1));
     setPageInput(String(pg));
-    if (pg !== page) carregar(pg, search, somenteTel, pageSize);
+    if (pg !== page) carregar(pg, search, somenteTel, pageSize, uf, cidade);
   }
 
-  // UFs disponíveis na lista atual (sem filtro de UF/cidade aplicado)
-  const ufsDisponiveis = useMemo(() => {
-    const set = new Set(clientes.map(c => c.estado).filter(Boolean));
-    return Array.from(set).sort();
-  }, [clientes]);
-
-  // Cidades disponíveis respeitando o filtro de UF selecionado
-  const cidadesDisponiveis = useMemo(() => {
-    const base = uf === 'todas' ? clientes : clientes.filter(c => c.estado === uf);
-    const set = new Set(base.map(c => c.cidade).filter(Boolean));
-    return Array.from(set).sort();
-  }, [clientes, uf]);
-
-  // Quando a UF muda, resetar cidade se a cidade atual não existe nessa UF
+  // UF/cidade: filtros passados ao backend, não localmente
+  // Os selects usam ufsDisp/cidadesDisp vindos do backend
   const handleUfChange = (novaUf) => {
     setUf(novaUf);
     setCidade('todas');
+    carregar(1, search, somenteTel, pageSize, novaUf, 'todas');
   };
 
+  const handleCidadeChange = (novaCidade) => {
+    setCidade(novaCidade);
+    carregar(1, search, somenteTel, pageSize, uf, novaCidade);
+  };
+
+  // Fonte: filtro local (não afeta total do backend, só a visualização da página)
   const filtrados = useMemo(() => {
-    let lista = clientes;
-    if (fonte  !== 'todas') lista = lista.filter(c => c.fonte   === fonte);
-    if (uf     !== 'todas') lista = lista.filter(c => c.estado  === uf);
-    if (cidade !== 'todas') lista = lista.filter(c => c.cidade  === cidade);
-    return lista;
-  }, [clientes, fonte, uf, cidade]);
+    if (fonte === 'todas') return clientes;
+    return clientes.filter(c => c.fonte === fonte);
+  }, [clientes, fonte]);
 
   function exportarCSV() {
     const linhas = [
@@ -283,8 +282,12 @@ export default function Clientes() {
         {/* Cards */}
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:'1rem',marginBottom:'1.5rem'}}>
           {[
-            {icon:<Users size={28}/>,   cor:'var(--primary)', val:total.toLocaleString('pt-BR'), label: somenteTel?'Com telefone':'Total clientes'},
-            {icon:<Database size={28}/>,cor:'var(--success)', val:fontes.length,                  label:'Fontes de dados'},
+            {
+              icon:<Users size={28}/>, cor:'var(--primary)',
+              val: total.toLocaleString('pt-BR'),
+              label: uf !== 'todas' ? `${uf}${cidade !== 'todas' ? ' · ' + cidade : ''}` : somenteTel ? 'Com telefone' : 'Total clientes',
+            },
+            {icon:<Database size={28}/>,cor:'var(--success)', val:fontes.length, label:'Fontes de dados'},
             {icon:<Phone size={28}/>,   cor:'var(--info)',    val:filtrados.length.toLocaleString('pt-BR'), label:'Nesta página'},
           ].map((c,i)=>(
             <div key={i} className="card" style={{padding:'1.25rem',display:'flex',alignItems:'center',gap:'1rem'}}>
@@ -333,14 +336,14 @@ export default function Clientes() {
               <select value={uf} onChange={e=>handleUfChange(e.target.value)}
                 style={{padding:'0.5rem 0.75rem',border:'1px solid var(--border)',borderRadius:8,fontSize:'0.875rem',background:'white',minWidth:70}}>
                 <option value="todas">Todos UFs</option>
-                {ufsDisponiveis.map(u=><option key={u} value={u}>{u}</option>)}
+                {ufsDisp.map(u=><option key={u} value={u}>{u}</option>)}
               </select>
 
               {/* Filtro cidade */}
-              <select value={cidade} onChange={e=>setCidade(e.target.value)}
+              <select value={cidade} onChange={e=>handleCidadeChange(e.target.value)}
                 style={{padding:'0.5rem 0.75rem',border:'1px solid var(--border)',borderRadius:8,fontSize:'0.875rem',background:'white',maxWidth:160}}>
                 <option value="todas">Todas as cidades</option>
-                {cidadesDisponiveis.map(c=><option key={c} value={c}>{c}</option>)}
+                {cidadesDisp.map(c=><option key={c} value={c}>{c}</option>)}
               </select>
 
               {/* Itens por página */}
@@ -356,7 +359,7 @@ export default function Clientes() {
               </button>
 
               {/* Recarregar */}
-              <button onClick={()=>carregar(page,search,somenteTel,pageSize)} className="btn btn-primary" disabled={loading}
+              <button onClick={()=>carregar(page,search,somenteTel,pageSize,uf,cidade)} className="btn btn-primary" disabled={loading}
                 style={{display:'flex',alignItems:'center',gap:'0.4rem'}}>
                 <RefreshCw size={15} style={loading?{animation:'spin 1s linear infinite'}:{}}/>
               </button>
@@ -426,10 +429,10 @@ export default function Clientes() {
               </span>
               <div style={{display:'flex',gap:'0.4rem',alignItems:'center'}}>
                 {/* Primeira página */}
-                <button onClick={()=>carregar(1,search,somenteTel,pageSize)} disabled={page<=1||loading}
+                <button onClick={()=>carregar(1,search,somenteTel,pageSize,uf,cidade)} disabled={page<=1||loading}
                   className="btn btn-secondary" style={{padding:'0.4rem 0.6rem',fontSize:'0.8rem'}}>«</button>
                 {/* Anterior */}
-                <button onClick={()=>carregar(page-1,search,somenteTel,pageSize)} disabled={page<=1||loading}
+                <button onClick={()=>carregar(page-1,search,somenteTel,pageSize,uf,cidade)} disabled={page<=1||loading}
                   className="btn btn-secondary" style={{padding:'0.4rem 0.6rem',display:'flex',alignItems:'center'}}>
                   <ChevronLeft size={16}/>
                 </button>
@@ -446,12 +449,12 @@ export default function Clientes() {
                   <span style={{fontSize:'0.82rem',color:'var(--gray)',whiteSpace:'nowrap'}}>/ {totalPages.toLocaleString('pt-BR')}</span>
                 </div>
                 {/* Próxima */}
-                <button onClick={()=>carregar(page+1,search,somenteTel,pageSize)} disabled={page>=totalPages||loading}
+                <button onClick={()=>carregar(page+1,search,somenteTel,pageSize,uf,cidade)} disabled={page>=totalPages||loading}
                   className="btn btn-secondary" style={{padding:'0.4rem 0.6rem',display:'flex',alignItems:'center'}}>
                   <ChevronRight size={16}/>
                 </button>
                 {/* Última página */}
-                <button onClick={()=>carregar(totalPages,search,somenteTel,pageSize)} disabled={page>=totalPages||loading}
+                <button onClick={()=>carregar(totalPages,search,somenteTel,pageSize,uf,cidade)} disabled={page>=totalPages||loading}
                   className="btn btn-secondary" style={{padding:'0.4rem 0.6rem',fontSize:'0.8rem'}}>»</button>
               </div>
             </div>

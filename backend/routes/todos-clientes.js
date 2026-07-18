@@ -188,8 +188,10 @@ router.get('/', async (req, res) => {
     const offset          = (page - 1) * limit;
     const search          = (req.query.search || '').trim().toLowerCase();
     const somenteTelefone = req.query.somente_com_telefone === 'true';
+    const ufFiltro        = (req.query.uf     || '').trim();
+    const cidadeFiltro    = (req.query.cidade || '').trim();
 
-    console.log(`🔍 /todos-clientes page=${page} limit=${limit} search="${search}" somenteTel=${somenteTelefone}`);
+    console.log(`🔍 /todos-clientes page=${page} limit=${limit} search="${search}" somenteTel=${somenteTelefone} uf="${ufFiltro}" cidade="${cidadeFiltro}"`);
 
     // Carregar todos os clientes (do cache ou banco)
     const todos = await getClientesDedup();
@@ -198,6 +200,8 @@ router.get('/', async (req, res) => {
     let filtrados = todos;
     if (somenteTelefone) filtrados = filtrados.filter(c => c.telefone);
     if (search)          filtrados = filtrados.filter(c => c.nome.toLowerCase().includes(search));
+    if (ufFiltro)        filtrados = filtrados.filter(c => c.estado === ufFiltro);
+    if (cidadeFiltro)    filtrados = filtrados.filter(c => c.cidade === cidadeFiltro);
 
     const total      = filtrados.length;
     const totalPages = Math.ceil(total / limit);
@@ -206,13 +210,31 @@ router.get('/', async (req, res) => {
     const porFonte = {};
     for (const c of pagina) porFonte[c.fonte] = (porFonte[c.fonte] || 0) + 1;
 
-    console.log(`✅ ${pagina.length} de ${total} (filtrados: somenteTel=${somenteTelefone}, search="${search}")`);
+    // UFs e cidades disponíveis (baseadas no conjunto sem filtro de UF/cidade,
+    // mas com os outros filtros aplicados — para popular os selects corretamente)
+    const baseParaSelects = ufFiltro || cidadeFiltro
+      ? todos.filter(c => {
+          if (somenteTelefone && !c.telefone) return false;
+          if (search && !c.nome.toLowerCase().includes(search)) return false;
+          return true;
+        })
+      : filtrados;
+
+    const ufsDisponiveis     = [...new Set(baseParaSelects.map(c => c.estado).filter(Boolean))].sort();
+    const cidadesDisponiveis = [...new Set(
+      (ufFiltro ? baseParaSelects.filter(c => c.estado === ufFiltro) : baseParaSelects)
+        .map(c => c.cidade).filter(Boolean)
+    )].sort();
+
+    console.log(`✅ ${pagina.length} de ${total}`);
 
     res.json({
       total,
       clientes: pagina,
       resumo: { totalClientes: total, porFonte, fontes: Object.keys(porFonte).length },
       pagination: { page, limit, total, totalPages },
+      ufsDisponiveis,
+      cidadesDisponiveis,
     });
 
   } catch (err) {
