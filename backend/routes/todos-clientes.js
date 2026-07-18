@@ -124,57 +124,64 @@ const FONES_UNION = `
 // ── Modo "somente com telefone" — deduplicado e com nome limpo ───────────────
 function buildComTelSql(search) {
   const sc = search ? `AND nome LIKE '%${search.replace(/'/g, "''")}%'` : '';
+  // Estratégia: FONES_UNION já tem todos os pares (nome_limpo, telefone).
+  // Agrupa por nome para deduplicar — um cliente = um telefone.
+  // Filtra nomes inválidos no WHERE externo.
   return `
-    SELECT nome, MIN(fonte) AS fonte,
-           MAX(CASE WHEN email  IS NOT NULL AND TRIM(email)  != '' THEN email  END) AS email,
-           MAX(CASE WHEN cidade IS NOT NULL AND TRIM(cidade) != '' THEN cidade END) AS cidade,
-           MAX(CASE WHEN estado IS NOT NULL AND TRIM(estado) != '' THEN estado END) AS estado,
-           MIN(telefone) AS telefone
+    SELECT
+      nome,
+      MIN(telefone) AS telefone,
+      MIN(fonte)    AS fonte,
+      MAX(CASE WHEN email  IS NOT NULL AND TRIM(email)  != '' THEN email  END) AS email,
+      MAX(CASE WHEN cidade IS NOT NULL AND TRIM(cidade) != '' THEN cidade END) AS cidade,
+      MAX(CASE WHEN estado IS NOT NULL AND TRIM(estado) != '' THEN estado END) AS estado
     FROM (
-      SELECT ${limparNome('p.contato_nome')} AS nome, 'Bling E-commerce' AS fonte,
-             NULL AS email, NULL AS cidade, NULL AS estado, TRIM(n.contato_telefone) AS telefone
+      SELECT ${limparNome('p.contato_nome')} AS nome, TRIM(n.contato_telefone) AS telefone,
+             'Bling E-commerce' AS fonte, NULL AS email, NULL AS cidade, NULL AS estado
       FROM bling_pedidos_venda_ecommerce p
       JOIN bling_nfe_saida_detalhes_ecommerce n ON n.contato_id = p.contato_id
       WHERE p.contato_id IS NOT NULL AND p.contato_id != '0'
         AND n.contato_telefone IS NOT NULL AND TRIM(n.contato_telefone) != ''
-        AND p.contato_nome IS NOT NULL
+        AND p.contato_nome IS NOT NULL AND LENGTH(TRIM(p.contato_nome)) > 2
       UNION ALL
-      SELECT ${limparNome('p.contato_nome')}, 'Bling Distribuição',
-             NULL, NULL, NULL, TRIM(n.contato_telefone)
+      SELECT ${limparNome('p.contato_nome')}, TRIM(n.contato_telefone),
+             'Bling Distribuição', NULL, NULL, NULL
       FROM bling_pedidos_venda_distribuicao p
       JOIN bling_nfe_saida_detalhes_distribuicao n ON n.contato_id = p.contato_id
       WHERE p.contato_id IS NOT NULL AND p.contato_id != '0'
         AND n.contato_telefone IS NOT NULL AND TRIM(n.contato_telefone) != ''
-        AND p.contato_nome IS NOT NULL
+        AND p.contato_nome IS NOT NULL AND LENGTH(TRIM(p.contato_nome)) > 2
       UNION ALL
-      SELECT ${limparNome('contato_nome')}, 'Bling E-commerce',
-             NULL, NULL, NULL, TRIM(contato_telefone)
+      SELECT ${limparNome('contato_nome')}, TRIM(contato_telefone),
+             'Bling E-commerce', NULL, NULL, NULL
       FROM bling_nfe_saida_detalhes_ecommerce
       WHERE contato_telefone IS NOT NULL AND TRIM(contato_telefone) != ''
-        AND contato_nome IS NOT NULL
+        AND contato_nome IS NOT NULL AND LENGTH(TRIM(contato_nome)) > 2
       UNION ALL
-      SELECT ${limparNome('contato_nome')}, 'Bling Distribuição',
-             NULL, NULL, NULL, TRIM(contato_telefone)
+      SELECT ${limparNome('contato_nome')}, TRIM(contato_telefone),
+             'Bling Distribuição', NULL, NULL, NULL
       FROM bling_nfe_saida_detalhes_distribuicao
       WHERE contato_telefone IS NOT NULL AND TRIM(contato_telefone) != ''
-        AND contato_nome IS NOT NULL
+        AND contato_nome IS NOT NULL AND LENGTH(TRIM(contato_nome)) > 2
       UNION ALL
-      SELECT ${limparNome('c.name')}, 'Tray E-commerce',
-             c.email, c.city, c.state, TRIM(n.contato_telefone)
+      SELECT ${limparNome('c.name')}, TRIM(n.contato_telefone),
+             'Tray E-commerce', c.email, c.city, c.state
       FROM clientes_tray_ecommerce c
       JOIN bling_nfe_saida_detalhes_ecommerce n ON TRIM(n.contato_email) = TRIM(c.email)
       WHERE n.contato_telefone IS NOT NULL AND TRIM(n.contato_telefone) != ''
-        AND c.email IS NOT NULL AND TRIM(c.email) != '' AND c.name IS NOT NULL
+        AND c.email IS NOT NULL AND TRIM(c.email) != ''
+        AND c.name IS NOT NULL AND LENGTH(TRIM(c.name)) > 2
       UNION ALL
-      SELECT ${limparNome('c.name')}, 'Tray E-commerce',
-             c.email, c.city, c.state, TRIM(n.contato_telefone)
+      SELECT ${limparNome('c.name')}, TRIM(n.contato_telefone),
+             'Tray E-commerce', c.email, c.city, c.state
       FROM clientes_tray_ecommerce c
       JOIN bling_nfe_saida_detalhes_distribuicao n ON TRIM(n.contato_email) = TRIM(c.email)
       WHERE n.contato_telefone IS NOT NULL AND TRIM(n.contato_telefone) != ''
-        AND c.email IS NOT NULL AND TRIM(c.email) != '' AND c.name IS NOT NULL
+        AND c.email IS NOT NULL AND TRIM(c.email) != ''
+        AND c.name IS NOT NULL AND LENGTH(TRIM(c.name)) > 2
       UNION ALL
-      SELECT ${limparNome('pe.contato_nome')}, 'Bling E-commerce',
-             NULL, NULL, NULL, TRIM(nd.contato_telefone)
+      SELECT ${limparNome('pe.contato_nome')}, TRIM(nd.contato_telefone),
+             'Bling E-commerce', NULL, NULL, NULL
       FROM bling_pedidos_venda_ecommerce pe
       JOIN bling_nfe_saida_detalhes_distribuicao nd
         ON REPLACE(REPLACE(REPLACE(nd.contato_numerodocumento,'.',''),'-',''),'/','')
@@ -182,14 +189,14 @@ function buildComTelSql(search) {
       WHERE nd.contato_telefone IS NOT NULL AND TRIM(nd.contato_telefone) != ''
         AND pe.contato_numerodocumento IS NOT NULL
         AND LENGTH(REPLACE(REPLACE(REPLACE(pe.contato_numerodocumento,'.',''),'-',''),'/','')) >= 11
-        AND pe.contato_nome IS NOT NULL
+        AND pe.contato_nome IS NOT NULL AND LENGTH(TRIM(pe.contato_nome)) > 2
     ) raw
     WHERE LENGTH(TRIM(nome)) > 2
       AND NOT TRIM(nome) REGEXP '^[0-9 .\\-/]+$'
       AND NOT TRIM(nome) REGEXP '^&#'
+      AND telefone IS NOT NULL AND TRIM(telefone) != ''
       ${sc}
     GROUP BY nome
-    HAVING telefone IS NOT NULL AND TRIM(telefone) != ''
   `;
 }
 
