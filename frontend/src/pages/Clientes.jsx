@@ -130,6 +130,8 @@ export default function Clientes() {
   const [searchInput, setSearchInput] = useState('');
   const [fonte,       setFonte]       = useState('todas');
   const [fontes,      setFontes]      = useState([]);
+  const [uf,          setUf]          = useState('todas');
+  const [cidade,      setCidade]      = useState('todas');
   const [clienteSel,  setClienteSel]  = useState(null);
   // Checkbox — ativado por padrão
   const [somenteTel,  setSomenteTel]  = useState(true);
@@ -170,11 +172,14 @@ export default function Clientes() {
   function buscar() {
     setSearch(searchInput);
     setFonte('todas');
+    setUf('todas');
+    setCidade('todas');
     carregar(1, searchInput, somenteTel, pageSize);
   }
 
   function limparBusca() {
     setSearchInput(''); setSearch(''); setFonte('todas');
+    setUf('todas'); setCidade('todas');
     carregar(1, '', somenteTel, pageSize);
   }
 
@@ -183,6 +188,8 @@ export default function Clientes() {
     const novo = !somenteTel;
     setSomenteTel(novo);
     setFonte('todas');
+    setUf('todas');
+    setCidade('todas');
     carregar(1, search, novo, pageSize);
   }
 
@@ -200,10 +207,32 @@ export default function Clientes() {
     if (pg !== page) carregar(pg, search, somenteTel, pageSize);
   }
 
+  // UFs disponíveis na lista atual (sem filtro de UF/cidade aplicado)
+  const ufsDisponiveis = useMemo(() => {
+    const set = new Set(clientes.map(c => c.estado).filter(Boolean));
+    return Array.from(set).sort();
+  }, [clientes]);
+
+  // Cidades disponíveis respeitando o filtro de UF selecionado
+  const cidadesDisponiveis = useMemo(() => {
+    const base = uf === 'todas' ? clientes : clientes.filter(c => c.estado === uf);
+    const set = new Set(base.map(c => c.cidade).filter(Boolean));
+    return Array.from(set).sort();
+  }, [clientes, uf]);
+
+  // Quando a UF muda, resetar cidade se a cidade atual não existe nessa UF
+  const handleUfChange = (novaUf) => {
+    setUf(novaUf);
+    setCidade('todas');
+  };
+
   const filtrados = useMemo(() => {
-    if (fonte === 'todas') return clientes;
-    return clientes.filter(c => c.fonte === fonte);
-  }, [clientes, fonte]);
+    let lista = clientes;
+    if (fonte  !== 'todas') lista = lista.filter(c => c.fonte   === fonte);
+    if (uf     !== 'todas') lista = lista.filter(c => c.estado  === uf);
+    if (cidade !== 'todas') lista = lista.filter(c => c.cidade  === cidade);
+    return lista;
+  }, [clientes, fonte, uf, cidade]);
 
   function exportarCSV() {
     const linhas = [
@@ -300,6 +329,20 @@ export default function Clientes() {
                 {fontes.map(f=><option key={f} value={f}>{f}</option>)}
               </select>
 
+              {/* Filtro UF */}
+              <select value={uf} onChange={e=>handleUfChange(e.target.value)}
+                style={{padding:'0.5rem 0.75rem',border:'1px solid var(--border)',borderRadius:8,fontSize:'0.875rem',background:'white',minWidth:70}}>
+                <option value="todas">Todos UFs</option>
+                {ufsDisponiveis.map(u=><option key={u} value={u}>{u}</option>)}
+              </select>
+
+              {/* Filtro cidade */}
+              <select value={cidade} onChange={e=>setCidade(e.target.value)}
+                style={{padding:'0.5rem 0.75rem',border:'1px solid var(--border)',borderRadius:8,fontSize:'0.875rem',background:'white',maxWidth:160}}>
+                <option value="todas">Todas as cidades</option>
+                {cidadesDisponiveis.map(c=><option key={c} value={c}>{c}</option>)}
+              </select>
+
               {/* Itens por página */}
               <select value={pageSize} onChange={e=>mudarPageSize(Number(e.target.value))}
                 style={{padding:'0.5rem 0.75rem',border:'1px solid var(--border)',borderRadius:8,fontSize:'0.875rem',background:'white'}}>
@@ -342,9 +385,13 @@ export default function Clientes() {
                 <tbody>
                   {filtrados.length === 0 ? (
                     <tr><td colSpan={6} style={{textAlign:'center',padding:'3rem',color:'var(--gray)'}}>
-                      {search ? `Nenhum cliente encontrado para "${search}".`
-                               : somenteTel ? 'Nenhum cliente com telefone encontrado.'
-                               : 'Nenhum cliente encontrado.'}
+                      {search
+                        ? `Nenhum cliente encontrado para "${search}".`
+                        : (uf !== 'todas' || cidade !== 'todas')
+                          ? 'Nenhum cliente encontrado com os filtros de localização aplicados.'
+                          : somenteTel
+                            ? 'Nenhum cliente com telefone encontrado.'
+                            : 'Nenhum cliente encontrado.'}
                     </td></tr>
                   ) : filtrados.map((c,i)=>(
                     <tr key={i} onClick={()=>setClienteSel(c)} style={{cursor:'pointer'}} title="Clique para ver pedidos">
