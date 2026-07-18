@@ -5,32 +5,46 @@ import compression from 'compression';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import logger from './utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = dirname(__filename);
 
-// .env fica na raiz do projeto (um nível acima de /backend)
 dotenv.config({ path: join(__dirname, '..', '.env') });
 
-import clientesRouter     from './routes/clientes.js';
+import clientesRouter      from './routes/clientes.js';
 import todosClientesRouter from './routes/todos-clientes.js';
-import pedidosRouter      from './routes/pedidos.js';
-import trafegoRouter      from './routes/trafego.js';
-import relatoriosRouter   from './routes/relatorios.js';
+import pedidosRouter       from './routes/pedidos.js';
+import trafegoRouter       from './routes/trafego.js';
+import relatoriosRouter    from './routes/relatorios.js';
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares
 app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// CORS — aceitar qualquer origem (ajustar para domínio específico em produção se necessário)
 app.use(cors({ origin: true, credentials: true }));
 
-// Health check — sem consulta ao banco para responder rápido
+// ── Middleware de log de requisições → Supervisor ─────────────────────────────
+app.use((req, _res, next) => {
+  const start = Date.now();
+  _res.on('finish', () => {
+    const duration = Date.now() - start;
+    const level    = _res.statusCode >= 500 ? 'error'
+                   : _res.statusCode >= 400 ? 'warn'
+                   : 'info';
+    logger[level]('http', `${req.method} ${req.path} → ${_res.statusCode}`, {
+      method: req.method, path: req.path,
+      status: _res.statusCode, duration,
+      ip: req.ip,
+    });
+  });
+  next();
+});
+
+// ── Health ────────────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
@@ -40,38 +54,32 @@ app.get('/health', (_req, res) => {
   });
 });
 
-// Rotas da API
-app.use('/api/clientes',      clientesRouter);
+// ── Rotas ─────────────────────────────────────────────────────────────────────
+app.use('/api/clientes',       clientesRouter);
 app.use('/api/todos-clientes', todosClientesRouter);
-app.use('/api/pedidos',       pedidosRouter);
-app.use('/api/trafego',       trafegoRouter);
-app.use('/api/relatorios',    relatoriosRouter);
+app.use('/api/pedidos',        pedidosRouter);
+app.use('/api/trafego',        trafegoRouter);
+app.use('/api/relatorios',     relatoriosRouter);
 
-// Rota raiz
 app.get('/', (_req, res) => {
-  res.json({
-    name: 'API Gestão de Tráfego - Luna Cosméticos',
-    version: '2.0.0',
-    status: 'online',
-    endpoints: ['/health', '/api/clientes', '/api/todos-clientes', '/api/pedidos', '/api/trafego', '/api/relatorios'],
-  });
+  res.json({ name: 'API Gestão de Tráfego - Luna Cosméticos', version: '2.0.0', status: 'online' });
 });
 
-// 404
 app.use((req, res) => {
+  logger.warn('http', `404 — ${req.method} ${req.path}`);
   res.status(404).json({ error: 'Rota não encontrada', path: req.path });
 });
 
-// Error handler global
 app.use((err, _req, res, _next) => {
-  console.error('Erro global:', err.message);
+  logger.error('http', `500 — ${err.message}`, { stack: err.stack });
   res.status(err.status || 500).json({ error: err.message || 'Erro interno do servidor' });
 });
 
+// ── Start ─────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-  console.log(`🚀 Backend rodando na porta ${PORT} [${process.env.NODE_ENV || 'development'}]`);
-  console.log(`💾 DB: ${process.env.DB_NAME}@${process.env.DB_HOST}`);
+  logger.info('server', `Backend rodando na porta ${PORT} [${process.env.NODE_ENV || 'development'}]`);
+  logger.info('server', `DB: ${process.env.DB_NAME}@${process.env.DB_HOST}`);
 });
 
-process.on('SIGTERM', () => process.exit(0));
-process.on('SIGINT',  () => process.exit(0));
+process.on('SIGTERM', () => { logger.info('server', 'SIGTERM — encerrando'); process.exit(0); });
+process.on('SIGINT',  () => { logger.info('server', 'SIGINT — encerrando');  process.exit(0); });

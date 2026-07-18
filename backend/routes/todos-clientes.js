@@ -119,6 +119,21 @@ const XML_FONES_SQL = `
     AND dest_nome IS NOT NULL AND LENGTH(TRIM(dest_nome)) > 2
 `;
 
+// ── SQL: contatos do planilha xlsx (banco local) ──────────────────────────────
+const CONTATOS_XLSX_CLIENTES_SQL = `
+  SELECT nome, 'Contatos Internos' AS fonte,
+         NULL AS email, cidade, NULL AS estado
+  FROM contatos_xlsx
+  WHERE nome IS NOT NULL AND LENGTH(TRIM(nome)) > 2
+`;
+
+const CONTATOS_XLSX_FONES_SQL = `
+  SELECT nome, telefone, 'Contatos Internos' AS fonte
+  FROM contatos_xlsx
+  WHERE telefone IS NOT NULL AND TRIM(telefone) != ''
+    AND nome IS NOT NULL AND LENGTH(TRIM(nome)) > 2
+`;
+
 // ── Construir mapa de telefones com mesclagem ─────────────────────────────────
 // Para cada nome limpo, acumula todos os pares (telefone, fonte).
 // Regra de mesclagem:
@@ -215,19 +230,21 @@ async function getClientesDedup() {
   console.log('🔄 Reconstruindo cache de clientes...');
 
   // Buscar dados do remoto e do banco local em paralelo
-  const [rawRemoto, fonesRemoto, rawLocal, fonesLocal] = await Promise.all([
+  const [rawRemoto, fonesRemoto, rawXml, fonesXml, rawContatos, fonesContatos] = await Promise.all([
     query(CLIENTES_RAW_SQL),
     query(FONES_RAW_SQL),
-    queryLocal(XML_CLIENTES_SQL),   // retorna [] se banco local indisponível
+    queryLocal(XML_CLIENTES_SQL),
     queryLocal(XML_FONES_SQL),
+    queryLocal(CONTATOS_XLSX_CLIENTES_SQL),
+    queryLocal(CONTATOS_XLSX_FONES_SQL),
   ]);
 
-  console.log(`  Remoto: ${rawRemoto.length} clientes, ${fonesRemoto.length} registros de fone`);
-  console.log(`  XML local: ${rawLocal.length} clientes, ${fonesLocal.length} registros de fone`);
+  console.log(`  Remoto: ${rawRemoto.length} clientes, ${fonesRemoto.length} fones`);
+  console.log(`  XML local: ${rawXml.length} clientes, ${fonesXml.length} fones`);
+  console.log(`  Contatos xlsx: ${rawContatos.length} clientes, ${fonesContatos.length} fones`);
 
-  // Unir todas as linhas e deduplicar
-  const todosRaw   = [...rawRemoto, ...rawLocal];
-  const todosFones = [...fonesRemoto, ...fonesLocal];
+  const todosRaw   = [...rawRemoto, ...rawXml, ...rawContatos];
+  const todosFones = [...fonesRemoto, ...fonesXml, ...fonesContatos];
 
   const clientes    = deduplicarClientes(todosRaw);
   const fonesMapa   = construirMapaTelefonesMesclado(todosFones);
