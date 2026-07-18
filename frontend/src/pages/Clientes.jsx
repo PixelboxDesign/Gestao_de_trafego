@@ -405,7 +405,15 @@ export default function Clientes() {
                       </td>
                       <td style={{fontSize:'0.85rem'}}>
                         {c.telefone
-                          ? <span style={{display:'flex',alignItems:'center',gap:'0.3rem',color:'var(--success)',fontWeight:600}}><Phone size={13}/>{c.telefone}</span>
+                          ? <span style={{display:'flex',alignItems:'center',gap:'0.3rem',color:'var(--success)',fontWeight:600,flexWrap:'wrap'}}>
+                              <Phone size={13}/>
+                              {c.telefone}
+                              {c.fonte_tel && c.telefone.includes('/') && (
+                                <span style={{fontSize:'0.7rem',color:'var(--gray)',fontWeight:400,marginLeft:'0.2rem'}}>
+                                  ({c.fonte_tel})
+                                </span>
+                              )}
+                            </span>
                           : <span style={{color:'var(--gray)'}}>—</span>}
                       </td>
                       <td>
