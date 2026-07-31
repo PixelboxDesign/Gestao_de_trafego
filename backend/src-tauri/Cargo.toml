@@ -1,0 +1,58 @@
+[package]
+name = "luna-server"
+version = "0.1.0"
+description = "Luna Cosméticos — Tauri Server (backend central 24/7)"
+authors = ["Matheus Maia"]
+edition = "2021"
+
+[lib]
+name = "luna_server_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "luna-server"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# Tauri
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-shell = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-http = "2"
+tauri-plugin-notification = "2"
+
+# HTTP Server (API REST interna)
+axum = { version = "0.7", features = ["json", "ws"] }
+tokio = { version = "1", features = ["full"] }
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+tower = "0.4"
+
+# Banco de dados
+sqlx = { version = "0.7", features = ["runtime-tokio", "mysql", "chrono", "uuid"] }
+
+# Serialização
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Autenticação
+jsonwebtoken = "9"
+bcrypt = "0.15"
+
+# Utilitários
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+dotenv = "0.15"
+anyhow = "1"
+thiserror = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
