@@ -11,6 +11,7 @@ luna_cosmeticos/
 ├── frontend/                 → Reservado para arquitetura futura
 ├── lixeira/                  → Scripts descartados após uso único
 ├── portal_luna_cosmeticos/   → App instalável (notebook da loja)
+├── prompts/                  → Prompts de referência (não versionados)
 ├── scripts_permanentes/      → Scripts git e automações fixas
 └── scripts_temporarios/      → Scripts em validação
 ```

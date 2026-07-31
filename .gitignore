@@ -6,3 +6,4 @@ lixeira/
 scripts_temporarios/node_modules/
 scripts_temporarios/package-lock.json
 scripts_temporarios/package.json
+prompts/
