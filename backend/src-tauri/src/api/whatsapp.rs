@@ -15,6 +15,7 @@ pub struct WhatsAppStatusResponse {
 #[derive(Debug, Deserialize)]
 pub struct SendMessageRequest {
     pub numero: String,
+    #[allow(dead_code)]
     pub mensagem: String,
 }
 

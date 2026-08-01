@@ -1,6 +1,4 @@
 use sqlx::MySqlPool;
-use std::sync::Arc;
-use tokio::sync::Mutex;
 
 /// Estado global compartilhado entre API e Tauri
 pub struct AppState {

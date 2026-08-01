@@ -4,22 +4,22 @@ pub mod logs;
 pub mod whatsapp;
 
 use axum::{
-    http::{HeaderValue, Method},
+    http::Method,
     routing::get,
     Router,
 };
 use std::{net::SocketAddr, sync::Arc};
 use tokio::sync::Mutex;
-use tower_http::cors::CorsLayer;
+use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 
 use crate::AppState;
 
 pub async fn start_server(state: Arc<Mutex<AppState>>) {
     let cors = CorsLayer::new()
-        .allow_origin("*".parse::<HeaderValue>().unwrap())
+        .allow_origin(Any)
         .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
-        .allow_headers(tower_http::cors::Any);
+        .allow_headers(Any);
 
     let app = Router::new()
         // Health check
@@ -33,7 +33,10 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         // Rotas de WhatsApp
         .route("/api/whatsapp/status", get(whatsapp::status))
         .route("/api/whatsapp/qr", get(whatsapp::get_qr))
-        .route("/api/whatsapp/send", axum::routing::post(whatsapp::send_message))
+        .route(
+            "/api/whatsapp/send",
+            axum::routing::post(whatsapp::send_message),
+        )
         // Rotas de logs
         .route("/api/logs", get(logs::list))
         .layer(cors)
