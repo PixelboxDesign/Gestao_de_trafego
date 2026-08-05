@@ -37,53 +37,112 @@ pub struct ClientesResponse {
     pub limit: u32,
 }
 
-// Subquery base reutilizada em dados e count
-// Aplica limpeza de nome:
-//   1. Remove CPF/CNPJ no início (números, pontos, traços, barras seguidos de espaço)
-//   2. Remove CPF/número no fim (espaço + números com pontos/traços no final)
-//   3. Remove conteúdo entre parênteses
-//   4. Limpa espaços extras
-fn limpar_nome(col: &str) -> String {
-    format!(
-        r#"TRIM(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(
-            TRIM({col}),
-            '^[0-9][0-9. /-]*[0-9] +', ''),
-            ' [0-9][0-9. -]*[0-9]$', ''),
-            '[(][^)]*[)][.]?', ''))"#
-    )
+// Limpa o nome do cliente removendo lixo comum nos dados brutos
+fn limpar_nome_str(nome: &str) -> String {
+    let s = nome.trim();
+
+    // Remove HTML entities (&#XXXXX; ou &amp; etc)
+    if s.contains("&#") || s.contains("&amp;") || s.contains("&lt;") {
+        return String::new();
+    }
+
+    // Remove se parece telefone (só tem números, parênteses, traços, espaços)
+    let sem_fmt: String = s.chars().filter(|c| c.is_ascii_digit()).collect();
+    if sem_fmt.len() >= 8 && sem_fmt.len() == s.chars().filter(|c| c.is_ascii_digit() || *c == ' ' || *c == '-' || *c == '(' || *c == ')' || *c == '+').count() {
+        return String::new();
+    }
+
+    // Remove lixo no início: pontos, vírgulas, underscores, aspas, >
+    let s = s.trim_start_matches(|c: char| matches!(c, '.' | ',' | '_' | '"' | '\'' | '>' | '?' | '!' | ';'));
+    let s = s.trim();
+
+    // Se começa com número: tenta extrair apenas a parte do nome
+    // Padrões: "12345678 Nome", "12.345.678 Nome", "12345678/Nome", "12345678000141Nome"
+    let resultado = if s.chars().next().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+        // Encontra onde começa a parte alfabética
+        let pos = s.find(|c: char| c.is_alphabetic());
+        match pos {
+            Some(p) if p > 0 => {
+                let antes = &s[..p];
+                // Só remove o prefixo se for claramente um número/CPF/CNPJ (sem letras)
+                if !antes.chars().any(|c| c.is_alphabetic()) {
+                    s[p..].trim_start_matches(|c: char| matches!(c, ' ' | '/' | '-' | '.'))
+                } else {
+                    s
+                }
+            }
+            _ => s,
+        }
+    } else {
+        s
+    };
+
+    // Remove sufixo numérico: " 114.688.616-03" no fim
+    let resultado = {
+        let partes: Vec<&str> = resultado.rsplitn(2, ' ').collect();
+        if partes.len() == 2 {
+            let sufixo = partes[0];
+            let sufixo_limpo: String = sufixo.chars().filter(|c| c.is_ascii_digit()).collect();
+            // Se o sufixo tem mais de 6 dígitos e sem letras → é CPF/número → remove
+            if sufixo_limpo.len() >= 6 && !sufixo.chars().any(|c| c.is_alphabetic()) {
+                partes[1]
+            } else {
+                resultado
+            }
+        } else {
+            resultado
+        }
+    };
+
+    // Remove conteúdo entre parênteses no fim: "Nome (codigo123)"
+    let resultado = if let Some(p) = resultado.rfind('(') {
+        let parte = resultado[p..].trim();
+        // Só remove se o conteúdo parecer código (não nome real)
+        let dentro: &str = parte.trim_start_matches('(').trim_end_matches(')');
+        let tem_letra = dentro.chars().any(|c| c.is_alphabetic());
+        let tem_numero = dentro.chars().any(|c| c.is_ascii_digit());
+        if tem_numero && (!tem_letra || dentro.len() < 6) {
+            resultado[..p].trim()
+        } else {
+            resultado
+        }
+    } else {
+        resultado
+    };
+
+    // Garante primeira letra maiúscula se tudo maiúsculo
+    let resultado = resultado.trim().to_string();
+    resultado
 }
 
+// Subquery base — sem REGEXP, retorna dados brutos para limpeza em Rust
 fn base_union_sql() -> String {
-    let n_bling  = limpar_nome("contato_nome");
-    let n_tray   = limpar_nome("name");
-    let n_xml    = limpar_nome("dest_nome");
-    let n_cont   = limpar_nome("nome");
-    format!(r#"
+    String::from(r#"
         SELECT
-            {n_bling}      as nome,
-            CAST(NULL AS CHAR) as telefone,
-            CAST(NULL AS CHAR) as estado,
-            CAST(NULL AS CHAR) as cidade,
-            CAST(NULL AS CHAR) as email,
-            'Bling E-commerce' as fonte
+            TRIM(contato_nome)     as nome,
+            CAST(NULL AS CHAR)     as telefone,
+            CAST(NULL AS CHAR)     as estado,
+            CAST(NULL AS CHAR)     as cidade,
+            CAST(NULL AS CHAR)     as email,
+            'Bling E-commerce'     as fonte
         FROM bling_pedidos_venda_ecommerce
         WHERE contato_nome IS NOT NULL
 
         UNION ALL
 
-        SELECT {n_tray}, CAST(NULL AS CHAR), state, city, email, 'Tray E-commerce'
+        SELECT TRIM(name), CAST(NULL AS CHAR), state, city, email, 'Tray E-commerce'
         FROM clientes_tray_ecommerce
         WHERE name IS NOT NULL
 
         UNION ALL
 
-        SELECT {n_xml}, dest_telefone, dest_uf, dest_municipio, CAST(NULL AS CHAR), 'XML Interno'
+        SELECT TRIM(dest_nome), dest_telefone, dest_uf, dest_municipio, CAST(NULL AS CHAR), 'XML Interno'
         FROM nfe_xml_importado
         WHERE dest_nome IS NOT NULL
 
         UNION ALL
 
-        SELECT {n_cont}, telefone, CAST(NULL AS CHAR), cidade, CAST(NULL AS CHAR), 'Contatos'
+        SELECT TRIM(nome), telefone, CAST(NULL AS CHAR), cidade, CAST(NULL AS CHAR), 'Contatos'
         FROM contatos_xlsx
         WHERE nome IS NOT NULL
     "#)
@@ -134,10 +193,19 @@ pub async fn list(
         r#"SELECT COUNT(*) FROM ({base}) AS todos WHERE {where_clause}"#
     );
 
-    let clientes: Vec<Cliente> = sqlx::query_as(&sql)
+    let mut clientes: Vec<Cliente> = sqlx::query_as(&sql)
         .fetch_all(&state.db)
         .await
         .unwrap_or_default();
+
+    // Aplica limpeza de nome em Rust após buscar do banco
+    for c in &mut clientes {
+        let nome_limpo = limpar_nome_str(&c.nome);
+        c.nome = if nome_limpo.len() > 2 { nome_limpo } else { c.nome.clone() };
+    }
+
+    // Remove registros cujo nome ficou vazio após limpeza
+    clientes.retain(|c| c.nome.len() > 2);
 
     let total: i64 = match sqlx::query_scalar(&count_sql)
         .fetch_one(&state.db)
