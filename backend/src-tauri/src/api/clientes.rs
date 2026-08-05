@@ -37,81 +37,83 @@ pub struct ClientesResponse {
     pub limit: u32,
 }
 
-// Limpa o nome do cliente removendo lixo comum nos dados brutos
+// Limpa o nome do cliente removendo lixo dos dados brutos
 fn limpar_nome_str(nome: &str) -> String {
     let s = nome.trim();
 
-    // Remove HTML entities (&#XXXXX; ou &amp; etc)
-    if s.contains("&#") || s.contains("&amp;") || s.contains("&lt;") {
+    // 1. Descarta HTML entities
+    if s.contains("&#") || s.contains("&amp;") {
         return String::new();
     }
 
-    // Remove se parece telefone (só tem números, parênteses, traços, espaços)
-    let sem_fmt: String = s.chars().filter(|c| c.is_ascii_digit()).collect();
-    if sem_fmt.len() >= 8 && sem_fmt.len() == s.chars().filter(|c| c.is_ascii_digit() || *c == ' ' || *c == '-' || *c == '(' || *c == ')' || *c == '+').count() {
+    // 2. Descarta nomes censurados com asterisco (A*****a)
+    if s.contains('*') {
         return String::new();
     }
 
-    // Remove lixo no início: pontos, vírgulas, underscores, aspas, >
-    let s = s.trim_start_matches(|c: char| matches!(c, '.' | ',' | '_' | '"' | '\'' | '>' | '?' | '!' | ';'));
+    // 3. Descarta registros que são só números (sem nenhuma letra)
+    if !s.chars().any(|c| c.is_alphabetic()) {
+        return String::new();
+    }
+
+    // 4. Remove caracteres inválidos no início: . , _ " ' > ? ! ;
+    let s = s.trim_start_matches(|c: char| {
+        matches!(c, '.' | ',' | '_' | '"' | '\'' | '>' | '?' | '!' | ';' | '(' | ')')
+    });
     let s = s.trim();
 
-    // Se começa com número: tenta extrair apenas a parte do nome
-    // Padrões: "12345678 Nome", "12.345.678 Nome", "12345678/Nome", "12345678000141Nome"
-    let resultado = if s.chars().next().map(|c| c.is_ascii_digit()).unwrap_or(false) {
-        // Encontra onde começa a parte alfabética
-        let pos = s.find(|c: char| c.is_alphabetic());
-        match pos {
-            Some(p) if p > 0 => {
-                let antes = &s[..p];
-                // Só remove o prefixo se for claramente um número/CPF/CNPJ (sem letras)
-                if !antes.chars().any(|c| c.is_alphabetic()) {
-                    s[p..].trim_start_matches(|c: char| matches!(c, ' ' | '/' | '-' | '.'))
-                } else {
-                    s
-                }
+    // 5. Se começa com número: encontra onde a parte alfabética começa e remove o prefixo
+    let s = if s.chars().next().map(|c| c.is_ascii_digit()).unwrap_or(false) {
+        // Encontra primeira letra
+        match s.char_indices().find(|(_, c)| c.is_alphabetic()) {
+            Some((pos, _)) => {
+                // Remove separadores antes do nome (espaço, ponto, traço, barra)
+                s[pos..].trim_start_matches(|c: char| matches!(c, ' ' | '.' | '-' | '/'))
             }
-            _ => s,
+            None => return String::new(), // só números, descarta
         }
     } else {
         s
     };
 
-    // Remove sufixo numérico: " 114.688.616-03" no fim
-    let resultado = {
-        let partes: Vec<&str> = resultado.rsplitn(2, ' ').collect();
-        if partes.len() == 2 {
-            let sufixo = partes[0];
-            let sufixo_limpo: String = sufixo.chars().filter(|c| c.is_ascii_digit()).collect();
-            // Se o sufixo tem mais de 6 dígitos e sem letras → é CPF/número → remove
-            if sufixo_limpo.len() >= 6 && !sufixo.chars().any(|c| c.is_alphabetic()) {
-                partes[1]
+    // 6. Remove sufixo numérico: " 114.688.616-03" no fim (CPF no final)
+    let s = {
+        // Procura último espaço e verifica se o que vem depois é só número/pontos/traços
+        if let Some(pos) = s.rfind(' ') {
+            let sufixo = &s[pos + 1..];
+            let digits: String = sufixo.chars().filter(|c| c.is_ascii_digit()).collect();
+            if digits.len() >= 6 && !sufixo.chars().any(|c| c.is_alphabetic()) {
+                s[..pos].trim()
             } else {
-                resultado
+                s
             }
         } else {
-            resultado
+            s
         }
     };
 
-    // Remove conteúdo entre parênteses no fim: "Nome (codigo123)"
-    let resultado = if let Some(p) = resultado.rfind('(') {
-        let parte = resultado[p..].trim();
-        // Só remove se o conteúdo parecer código (não nome real)
-        let dentro: &str = parte.trim_start_matches('(').trim_end_matches(')');
-        let tem_letra = dentro.chars().any(|c| c.is_alphabetic());
-        let tem_numero = dentro.chars().any(|c| c.is_ascii_digit());
-        if tem_numero && (!tem_letra || dentro.len() < 6) {
-            resultado[..p].trim()
+    // 7. Remove conteúdo entre parênteses que pareça código/número
+    let s = if let Some(p) = s.rfind('(') {
+        let dentro = s[p..].trim_start_matches('(').trim_end_matches(')').trim();
+        // Remove parênteses se o conteúdo tiver mais dígitos que letras (parece código)
+        let letras = dentro.chars().filter(|c| c.is_alphabetic()).count();
+        let digitos = dentro.chars().filter(|c| c.is_ascii_digit()).count();
+        if digitos > letras {
+            s[..p].trim()
         } else {
-            resultado
+            s
         }
     } else {
-        resultado
+        s
     };
 
-    // Garante primeira letra maiúscula se tudo maiúsculo
-    let resultado = resultado.trim().to_string();
+    let resultado = s.trim().to_string();
+
+    // 8. Descarta se ficou muito curto ou ainda não tem letra
+    if resultado.len() < 3 || !resultado.chars().any(|c| c.is_alphabetic()) {
+        return String::new();
+    }
+
     resultado
 }
 
