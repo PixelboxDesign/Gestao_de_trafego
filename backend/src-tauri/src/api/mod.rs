@@ -15,6 +15,21 @@ use tracing::info;
 
 use crate::AppState;
 
+/// Tenta vincular a uma porta a partir de `start`, incrementando até encontrar uma livre
+async fn bind_available_port(start: u16) -> (tokio::net::TcpListener, u16) {
+    let mut port = start;
+    loop {
+        let addr = SocketAddr::from(([0, 0, 0, 0], port));
+        match tokio::net::TcpListener::bind(addr).await {
+            Ok(listener) => return (listener, port),
+            Err(_) => {
+                info!("Porta {} ocupada, tentando {}...", port, port + 1);
+                port += 1;
+            }
+        }
+    }
+}
+
 pub async fn start_server(state: Arc<Mutex<AppState>>) {
     let cors = CorsLayer::new()
         .allow_origin(Any)
@@ -26,6 +41,9 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .route("/health", get(health))
         // Rotas de clientes
         .route("/api/clientes", get(clientes::list))
+        .route("/api/clientes/filtros/ufs", get(clientes::list_ufs))
+        .route("/api/clientes/filtros/cidades", get(clientes::list_cidades))
+        .route("/api/clientes/filtros/fontes", get(clientes::list_fontes))
         .route("/api/clientes/:id", get(clientes::get_by_id))
         // Rotas de catálogo
         .route("/api/catalogo", get(catalogo::list_files))
@@ -42,10 +60,9 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .layer(cors)
         .with_state(state);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 3001));
-    info!("🚀 API REST ouvindo em http://{}", addr);
+    let (listener, port) = bind_available_port(3001).await;
+    info!("🚀 API REST ouvindo em http://0.0.0.0:{}", port);
 
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
 
