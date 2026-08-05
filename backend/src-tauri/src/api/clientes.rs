@@ -38,36 +38,55 @@ pub struct ClientesResponse {
 }
 
 // Subquery base reutilizada em dados e count
-fn base_union_sql() -> &'static str {
-    r#"
+// Aplica limpeza de nome:
+//   1. Remove CPF/CNPJ no início (números, pontos, traços, barras seguidos de espaço)
+//   2. Remove CPF/número no fim (espaço + números com pontos/traços no final)
+//   3. Remove conteúdo entre parênteses
+//   4. Limpa espaços extras
+fn limpar_nome(col: &str) -> String {
+    format!(
+        r#"TRIM(REGEXP_REPLACE(REGEXP_REPLACE(REGEXP_REPLACE(
+            TRIM({col}),
+            '^[0-9][0-9. /-]*[0-9] +', ''),
+            ' [0-9][0-9. -]*[0-9]$', ''),
+            '[(][^)]*[)][.]?', ''))"#
+    )
+}
+
+fn base_union_sql() -> String {
+    let n_bling  = limpar_nome("contato_nome");
+    let n_tray   = limpar_nome("name");
+    let n_xml    = limpar_nome("dest_nome");
+    let n_cont   = limpar_nome("nome");
+    format!(r#"
         SELECT
-            TRIM(contato_nome) as nome,
-            NULL               as telefone,
-            NULL               as estado,
-            NULL               as cidade,
-            NULL               as email,
+            {n_bling}      as nome,
+            CAST(NULL AS CHAR) as telefone,
+            CAST(NULL AS CHAR) as estado,
+            CAST(NULL AS CHAR) as cidade,
+            CAST(NULL AS CHAR) as email,
             'Bling E-commerce' as fonte
         FROM bling_pedidos_venda_ecommerce
         WHERE contato_nome IS NOT NULL
 
         UNION ALL
 
-        SELECT TRIM(name), NULL, state, city, email, 'Tray E-commerce'
+        SELECT {n_tray}, CAST(NULL AS CHAR), state, city, email, 'Tray E-commerce'
         FROM clientes_tray_ecommerce
         WHERE name IS NOT NULL
 
         UNION ALL
 
-        SELECT TRIM(dest_nome), dest_telefone, dest_uf, dest_municipio, NULL, 'XML Interno'
+        SELECT {n_xml}, dest_telefone, dest_uf, dest_municipio, CAST(NULL AS CHAR), 'XML Interno'
         FROM nfe_xml_importado
         WHERE dest_nome IS NOT NULL
 
         UNION ALL
 
-        SELECT TRIM(nome), telefone, NULL, cidade, NULL, 'Contatos'
+        SELECT {n_cont}, telefone, CAST(NULL AS CHAR), cidade, CAST(NULL AS CHAR), 'Contatos'
         FROM contatos_xlsx
         WHERE nome IS NOT NULL
-    "#
+    "#)
 }
 
 pub async fn list(
@@ -101,53 +120,18 @@ pub async fn list(
     let where_clause = where_parts.join(" AND ");
     let base = base_union_sql();
 
-    // Query de dados — usa CAST para garantir tipos corretos nos NULLs
+    // Query de dados
     let sql = format!(
-        r#"SELECT nome, telefone, estado as uf, cidade, email, fonte FROM (
-            SELECT
-                TRIM(contato_nome) as nome,
-                CAST(NULL AS CHAR) as telefone,
-                CAST(NULL AS CHAR) as estado,
-                CAST(NULL AS CHAR) as cidade,
-                CAST(NULL AS CHAR) as email,
-                'Bling E-commerce' as fonte
-            FROM bling_pedidos_venda_ecommerce WHERE contato_nome IS NOT NULL
-            UNION ALL
-            SELECT TRIM(name), CAST(NULL AS CHAR), state, city, email, 'Tray E-commerce'
-            FROM clientes_tray_ecommerce WHERE name IS NOT NULL
-            UNION ALL
-            SELECT TRIM(dest_nome), dest_telefone, dest_uf, dest_municipio, CAST(NULL AS CHAR), 'XML Interno'
-            FROM nfe_xml_importado WHERE dest_nome IS NOT NULL
-            UNION ALL
-            SELECT TRIM(nome), telefone, CAST(NULL AS CHAR), cidade, CAST(NULL AS CHAR), 'Contatos'
-            FROM contatos_xlsx WHERE nome IS NOT NULL
-        ) AS todos
-        WHERE {where_clause}
-        ORDER BY nome ASC
-        LIMIT {limit} OFFSET {offset}"#
+        r#"SELECT nome, telefone, estado as uf, cidade, email, fonte
+           FROM ({base}) AS todos
+           WHERE {where_clause}
+           ORDER BY nome ASC
+           LIMIT {limit} OFFSET {offset}"#
     );
 
-    // Query de count — usa CAST para garantir que NULL as telefone seja reconhecido
+    // Query de count
     let count_sql = format!(
-        r#"SELECT COUNT(*) FROM (
-            SELECT
-                TRIM(contato_nome) as nome,
-                CAST(NULL AS CHAR) as telefone,
-                CAST(NULL AS CHAR) as estado,
-                CAST(NULL AS CHAR) as cidade,
-                CAST(NULL AS CHAR) as email,
-                'Bling E-commerce' as fonte
-            FROM bling_pedidos_venda_ecommerce WHERE contato_nome IS NOT NULL
-            UNION ALL
-            SELECT TRIM(name), CAST(NULL AS CHAR), state, city, email, 'Tray E-commerce'
-            FROM clientes_tray_ecommerce WHERE name IS NOT NULL
-            UNION ALL
-            SELECT TRIM(dest_nome), dest_telefone, dest_uf, dest_municipio, CAST(NULL AS CHAR), 'XML Interno'
-            FROM nfe_xml_importado WHERE dest_nome IS NOT NULL
-            UNION ALL
-            SELECT TRIM(nome), telefone, CAST(NULL AS CHAR), cidade, CAST(NULL AS CHAR), 'Contatos'
-            FROM contatos_xlsx WHERE nome IS NOT NULL
-        ) AS todos WHERE {where_clause}"#
+        r#"SELECT COUNT(*) FROM ({base}) AS todos WHERE {where_clause}"#
     );
 
     let clientes: Vec<Cliente> = sqlx::query_as(&sql)
