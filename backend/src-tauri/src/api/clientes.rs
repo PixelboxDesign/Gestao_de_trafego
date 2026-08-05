@@ -27,6 +27,7 @@ pub struct ClienteQuery {
     pub cidade: Option<String>,
     pub fonte: Option<String>,
     pub somente_com_telefone: Option<bool>,
+    pub deduplicar: Option<bool>,
 }
 
 #[derive(Debug, Serialize)]
@@ -180,20 +181,50 @@ pub async fn list(
 
     let where_clause = where_parts.join(" AND ");
     let base = base_union_sql();
+    let deduplicar = params.deduplicar.unwrap_or(false);
 
-    // Query de dados
-    let sql = format!(
-        r#"SELECT nome, telefone, estado as uf, cidade, email, fonte
-           FROM ({base}) AS todos
-           WHERE {where_clause}
-           ORDER BY nome ASC
-           LIMIT {limit} OFFSET {offset}"#
-    );
+    // Query de dados — com ou sem deduplicação por telefone
+    let sql = if deduplicar {
+        format!(
+            r#"SELECT
+                MIN(nome)     as nome,
+                telefone,
+                MIN(estado)   as uf,
+                MIN(cidade)   as cidade,
+                MIN(email)    as email,
+                MIN(fonte)    as fonte
+               FROM ({base}) AS todos
+               WHERE {where_clause}
+               AND telefone IS NOT NULL AND TRIM(telefone) != ''
+               GROUP BY telefone
+               ORDER BY nome ASC
+               LIMIT {limit} OFFSET {offset}"#
+        )
+    } else {
+        format!(
+            r#"SELECT nome, telefone, estado as uf, cidade, email, fonte
+               FROM ({base}) AS todos
+               WHERE {where_clause}
+               ORDER BY nome ASC
+               LIMIT {limit} OFFSET {offset}"#
+        )
+    };
 
-    // Query de count
-    let count_sql = format!(
-        r#"SELECT COUNT(*) FROM ({base}) AS todos WHERE {where_clause}"#
-    );
+    // Query de count — adapta para deduplicação
+    let count_sql = if deduplicar {
+        format!(
+            r#"SELECT COUNT(*) FROM (
+                SELECT telefone FROM ({base}) AS todos
+                WHERE {where_clause}
+                AND telefone IS NOT NULL AND TRIM(telefone) != ''
+                GROUP BY telefone
+            ) AS dedup"#
+        )
+    } else {
+        format!(
+            r#"SELECT COUNT(*) FROM ({base}) AS todos WHERE {where_clause}"#
+        )
+    };
 
     let mut clientes: Vec<Cliente> = sqlx::query_as(&sql)
         .fetch_all(&state.db)

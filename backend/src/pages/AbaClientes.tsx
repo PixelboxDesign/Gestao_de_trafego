@@ -36,6 +36,7 @@ export default function AbaClientes() {
   const [search, setSearch]           = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [somenteTel, setSomenteTel]   = useState(false);
+  const [deduplicar, setDeduplicar]   = useState(false);
   const [loading, setLoading]         = useState(false);
   const [apiBase, setApiBase]         = useState(API);
 
@@ -59,7 +60,7 @@ export default function AbaClientes() {
       fetch(`${base}/api/clientes/filtros/cidades`).then(r => r.json()).then(setCidades).catch(() => {});
       fetch(`${base}/api/clientes/filtros/fontes`).then(r => r.json()).then(setFontes).catch(() => {});
       // carrega clientes iniciais
-      carregarComBase(base, 1, "", false, "", "", "");
+      carregarComBase(base, 1, "", false, "", "", "", false);
     });
   }, []);
 
@@ -71,6 +72,7 @@ export default function AbaClientes() {
     ufFiltro: string,
     cidadeFiltro: string,
     fonteFiltro: string,
+    dedup: boolean,
   ) => {
     setLoading(true);
     try {
@@ -80,6 +82,7 @@ export default function AbaClientes() {
       if (ufFiltro)     params.set("uf", ufFiltro);
       if (cidadeFiltro) params.set("cidade", cidadeFiltro);
       if (fonteFiltro)  params.set("fonte", fonteFiltro);
+      if (dedup)        params.set("deduplicar", "true");
 
       const res = await fetch(`${base}/api/clientes?${params}`);
       const json: ClientesResponse = await res.json();
@@ -100,13 +103,14 @@ export default function AbaClientes() {
     ufFiltro = uf,
     cidadeFiltro = cidade,
     fonteFiltro = fonte,
+    dedup = deduplicar,
   ) => {
-    carregarComBase(apiBase, pg, busca, apenasTel, ufFiltro, cidadeFiltro, fonteFiltro);
-  }, [apiBase, search, somenteTel, uf, cidade, fonte, carregarComBase]);
+    carregarComBase(apiBase, pg, busca, apenasTel, ufFiltro, cidadeFiltro, fonteFiltro, dedup);
+  }, [apiBase, search, somenteTel, uf, cidade, fonte, deduplicar, carregarComBase]);
 
   function buscar() {
     setSearch(searchInput);
-    carregar(1, searchInput, somenteTel, uf, cidade, fonte);
+    carregar(1, searchInput, somenteTel, uf, cidade, fonte, deduplicar);
   }
 
   const totalPages = Math.ceil(total / LIMIT);
@@ -139,7 +143,7 @@ export default function AbaClientes() {
         {search && (
           <button className="btn btn-secondary" onClick={() => {
             setSearchInput(""); setSearch("");
-            carregar(1, "", somenteTel, uf, cidade, fonte);
+            carregar(1, "", somenteTel, uf, cidade, fonte, deduplicar);
           }}>✕</button>
         )}
 
@@ -151,9 +155,28 @@ export default function AbaClientes() {
           color: somenteTel ? "var(--success)" : "var(--text2)", fontSize: 12, fontWeight: 600,
         }}>
           <input type="checkbox" checked={somenteTel}
-            onChange={e => { setSomenteTel(e.target.checked); carregar(1, search, e.target.checked, uf, cidade, fonte); }}
+            onChange={e => { setSomenteTel(e.target.checked); carregar(1, search, e.target.checked, uf, cidade, fonte, deduplicar); }}
             style={{ accentColor: "var(--success)" }} />
           📞 Com telefone
+        </label>
+
+        <label style={{
+          display: "flex", alignItems: "center", gap: 6, cursor: "pointer",
+          padding: "4px 10px", borderRadius: 6,
+          border: `1px solid ${deduplicar ? "var(--warning)" : "var(--border)"}`,
+          background: deduplicar ? "rgba(245,158,11,0.08)" : "transparent",
+          color: deduplicar ? "var(--warning)" : "var(--text2)", fontSize: 12, fontWeight: 600,
+        }}>
+          <input type="checkbox" checked={deduplicar}
+            onChange={e => {
+              const val = e.target.checked;
+              setDeduplicar(val);
+              // deduplicar implica ter telefone
+              if (val) setSomenteTel(true);
+              carregar(1, search, val ? true : somenteTel, uf, cidade, fonte, val);
+            }}
+            style={{ accentColor: "var(--warning)" }} />
+          🔀 Sem duplicatas
         </label>
 
         <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text2)" }}>
@@ -168,7 +191,7 @@ export default function AbaClientes() {
           <span style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>UF</span>
           <select style={selectStyle} value={uf} onChange={e => {
             setUf(e.target.value);
-            carregar(1, search, somenteTel, e.target.value, cidade, fonte);
+            carregar(1, search, somenteTel, e.target.value, cidade, fonte, deduplicar);
           }}>
             <option value="">Todos</option>
             {ufs.map(u => <option key={u} value={u}>{u}</option>)}
@@ -180,7 +203,7 @@ export default function AbaClientes() {
           <span style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Cidade</span>
           <select style={{ ...selectStyle, minWidth: 180 }} value={cidade} onChange={e => {
             setCidade(e.target.value);
-            carregar(1, search, somenteTel, uf, e.target.value, fonte);
+            carregar(1, search, somenteTel, uf, e.target.value, fonte, deduplicar);
           }}>
             <option value="">Todas</option>
             {cidades.map(c => <option key={c} value={c}>{c}</option>)}
@@ -192,7 +215,7 @@ export default function AbaClientes() {
           <span style={{ fontSize: 11, color: "var(--text2)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Fonte</span>
           <select style={selectStyle} value={fonte} onChange={e => {
             setFonte(e.target.value);
-            carregar(1, search, somenteTel, uf, cidade, e.target.value);
+            carregar(1, search, somenteTel, uf, cidade, e.target.value, deduplicar);
           }}>
             <option value="">Todas</option>
             {fontes.map(f => <option key={f} value={f}>{f}</option>)}
@@ -203,7 +226,7 @@ export default function AbaClientes() {
         {(uf || cidade || fonte) && (
           <button className="btn btn-secondary" style={{ marginLeft: "auto" }} onClick={() => {
             setUf(""); setCidade(""); setFonte("");
-            carregar(1, search, somenteTel, "", "", "");
+            carregar(1, search, somenteTel, "", "", "", deduplicar);
           }}>
             ✕ Limpar filtros
           </button>
@@ -248,11 +271,11 @@ export default function AbaClientes() {
 
       {/* Paginação */}
       <div style={{ padding: "0.75rem 1.25rem", borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "0.5rem", background: "var(--bg2)", flexShrink: 0 }}>
-        <button className="btn btn-secondary" onClick={() => carregar(1, search, somenteTel, uf, cidade, fonte)} disabled={page <= 1 || loading}>«</button>
-        <button className="btn btn-secondary" onClick={() => carregar(page - 1, search, somenteTel, uf, cidade, fonte)} disabled={page <= 1 || loading}>‹</button>
+        <button className="btn btn-secondary" onClick={() => carregar(1, search, somenteTel, uf, cidade, fonte, deduplicar)} disabled={page <= 1 || loading}>«</button>
+        <button className="btn btn-secondary" onClick={() => carregar(page - 1, search, somenteTel, uf, cidade, fonte, deduplicar)} disabled={page <= 1 || loading}>‹</button>
         <span style={{ fontSize: 12, color: "var(--text2)", minWidth: 100, textAlign: "center" }}>{page} / {totalPages || 1}</span>
-        <button className="btn btn-secondary" onClick={() => carregar(page + 1, search, somenteTel, uf, cidade, fonte)} disabled={page >= totalPages || loading}>›</button>
-        <button className="btn btn-secondary" onClick={() => carregar(totalPages, search, somenteTel, uf, cidade, fonte)} disabled={page >= totalPages || loading}>»</button>
+        <button className="btn btn-secondary" onClick={() => carregar(page + 1, search, somenteTel, uf, cidade, fonte, deduplicar)} disabled={page >= totalPages || loading}>›</button>
+        <button className="btn btn-secondary" onClick={() => carregar(totalPages, search, somenteTel, uf, cidade, fonte, deduplicar)} disabled={page >= totalPages || loading}>»</button>
       </div>
     </>
   );
