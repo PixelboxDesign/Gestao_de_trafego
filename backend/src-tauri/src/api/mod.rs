@@ -46,8 +46,10 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .route("/api/clientes/filtros/fontes", get(clientes::list_fontes))
         .route("/api/clientes/:id", get(clientes::get_by_id))
         // Rotas de catálogo
-        .route("/api/catalogo", get(catalogo::list_files))
-        .route("/api/catalogo/*path", get(catalogo::serve_file))
+        .route("/api/catalogo/kits", get(catalogo::listar_kits))
+        .route("/api/catalogo/imagem/:kit", get(catalogo::servir_imagem))
+        .route("/api/catalogo/salvar", axum::routing::post(catalogo::salvar_info))
+        .route("/api/catalogo/files/*path", get(catalogo::serve_file))
         // Rotas de WhatsApp
         .route("/api/whatsapp/status", get(whatsapp::status))
         .route("/api/whatsapp/qr", get(whatsapp::get_qr))

@@ -5,56 +5,208 @@ use axum::{
     response::Response,
     Json,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
 use tokio::{fs, sync::Mutex};
 
 use crate::AppState;
 
-const CATALOGO_BASE: &str = "f:\\luna_cosmeticos\\catalogo";
+const CATALOGO_BASE: &str = "f:\\luna_cosmeticos\\catalogos";
+
+// ─── Tipos ───────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Serialize)]
-pub struct CatalogoItem {
+pub struct Kit {
     pub nome: String,
-    pub tipo: String, // "arquivo" | "pasta"
-    pub tamanho: Option<u64>,
-    pub caminho: String,
+    pub tem_imagem: bool,
+    pub imagem_ext: Option<String>,
+    pub info: KitInfo,
 }
 
-/// Lista arquivos e pastas do catálogo
-pub async fn list_files(
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct KitInfo {
+    #[serde(default)]
+    pub preco: String,
+    #[serde(default)]
+    pub mensagem: String,
+}
+
+impl Default for KitInfo {
+    fn default() -> Self {
+        Self {
+            preco: String::new(),
+            mensagem: String::new(),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SalvarInfoBody {
+    pub kit: String,
+    pub preco: String,
+    pub mensagem: String,
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+fn catalogo_path() -> PathBuf {
+    PathBuf::from(CATALOGO_BASE)
+}
+
+/// Encontra a primeira imagem jpg/jpeg dentro de uma pasta de kit
+async fn encontrar_imagem(kit_path: &PathBuf) -> Option<String> {
+    if let Ok(mut entries) = fs::read_dir(kit_path).await {
+        while let Ok(Some(entry)) = entries.next_entry().await {
+            let nome = entry.file_name().to_string_lossy().to_lowercase();
+            if nome.ends_with(".jpg") || nome.ends_with(".jpeg") || nome.ends_with(".png") || nome.ends_with(".webp") {
+                return Some(entry.file_name().to_string_lossy().to_string());
+            }
+        }
+    }
+    None
+}
+
+/// Lê o info.json de um kit, retorna default se não existir
+async fn ler_info(kit_path: &PathBuf) -> KitInfo {
+    let info_path = kit_path.join("info.json");
+    if let Ok(conteudo) = fs::read_to_string(&info_path).await {
+        serde_json::from_str(&conteudo).unwrap_or_default()
+    } else {
+        KitInfo::default()
+    }
+}
+
+// ─── Handlers ────────────────────────────────────────────────────────────────
+
+/// GET /api/catalogo/kits — lista todas as subpastas como kits
+pub async fn listar_kits(
     State(_state): State<Arc<Mutex<AppState>>>,
-) -> Json<Vec<CatalogoItem>> {
-    let base = PathBuf::from(CATALOGO_BASE);
-    let mut items = Vec::new();
+) -> Json<Vec<Kit>> {
+    let base = catalogo_path();
+    let mut kits = Vec::new();
+
+    // Cria a pasta se não existir
+    let _ = fs::create_dir_all(&base).await;
 
     if let Ok(mut entries) = fs::read_dir(&base).await {
         while let Ok(Some(entry)) = entries.next_entry().await {
-            let metadata = entry.metadata().await.unwrap_or_else(|_| {
-                panic!("Falha ao ler metadata")
-            });
-            let nome = entry.file_name().to_string_lossy().to_string();
-            let tipo = if metadata.is_dir() { "pasta" } else { "arquivo" }.to_string();
-            let tamanho = if metadata.is_file() { Some(metadata.len()) } else { None };
-            let caminho = entry.path().to_string_lossy().to_string();
+            if let Ok(meta) = entry.metadata().await {
+                if !meta.is_dir() {
+                    continue;
+                }
+            }
 
-            items.push(CatalogoItem { nome, tipo, tamanho, caminho });
+            let nome = entry.file_name().to_string_lossy().to_string();
+            let kit_path = base.join(&nome);
+
+            let imagem_arquivo = encontrar_imagem(&kit_path).await;
+            let imagem_ext = imagem_arquivo.clone().and_then(|f| {
+                std::path::Path::new(&f)
+                    .extension()
+                    .map(|e| e.to_string_lossy().to_string())
+            });
+
+            let info = ler_info(&kit_path).await;
+
+            kits.push(Kit {
+                nome,
+                tem_imagem: imagem_arquivo.is_some(),
+                imagem_ext,
+                info,
+            });
         }
     }
 
-    items.sort_by(|a, b| a.nome.cmp(&b.nome));
-    Json(items)
+    kits.sort_by(|a, b| a.nome.cmp(&b.nome));
+    Json(kits)
 }
 
-/// Serve um arquivo do catálogo
+/// GET /api/catalogo/imagem/:kit — serve a imagem do kit
+pub async fn servir_imagem(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Path(kit_nome): Path<String>,
+) -> Result<Response<Body>, (StatusCode, String)> {
+    let base = catalogo_path();
+    let kit_path = base.join(&kit_nome);
+
+    // Segurança: garante que está dentro do catálogo
+    let canonical_base = base.canonicalize().map_err(|_| {
+        (StatusCode::INTERNAL_SERVER_ERROR, "Catálogo não encontrado".to_string())
+    })?;
+    let canonical_kit = kit_path.canonicalize().map_err(|_| {
+        (StatusCode::NOT_FOUND, format!("Kit '{}' não encontrado", kit_nome))
+    })?;
+    if !canonical_kit.starts_with(&canonical_base) {
+        return Err((StatusCode::FORBIDDEN, "Acesso negado".to_string()));
+    }
+
+    // Procura a imagem dentro do kit
+    let imagem_arquivo = encontrar_imagem(&canonical_kit).await
+        .ok_or_else(|| (StatusCode::NOT_FOUND, "Imagem não encontrada".to_string()))?;
+
+    let imagem_path = canonical_kit.join(&imagem_arquivo);
+    let content = fs::read(&imagem_path).await.map_err(|_| {
+        (StatusCode::NOT_FOUND, "Erro ao ler imagem".to_string())
+    })?;
+
+    let mime = mime_guess::from_path(&imagem_path)
+        .first_or_octet_stream()
+        .to_string();
+
+    Ok(Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, mime)
+        .header(header::CACHE_CONTROL, "public, max-age=3600")
+        .body(Body::from(content))
+        .unwrap())
+}
+
+/// POST /api/catalogo/salvar — salva info.json no kit
+pub async fn salvar_info(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Json(body): Json<SalvarInfoBody>,
+) -> Json<serde_json::Value> {
+    let base = catalogo_path();
+    let kit_path = base.join(&body.kit);
+
+    // Segurança
+    let canonical_base = match base.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Catálogo não encontrado" })),
+    };
+    let canonical_kit = match kit_path.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Kit não encontrado" })),
+    };
+    if !canonical_kit.starts_with(&canonical_base) {
+        return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
+    }
+
+    let info = KitInfo {
+        preco: body.preco.trim().to_string(),
+        mensagem: body.mensagem.trim().to_string(),
+    };
+
+    let json_str = match serde_json::to_string_pretty(&info) {
+        Ok(s) => s,
+        Err(e) => return Json(serde_json::json!({ "ok": false, "erro": e.to_string() })),
+    };
+
+    let info_path = canonical_kit.join("info.json");
+    match fs::write(&info_path, json_str).await {
+        Ok(_) => Json(serde_json::json!({ "ok": true })),
+        Err(e) => Json(serde_json::json!({ "ok": false, "erro": e.to_string() })),
+    }
+}
+
+/// GET /api/catalogo/files/*path — serve arquivos genéricos (compatibilidade)
 pub async fn serve_file(
     State(_state): State<Arc<Mutex<AppState>>>,
     Path(file_path): Path<String>,
 ) -> Result<Response<Body>, (StatusCode, String)> {
-    let base = PathBuf::from(CATALOGO_BASE);
+    let base = catalogo_path();
     let full_path = base.join(&file_path);
 
-    // Segurança: garantir que o path está dentro do catálogo
     let canonical = full_path.canonicalize().map_err(|_| {
         (StatusCode::NOT_FOUND, "Arquivo não encontrado".to_string())
     })?;

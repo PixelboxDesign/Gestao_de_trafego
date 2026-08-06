@@ -2,8 +2,9 @@ import { useState } from "react";
 import AbaClientes from "./pages/AbaClientes";
 import AbaWhatsApp from "./pages/AbaWhatsApp";
 import AbaLogs from "./pages/AbaLogs";
+import AbaCatalogo from "./pages/AbaCatalogo";
 
-type Aba = "clientes" | "whatsapp" | "logs";
+type Aba = "clientes" | "catalogo" | "whatsapp" | "logs";
 
 export default function App() {
   const [abaAtiva, setAbaAtiva] = useState<Aba>("clientes");
@@ -29,6 +30,12 @@ export default function App() {
           👥 Clientes
         </button>
         <button
+          className={`tab ${abaAtiva === "catalogo" ? "active" : ""}`}
+          onClick={() => setAbaAtiva("catalogo")}
+        >
+          📦 Catálogo
+        </button>
+        <button
           className={`tab ${abaAtiva === "whatsapp" ? "active" : ""}`}
           onClick={() => setAbaAtiva("whatsapp")}
         >
@@ -44,9 +51,10 @@ export default function App() {
 
       {/* Conteúdo */}
       <main className="content">
-        {abaAtiva === "clientes" && <AbaClientes />}
-        {abaAtiva === "whatsapp" && <AbaWhatsApp />}
-        {abaAtiva === "logs"     && <AbaLogs />}
+        {abaAtiva === "clientes"  && <AbaClientes />}
+        {abaAtiva === "catalogo"  && <AbaCatalogo />}
+        {abaAtiva === "whatsapp"  && <AbaWhatsApp />}
+        {abaAtiva === "logs"      && <AbaLogs />}
       </main>
     </div>
   );
