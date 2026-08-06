@@ -1,90 +1,81 @@
-use axum::{extract::State, Json};
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-use tokio::sync::Mutex;
+use axum::Json;
+use serde::Deserialize;
 
-use crate::{state::WhatsAppStatus, AppState};
+const SIDECAR_URL: &str = "http://127.0.0.1:3002";
 
-#[derive(Debug, Serialize)]
-pub struct WhatsAppStatusResponse {
-    pub status: String,
-    pub qr: Option<String>,
-    pub mensagem: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct SendMessageRequest {
-    pub numero: String,
-    #[allow(dead_code)]
-    pub mensagem: String,
-}
-
-pub async fn status(
-    State(state): State<Arc<Mutex<AppState>>>,
-) -> Json<WhatsAppStatusResponse> {
-    let state = state.lock().await;
-
-    let (status_str, qr, mensagem) = match &state.whatsapp_status {
-        WhatsAppStatus::Disconnected => (
-            "disconnected", None, "WhatsApp desconectado".to_string()
-        ),
-        WhatsAppStatus::Connecting => (
-            "connecting", None, "Aguardando conexão...".to_string()
-        ),
-        WhatsAppStatus::WaitingQr(qr_data) => (
-            "waiting_qr", Some(qr_data.clone()), "Escaneie o QR Code".to_string()
-        ),
-        WhatsAppStatus::Connected => (
-            "connected", None, "WhatsApp conectado".to_string()
-        ),
-        WhatsAppStatus::Error(msg) => (
-            "error", None, format!("Erro: {}", msg)
-        ),
-    };
-
-    Json(WhatsAppStatusResponse {
-        status: status_str.to_string(),
-        qr,
-        mensagem,
-    })
-}
-
-pub async fn get_qr(
-    State(state): State<Arc<Mutex<AppState>>>,
-) -> Json<serde_json::Value> {
-    let state = state.lock().await;
-
-    match &state.whatsapp_status {
-        WhatsAppStatus::WaitingQr(qr) => Json(serde_json::json!({
-            "disponivel": true,
-            "qr": qr
-        })),
-        _ => Json(serde_json::json!({
-            "disponivel": false,
-            "qr": null
+/// GET /api/whatsapp/status — repassa para o sidecar
+pub async fn status() -> Json<serde_json::Value> {
+    match reqwest::get(format!("{}/status", SIDECAR_URL)).await {
+        Ok(res) => {
+            let json = res.json::<serde_json::Value>().await.unwrap_or_else(|_| {
+                serde_json::json!({ "status": "error", "erro": "resposta inválida do sidecar" })
+            });
+            Json(json)
+        }
+        Err(_) => Json(serde_json::json!({
+            "status": "disconnected",
+            "qr_base64": null,
+            "numero": null,
+            "erro": "Sidecar WhatsApp não está rodando"
         })),
     }
 }
 
+/// GET /api/whatsapp/qr — retorna QR code em base64
+pub async fn get_qr() -> Json<serde_json::Value> {
+    match reqwest::get(format!("{}/qr", SIDECAR_URL)).await {
+        Ok(res) => {
+            let json = res.json::<serde_json::Value>().await.unwrap_or_else(|_| {
+                serde_json::json!({ "disponivel": false, "qr": null })
+            });
+            Json(json)
+        }
+        Err(_) => Json(serde_json::json!({ "disponivel": false, "qr": null })),
+    }
+}
+
+/// POST /api/whatsapp/desconectar
+pub async fn desconectar() -> Json<serde_json::Value> {
+    let client = reqwest::Client::new();
+    match client.post(format!("{}/desconectar", SIDECAR_URL)).send().await {
+        Ok(res) => {
+            let json = res.json::<serde_json::Value>().await.unwrap_or_else(|_| {
+                serde_json::json!({ "ok": false })
+            });
+            Json(json)
+        }
+        Err(e) => Json(serde_json::json!({ "ok": false, "erro": e.to_string() })),
+    }
+}
+
+/// POST /api/whatsapp/send
+#[derive(Debug, Deserialize)]
+pub struct SendMessageRequest {
+    pub numero: String,
+    pub mensagem: String,
+}
+
 pub async fn send_message(
-    State(state): State<Arc<Mutex<AppState>>>,
     Json(body): Json<SendMessageRequest>,
 ) -> Json<serde_json::Value> {
-    let mut state = state.lock().await;
+    let client = reqwest::Client::new();
+    let payload = serde_json::json!({
+        "numero": body.numero,
+        "mensagem": body.mensagem
+    });
 
-    match &state.whatsapp_status {
-        WhatsAppStatus::Connected => {
-            // TODO: integrar com biblioteca WhatsApp (baileys via sidecar Node.js)
-            state.add_log(
-                crate::state::LogLevel::Info,
-                "whatsapp",
-                &format!("Mensagem enviada para {}", body.numero),
-            );
-            Json(serde_json::json!({ "ok": true, "mensagem": "Enviado com sucesso" }))
+    match client
+        .post(format!("{}/enviar", SIDECAR_URL))
+        .json(&payload)
+        .send()
+        .await
+    {
+        Ok(res) => {
+            let json = res.json::<serde_json::Value>().await.unwrap_or_else(|_| {
+                serde_json::json!({ "ok": false })
+            });
+            Json(json)
         }
-        _ => Json(serde_json::json!({
-            "ok": false,
-            "mensagem": "WhatsApp não está conectado"
-        })),
+        Err(e) => Json(serde_json::json!({ "ok": false, "erro": e.to_string() })),
     }
 }

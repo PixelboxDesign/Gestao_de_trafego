@@ -13,6 +13,47 @@ use tracing::info;
 
 pub use state::AppState;
 
+/// Inicia o sidecar Node.js do WhatsApp em background
+fn iniciar_whatsapp_sidecar() {
+    let exe_dir = std::env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(|d| d.to_path_buf()))
+        .unwrap_or_else(|| std::path::PathBuf::from("."));
+
+    // Caminhos possíveis — release bundle primeiro, depois dev
+    let sidecar_paths = vec![
+        // Release: recursos bundled pelo Tauri ficam em _up/resources
+        exe_dir.join("_up_").join("resources").join("whatsapp-sidecar").join("server.js"),
+        // Release Windows: junto ao .exe
+        exe_dir.join("whatsapp-sidecar").join("server.js"),
+        // Dev: pasta do workspace
+        std::path::PathBuf::from("f:\\luna_cosmeticos\\backend\\whatsapp-sidecar\\server.js"),
+    ];
+
+    let server_path = sidecar_paths.into_iter().find(|p| {
+        let exists = p.exists();
+        info!("Verificando sidecar em {}: {}", p.display(), exists);
+        exists
+    });
+
+    match server_path {
+        Some(path) => {
+            info!("🟢 Iniciando WhatsApp sidecar: {}", path.display());
+            match std::process::Command::new("node")
+                .arg(&path)
+                .env("WHATSAPP_PORT", "3002")
+                .spawn()
+            {
+                Ok(_) => info!("✅ WhatsApp sidecar iniciado"),
+                Err(e) => tracing::error!("❌ Falha ao iniciar WhatsApp sidecar: {}", e),
+            }
+        }
+        None => {
+            tracing::warn!("⚠️ WhatsApp sidecar não encontrado — WhatsApp não disponível");
+        }
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Inicializar logs
@@ -53,6 +94,9 @@ pub fn run() {
 
                 info!("✅ API REST iniciada na porta 3001");
             });
+
+            // Iniciar sidecar WhatsApp
+            iniciar_whatsapp_sidecar();
 
             // Configurar system tray
             let quit = MenuItem::with_id(app, "quit", "Encerrar Luna Server", true, None::<&str>)?;

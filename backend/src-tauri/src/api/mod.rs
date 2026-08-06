@@ -51,10 +51,8 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         // Rotas de WhatsApp
         .route("/api/whatsapp/status", get(whatsapp::status))
         .route("/api/whatsapp/qr", get(whatsapp::get_qr))
-        .route(
-            "/api/whatsapp/send",
-            axum::routing::post(whatsapp::send_message),
-        )
+        .route("/api/whatsapp/desconectar", axum::routing::post(whatsapp::desconectar))
+        .route("/api/whatsapp/send", axum::routing::post(whatsapp::send_message))
         // Rotas de logs
         .route("/api/logs", get(logs::list))
         .layer(cors)
