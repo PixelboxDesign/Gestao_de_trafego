@@ -7,3 +7,10 @@ scripts_temporarios/node_modules/
 scripts_temporarios/package-lock.json
 scripts_temporarios/package.json
 prompts/
+
+# Imagens do catálogo — ficam só no servidor local, não vão pro git
+catalogos/**/*.png
+catalogos/**/*.jpg
+catalogos/**/*.jpeg
+catalogos/**/*.webp
+catalogos/**/*.gif
