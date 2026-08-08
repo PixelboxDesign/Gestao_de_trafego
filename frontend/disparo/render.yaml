@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: luna-disparo
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: LUNA_API_URL
+        value: http://100.78.156.3:3001
