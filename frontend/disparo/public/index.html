@@ -1,41 +1,418 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Luna Cosméticos — Disparo</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Luna — Disparo</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0f1117;
+      --bg2:     #1a1d27;
+      --bg3:     #22263a;
+      --border:  #2d3148;
+      --primary: #e91e63;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger:  #ef4444;
+      --info:    #3b82f6;
+      --text:    #e2e8f0;
+      --text2:   #94a3b8;
+    }
+
     body {
+      background: var(--bg);
+      color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0f0f0f;
-      color: #e2e8f0;
+      font-size: 13px;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.25rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+    .header-title { font-size: 15px; font-weight: 700; }
+    .header-right  { margin-left: auto; display: flex; align-items: center; gap: .5rem; font-size: 12px; color: var(--text2); }
+
+    /* ── Tabs ── */
+    .tabs {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      padding: 0 1rem;
+      flex-shrink: 0;
+    }
+    .tab {
+      padding: .75rem 1.25rem;
+      background: none; border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text2); cursor: pointer;
+      font-size: 13px; font-weight: 500;
+      transition: all .15s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* ── Content ── */
+    .content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .page    { display: none; flex: 1; flex-direction: column; overflow: auto; }
+    .page.active { display: flex; }
+
+    /* ── Dot ── */
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .dot-green  { background: var(--success); box-shadow: 0 0 6px var(--success); }
+    .dot-yellow { background: var(--warning); animation: pulse 1.5s infinite; }
+    .dot-red    { background: var(--danger); }
+    .dot-gray   { background: var(--text2); }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
+
+    /* ── Btn ── */
+    .btn {
+      padding: .45rem 1rem; border: none; border-radius: 6px;
+      font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+    }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover:not(:disabled) { opacity: .85; }
+    .btn-danger  { background: var(--danger); color: #fff; }
+    .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+
+    /* ── WhatsApp page ── */
+    #page-whatsapp {
+      padding: 1.5rem;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .wa-status-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+    .wa-status-row { display: flex; align-items: center; gap: .75rem; }
+    .wa-status-text { font-size: 15px; font-weight: 700; }
+
+    .qr-wrap {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      align-self: flex-start;
     }
-    .container {
+    .qr-wrap img { width: 220px; height: 220px; display: block; }
+
+    .qr-hint { font-size: 12px; color: var(--text2); max-width: 320px; line-height: 1.6; }
+
+    /* ── Histórico ── */
+    #page-whatsapp .historico-titulo {
+      font-size: 13px; font-weight: 700; color: var(--text2);
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: .75rem;
+      width: 100%;
+    }
+
+    .disparo-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .75rem;
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+    }
+    .disparo-card .numero { font-size: 13px; font-weight: 700; color: var(--text); }
+    .disparo-card .mensagem {
+      font-size: 11px; color: var(--text2); line-height: 1.5;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+    .disparo-card .meta {
+      font-size: 10px; color: var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: .25rem;
+    }
+    .badge {
+      padding: 2px 7px; border-radius: 999px; font-size: 10px; font-weight: 600;
+    }
+    .badge-ok   { background: rgba(34,197,94,.15); color: #4ade80; }
+    .badge-err  { background: rgba(239,68,68,.15);  color: #f87171; }
+    .badge-pend { background: rgba(245,158,11,.15); color: #fbbf24; }
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: .75rem; color: var(--text2); padding: 2rem; text-align: center;
+    }
+    .empty-state span { font-size: 36px; }
+
+    /* ── Offline banner ── */
+    #offline-banner {
+      display: none;
+      background: rgba(239,68,68,.15);
+      border-bottom: 1px solid var(--danger);
+      padding: .5rem 1.25rem;
+      font-size: 12px;
+      color: var(--danger);
       text-align: center;
-      padding: 2rem;
     }
-    h1 { font-size: 2rem; color: #e91e63; margin-bottom: 0.5rem; }
-    p  { color: #94a3b8; font-size: 1rem; }
+    #offline-banner.show { display: block; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🌙 Luna Cosméticos</h1>
-    <p>Disparo — em construção</p>
+
+<!-- Header -->
+<header class="header">
+  <span style="font-size:20px">🌙</span>
+  <span class="header-title">Luna Cosméticos — Disparo</span>
+  <div class="header-right">
+    <span class="dot" id="server-dot" style="background:var(--text2)"></span>
+    <span id="server-status">Verificando...</span>
   </div>
-  <script>
-    // Busca a URL da API do backend ao iniciar
-    fetch('/config')
-      .then(r => r.json())
-      .then(cfg => {
-        window.__LUNA_API__ = cfg.api;
-        console.log('[Luna Disparo] API:', cfg.api);
-      });
-  </script>
+</header>
+
+<!-- Offline banner -->
+<div id="offline-banner">
+  ⚠️ Luna Server inacessível — verifique se o computador está ligado e o Tailscale ativo
+</div>
+
+<!-- Tabs -->
+<nav class="tabs">
+  <button class="tab active" onclick="trocarAba('whatsapp', this)">💬 WhatsApp</button>
+</nav>
+
+<!-- Content -->
+<main class="content">
+
+  <!-- Aba WhatsApp -->
+  <div id="page-whatsapp" class="page active">
+
+    <!-- Card de status -->
+    <div class="wa-status-card">
+      <div class="wa-status-row">
+        <span class="dot dot-gray" id="wa-dot"></span>
+        <span class="wa-status-text" id="wa-status-texto">Verificando...</span>
+      </div>
+      <div id="wa-numero" style="font-size:13px;color:var(--text2);display:none">
+        📱 Conectado: <strong id="wa-numero-val" style="color:var(--success)"></strong>
+      </div>
+      <div id="wa-erro" style="font-size:12px;color:var(--danger);display:none;background:rgba(239,68,68,.1);padding:.5rem .75rem;border-radius:6px"></div>
+      <div id="wa-acoes" style="display:flex;gap:.5rem;margin-top:.25rem"></div>
+    </div>
+
+    <!-- QR Code (visível só quando status=qr) -->
+    <div id="wa-qr-area" style="display:none;flex-direction:column;gap:.75rem">
+      <p class="qr-hint">
+        Abra o WhatsApp no celular → <strong>Dispositivos conectados</strong> → <strong>Conectar dispositivo</strong> → escaneie o QR Code abaixo
+      </p>
+      <div class="qr-wrap">
+        <img id="wa-qr-img" src="" alt="QR Code WhatsApp"/>
+      </div>
+      <p style="font-size:11px;color:var(--text2)">O QR Code atualiza automaticamente</p>
+    </div>
+
+    <!-- Separador histórico -->
+    <p class="historico-titulo">Histórico de disparos</p>
+
+    <!-- Grid de cards -->
+    <div id="historico-grid" class="cards-grid"></div>
+
+  </div><!-- /page-whatsapp -->
+
+</main>
+
+<script>
+// ── Troca de aba ─────────────────────────────────────────────────────────────
+function trocarAba(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── API helper ───────────────────────────────────────────────────────────────
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+
+// ── Status do servidor ───────────────────────────────────────────────────────
+async function verificarServidor() {
+  try {
+    await api('/api/health');
+    document.getElementById('server-dot').className   = 'dot dot-green';
+    document.getElementById('server-status').textContent = 'Luna Server Online';
+    document.getElementById('offline-banner').classList.remove('show');
+    return true;
+  } catch {
+    document.getElementById('server-dot').className   = 'dot dot-red';
+    document.getElementById('server-status').textContent = 'Servidor Offline';
+    document.getElementById('offline-banner').classList.add('show');
+    return false;
+  }
+}
+
+// ── WhatsApp status ──────────────────────────────────────────────────────────
+const STATUS_CFG = {
+  disconnected: { cls: 'dot-red',    texto: 'Desconectado',         cor: 'var(--danger)'  },
+  qr:           { cls: 'dot-yellow', texto: 'Aguardando QR Code',   cor: 'var(--warning)' },
+  connecting:   { cls: 'dot-yellow', texto: 'Conectando...',         cor: 'var(--warning)' },
+  connected:    { cls: 'dot-green',  texto: 'Conectado',             cor: 'var(--success)' },
+  error:        { cls: 'dot-red',    texto: 'Erro de conexão',       cor: 'var(--danger)'  },
+};
+
+async function atualizarWhatsApp() {
+  try {
+    const d = await api('/api/whatsapp/status');
+    const cfg = STATUS_CFG[d.status] || STATUS_CFG.disconnected;
+
+    document.getElementById('wa-dot').className         = `dot ${cfg.cls}`;
+    document.getElementById('wa-status-texto').textContent = cfg.texto;
+    document.getElementById('wa-status-texto').style.color = cfg.cor;
+
+    // Número conectado
+    const elNum = document.getElementById('wa-numero');
+    if (d.numero) {
+      document.getElementById('wa-numero-val').textContent = '+' + d.numero;
+      elNum.style.display = 'block';
+    } else {
+      elNum.style.display = 'none';
+    }
+
+    // Erro
+    const elErro = document.getElementById('wa-erro');
+    if (d.erro && d.status === 'error') {
+      elErro.textContent = d.erro;
+      elErro.style.display = 'block';
+    } else {
+      elErro.style.display = 'none';
+    }
+
+    // Botões de ação
+    const elAcoes = document.getElementById('wa-acoes');
+    elAcoes.innerHTML = '';
+    if (d.status === 'connected') {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-danger';
+      btn.textContent = 'Desconectar';
+      btn.onclick = desconectarWhatsApp;
+      elAcoes.appendChild(btn);
+    }
+
+    // QR Code
+    const qrArea = document.getElementById('wa-qr-area');
+    if (d.status === 'qr' && d.qr_base64) {
+      document.getElementById('wa-qr-img').src = d.qr_base64;
+      qrArea.style.display = 'flex';
+    } else {
+      qrArea.style.display = 'none';
+    }
+
+  } catch {
+    // servidor offline — já tratado em verificarServidor
+  }
+}
+
+async function desconectarWhatsApp() {
+  try {
+    await api('/api/whatsapp/desconectar', { method: 'POST' });
+  } catch {}
+}
+
+// ── Histórico de disparos ─────────────────────────────────────────────────────
+async function carregarHistorico() {
+  try {
+    const d = await api('/api/disparos?limit=60');
+    renderHistorico(d.data || []);
+  } catch {
+    renderHistorico([]);
+  }
+}
+
+function renderHistorico(lista) {
+  const grid = document.getElementById('historico-grid');
+
+  if (lista.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <span>📭</span>
+        <p>Nenhum disparo registrado ainda</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = lista.map(d => {
+    const badgeCls = d.status === 'enviado' ? 'badge-ok' : d.status === 'erro' ? 'badge-err' : 'badge-pend';
+    const badgeTxt = d.status === 'enviado' ? 'Enviado' : d.status === 'erro' ? 'Erro' : 'Pendente';
+    const data = d.criado_em ? new Date(d.criado_em).toLocaleString('pt-BR', {
+      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+    }) : '';
+    const nome = d.nome ? `<div style="font-size:11px;color:var(--text2)">${esc(d.nome)}</div>` : '';
+    return `
+      <div class="disparo-card">
+        <div class="numero">${esc(formatarTel(d.numero))}</div>
+        ${nome}
+        <div class="mensagem">${esc(d.mensagem)}</div>
+        <div class="meta">
+          <span>${data}</span>
+          <span class="badge ${badgeCls}">${badgeTxt}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatarTel(n) {
+  const d = String(n || '').replace(/\D/g,'');
+  if (d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+  if (d.length === 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+  return n;
+}
+
+// ── Loop principal ───────────────────────────────────────────────────────────
+async function tick() {
+  const online = await verificarServidor();
+  if (online) {
+    await atualizarWhatsApp();
+    await carregarHistorico();
+  }
+}
+
+tick();
+setInterval(tick, 4000); // atualiza a cada 4s
+</script>
 </body>
 </html>

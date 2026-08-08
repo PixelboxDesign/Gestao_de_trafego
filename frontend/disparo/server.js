@@ -1,29 +1,60 @@
+require('dotenv').config();
 const express = require('express');
-const path = require('path');
+const fetch   = require('node-fetch');
+const path    = require('path');
 
-const app = express();
+const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// URL do backend Luna Server (via Tailscale)
-// Configurar no Render como variável de ambiente: LUNA_API_URL
+// URL do Luna Server local (via Tailscale)
 const LUNA_API = process.env.LUNA_API_URL || 'http://100.78.156.3:3001';
 
 app.use(express.json());
-
-// Serve os arquivos estáticos do frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Expõe a URL da API para o frontend via endpoint de configuração
-app.get('/config', (req, res) => {
-  res.json({ api: LUNA_API });
+// ─── Proxy para o Luna Server local ──────────────────────────────────────────
+// Qualquer chamada /api/* é repassada para o computador local via Tailscale
+
+app.all('/api/*', async (req, res) => {
+  const destino = `${LUNA_API}${req.originalUrl}`;
+  try {
+    const opcoes = {
+      method: req.method,
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 10000,
+    };
+    if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
+      opcoes.body = JSON.stringify(req.body);
+    }
+    const resposta = await fetch(destino, opcoes);
+
+    // Repassa Content-Type da resposta
+    const ct = resposta.headers.get('content-type') || 'application/json';
+    res.status(resposta.status).set('Content-Type', ct);
+
+    // Para imagens, repassa buffer binário
+    if (ct.startsWith('image/')) {
+      const buffer = await resposta.buffer();
+      res.send(buffer);
+    } else {
+      const texto = await resposta.text();
+      res.send(texto);
+    }
+  } catch (err) {
+    res.status(503).json({
+      erro: 'Luna Server inacessível',
+      detalhe: err.message,
+      dica: 'Verifique se o Luna Server está rodando e o Tailscale está ativo'
+    });
+  }
 });
 
-// Rota catch-all — serve o index.html para SPA
+// ─── SPA catch-all ────────────────────────────────────────────────────────────
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(`[Luna Disparo] Rodando na porta ${PORT}`);
-  console.log(`[Luna Disparo] API backend: ${LUNA_API}`);
+  console.log(`[Luna Disparo] Porta ${PORT}`);
+  console.log(`[Luna Disparo] Proxy → ${LUNA_API}`);
 });

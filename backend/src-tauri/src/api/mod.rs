@@ -1,5 +1,6 @@
 pub mod catalogo;
 pub mod clientes;
+pub mod disparos;
 pub mod logs;
 pub mod whatsapp;
 
@@ -57,6 +58,9 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .route("/api/whatsapp/send", axum::routing::post(whatsapp::send_message))
         // Rotas de logs
         .route("/api/logs", get(logs::list))
+        // Rotas de disparos
+        .route("/api/disparos", get(disparos::list))
+        .route("/api/disparos", axum::routing::post(disparos::criar))
         .layer(cors)
         .with_state(state);
 
