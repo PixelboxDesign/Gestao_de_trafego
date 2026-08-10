@@ -10,7 +10,15 @@ const PORT = process.env.PORT || 3000;
 const LUNA_API = process.env.LUNA_API_URL || 'https://repackage-backstage-snowcap.ngrok-free.dev';
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Desativa cache de arquivos estáticos para garantir versão mais recente
+app.use(express.static(path.join(__dirname, 'public'), {
+  etag: false,
+  lastModified: false,
+  setHeaders: (res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  }
+}));
 
 // Endpoint de diagnóstico — mostra a URL que está sendo usada
 app.get('/diagnostico', (req, res) => {
