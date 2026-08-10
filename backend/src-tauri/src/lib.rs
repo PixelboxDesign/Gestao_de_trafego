@@ -13,6 +13,19 @@ use tracing::info;
 
 pub use state::AppState;
 
+/// Inicia o ngrok em background apontando para a porta 3001
+fn iniciar_ngrok() {
+    let dominio = "repackage-backstage-snowcap.ngrok-free.app";
+    info!("🟢 Iniciando ngrok → {}", dominio);
+    match std::process::Command::new("ngrok")
+        .args(["http", &format!("--url={}", dominio), "3001"])
+        .spawn()
+    {
+        Ok(_) => info!("✅ ngrok iniciado — https://{}", dominio),
+        Err(e) => tracing::warn!("⚠️ ngrok não encontrado ou falhou: {} — API só acessível localmente", e),
+    }
+}
+
 /// Inicia o sidecar Node.js do WhatsApp em background
 fn iniciar_whatsapp_sidecar() {
     let exe_dir = std::env::current_exe()
@@ -94,6 +107,9 @@ pub fn run() {
 
                 info!("✅ API REST iniciada na porta 3001");
             });
+
+            // Iniciar ngrok (expõe porta 3001 publicamente)
+            iniciar_ngrok();
 
             // Iniciar sidecar WhatsApp
             iniciar_whatsapp_sidecar();

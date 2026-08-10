@@ -20,7 +20,10 @@ app.all('/api/*', async (req, res) => {
   try {
     const opcoes = {
       method: req.method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+      },
       timeout: 10000,
     };
     if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
