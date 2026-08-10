@@ -7,10 +7,19 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 // URL do Luna Server local (via Tailscale)
-const LUNA_API = process.env.LUNA_API_URL || 'http://100.78.156.3:3001';
+const LUNA_API = process.env.LUNA_API_URL || 'https://repackage-backstage-snowcap.ngrok-free.dev';
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Endpoint de diagnóstico — mostra a URL que está sendo usada
+app.get('/diagnostico', (req, res) => {
+  res.json({
+    luna_api: LUNA_API,
+    env_set: !!process.env.LUNA_API_URL,
+    node_env: process.env.NODE_ENV || 'development',
+  });
+});
 
 // ─── Proxy para o Luna Server local ──────────────────────────────────────────
 // Qualquer chamada /api/* é repassada para o computador local via Tailscale
