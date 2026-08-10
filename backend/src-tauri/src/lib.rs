@@ -31,12 +31,18 @@ fn spawn_oculto(programa: &str, args: &[&str], envs: &[(&str, &str)]) -> bool {
     }
 }
 
-/// Inicia o ngrok em background sem janela
-fn iniciar_ngrok() {
+/// Inicia o ngrok em background sem janela (DESATIVADO - usando Cloudflare Tunnel)
+fn _iniciar_ngrok() {
     let dominio = "repackage-backstage-snowcap.ngrok-free.dev";
     info!("🟢 Iniciando ngrok → {}", dominio);
-    // --log=stdout desativa o browser warning banner
     spawn_oculto("ngrok", &["http", "--log=stdout", "3001"], &[]);
+}
+
+/// Inicia o Cloudflare Tunnel em background sem janela
+fn iniciar_cloudflare_tunnel() {
+    info!("🟢 Iniciando Cloudflare Tunnel (Quick Tunnel)");
+    // Quick Tunnel: URL temporária, sem configuração, inicia instantaneamente
+    spawn_oculto("cloudflared", &["tunnel", "--url", "http://localhost:3001"], &[]);
 }
 
 /// Inicia o sidecar Node.js do WhatsApp em background sem janela
@@ -101,8 +107,8 @@ pub fn run() {
                 info!("✅ API REST iniciada na porta 3001");
             });
 
-            // Iniciar ngrok (expõe porta 3001 publicamente)
-            iniciar_ngrok();
+            // Iniciar Cloudflare Tunnel (expõe porta 3001 publicamente)
+            iniciar_cloudflare_tunnel();
 
             // Iniciar sidecar WhatsApp
             iniciar_whatsapp_sidecar();
