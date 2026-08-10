@@ -35,7 +35,8 @@ fn spawn_oculto(programa: &str, args: &[&str], envs: &[(&str, &str)]) -> bool {
 fn iniciar_ngrok() {
     let dominio = "repackage-backstage-snowcap.ngrok-free.dev";
     info!("🟢 Iniciando ngrok → {}", dominio);
-    spawn_oculto("ngrok", &["http", &format!("--url={}", dominio), "3001"], &[]);
+    // --log=stdout desativa o browser warning banner
+    spawn_oculto("ngrok", &["http", "--log=stdout", "3001"], &[]);
 }
 
 /// Inicia o sidecar Node.js do WhatsApp em background sem janela
