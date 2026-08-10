@@ -1,6 +1,6 @@
 use axum::{
     body::Body,
-    extract::{Path, State},
+    extract::{Path, State, Multipart},
     http::{header, StatusCode},
     response::Response,
     Json,
@@ -230,4 +230,76 @@ pub async fn serve_file(
         .header(header::CONTENT_TYPE, mime)
         .body(Body::from(content))
         .unwrap())
+}
+
+/// POST /api/catalogo/upload-imagem/:kit — faz upload de imagem para o kit
+pub async fn upload_imagem(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Path(kit_nome): Path<String>,
+    mut multipart: Multipart,
+) -> Json<serde_json::Value> {
+    let base = catalogo_path();
+    let kit_path = base.join(&kit_nome);
+
+    // Segurança: valida que o kit existe e está dentro do catálogo
+    let canonical_base = match base.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Catálogo não encontrado" })),
+    };
+    let canonical_kit = match kit_path.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Kit não encontrado" })),
+    };
+    if !canonical_kit.starts_with(&canonical_base) {
+        return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
+    }
+
+    // Processa o upload
+    while let Ok(Some(field)) = multipart.next_field().await {
+        let name = field.name().unwrap_or("").to_string();
+        if name != "imagem" {
+            continue;
+        }
+
+        // Lê os bytes do arquivo
+        let data = match field.bytes().await {
+            Ok(bytes) => bytes,
+            Err(e) => return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao ler arquivo: {}", e) })),
+        };
+
+        // Valida tamanho (5MB)
+        if data.len() > 5 * 1024 * 1024 {
+            return Json(serde_json::json!({ "ok": false, "erro": "Arquivo muito grande (máx 5MB)" }));
+        }
+
+        // Detecta extensão pelo magic bytes
+        let ext = if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
+            "jpg"
+        } else if data.starts_with(&[0x89, 0x50, 0x4E, 0x47]) {
+            "png"
+        } else if data.starts_with(b"RIFF") && data.len() > 12 && &data[8..12] == b"WEBP" {
+            "webp"
+        } else {
+            return Json(serde_json::json!({ "ok": false, "erro": "Formato de imagem inválido (use JPG, PNG ou WebP)" }));
+        };
+
+        // Remove imagens antigas do kit
+        if let Ok(mut entries) = fs::read_dir(&canonical_kit).await {
+            while let Ok(Some(entry)) = entries.next_entry().await {
+                let nome = entry.file_name().to_string_lossy().to_lowercase();
+                if nome.ends_with(".jpg") || nome.ends_with(".jpeg") || nome.ends_with(".png") || nome.ends_with(".webp") {
+                    let _ = fs::remove_file(entry.path()).await;
+                }
+            }
+        }
+
+        // Salva nova imagem
+        let img_path = canonical_kit.join(format!("imagem.{}", ext));
+        match fs::write(&img_path, &data).await {
+            Ok(_) => return Json(serde_json::json!({ "ok": true, "caminho": img_path.to_string_lossy() })),
+            Err(e) => return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao salvar: {}", e) })),
+        }
+    }
+
+    Json(serde_json::json!({ "ok": false, "erro": "Nenhum arquivo recebido" }))
 }
