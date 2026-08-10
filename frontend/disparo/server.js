@@ -11,6 +11,15 @@ const LUNA_API = process.env.LUNA_API_URL || 'https://repackage-backstage-snowca
 
 app.use(express.json());
 
+// CORS headers para permitir requests do browser
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
 // Desativa cache de arquivos estáticos para garantir versão mais recente
 app.use(express.static(path.join(__dirname, 'public'), {
   etag: false,
