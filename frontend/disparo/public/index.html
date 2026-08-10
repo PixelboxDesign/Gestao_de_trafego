@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Luna — Disparo v4</title>
-  <!-- Build: 2026-08-10T14:33 -->
+  <title>Luna — Disparo v5</title>
+  <!-- Build: 2026-08-10T16:47 CLOUDFLARE -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -252,6 +255,13 @@
 </main>
 
 <script>
+// ── Service Worker Killer ────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => reg.unregister());
+  });
+}
+
 // ── Troca de aba ─────────────────────────────────────────────────────────────
 function trocarAba(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -269,13 +279,19 @@ async function api(path, opts) {
 
 // ── Status do servidor ───────────────────────────────────────────────────────
 async function verificarServidor() {
-  console.log('[Luna] verificando servidor via /health-check');
+  const buildVersion = 'v5-cloudflare-16h47';
+  console.log(`[Luna ${buildVersion}] verificando servidor via /health-check`);
   try {
-    // Timeout maior para dar tempo do Render acordar (plano gratuito dorme rápido)
+    // Adiciona timestamp para evitar cache
+    const url = `/health-check?_=${Date.now()}`;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     
-    const r = await fetch('/health-check', { signal: controller.signal });
+    const r = await fetch(url, { 
+      signal: controller.signal,
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache' }
+    });
     clearTimeout(timeoutId);
     
     const data = await r.json();
