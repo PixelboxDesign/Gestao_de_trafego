@@ -100,4 +100,9 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`[Luna Disparo] Porta ${PORT}`);
   console.log(`[Luna Disparo] Proxy → ${LUNA_API}`);
+  
+  // Ping a cada 5min para evitar que o Render durma (plano gratuito)
+  setInterval(() => {
+    fetch(`http://localhost:${PORT}/health-check`).catch(() => {});
+  }, 5 * 60 * 1000);
 });
