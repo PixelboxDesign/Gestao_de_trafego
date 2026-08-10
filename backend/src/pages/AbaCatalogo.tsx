@@ -1,9 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 
 const API = "http://localhost:3001";
+const MARCA_PADRAO = "Alphahall"; // Marca padrão
 
 interface Kit {
   nome: string;
+  marca: string;
   tem_imagem: boolean;
   imagem_ext: string | null;
   info: {
@@ -31,7 +33,7 @@ export default function AbaCatalogo() {
     setLoading(true);
     setErro(null);
     try {
-      const res = await fetch(`${API}/api/catalogo/kits`);
+      const res = await fetch(`${API}/api/catalogo/kits/${encodeURIComponent(MARCA_PADRAO)}`);
       const data: Kit[] = await res.json();
       setKits(data);
     } catch {
@@ -66,6 +68,7 @@ export default function AbaCatalogo() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          marca: modal.kit.marca,
           kit: modal.kit.nome,
           preco: modal.preco,
           mensagem: modal.mensagem,
@@ -195,7 +198,7 @@ export default function AbaCatalogo() {
             {modal.kit.tem_imagem && (
               <div style={{ background: "var(--bg3)", display: "flex", justifyContent: "center", padding: "1rem" }}>
                 <img
-                  src={`${API}/api/catalogo/imagem/${encodeURIComponent(modal.kit.nome)}?t=${Date.now()}`}
+                  src={`${API}/api/catalogo/imagem/${encodeURIComponent(modal.kit.marca)}/${encodeURIComponent(modal.kit.nome)}?t=${Date.now()}`}
                   alt={modal.kit.nome}
                   style={{
                     maxHeight: 200, maxWidth: "100%",
@@ -318,7 +321,7 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
       }}>
         {kit.tem_imagem && !imgErro ? (
           <img
-            src={`${API}/api/catalogo/imagem/${encodeURIComponent(kit.nome)}`}
+            src={`${API}/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}`}
             alt={kit.nome}
             onError={() => setImgErro(true)}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
