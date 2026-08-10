@@ -6,4 +6,4 @@ services:
     startCommand: npm start
     envVars:
       - key: LUNA_API_URL
-        value: https://repackage-backstage-snowcap.ngrok-free.app
+        value: https://repackage-backstage-snowcap.ngrok-free.dev

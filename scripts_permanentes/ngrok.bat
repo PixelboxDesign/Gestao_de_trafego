@@ -1,2 +1,2 @@
 @echo off
-ngrok http --url=repackage-backstage-snowcap.ngrok-free.app 3001
+ngrok http --url=repackage-backstage-snowcap.ngrok-free.dev 3001

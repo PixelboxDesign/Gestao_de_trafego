@@ -15,7 +15,7 @@ pub use state::AppState;
 
 /// Inicia o ngrok em background apontando para a porta 3001
 fn iniciar_ngrok() {
-    let dominio = "repackage-backstage-snowcap.ngrok-free.app";
+    let dominio = "repackage-backstage-snowcap.ngrok-free.dev";
     info!("🟢 Iniciando ngrok → {}", dominio);
     match std::process::Command::new("ngrok")
         .args(["http", &format!("--url={}", dominio), "3001"])
