@@ -3,11 +3,20 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Luna — Disparo v5</title>
-  <!-- Build: 2026-08-10T16:47 CLOUDFLARE -->
+  <title>Luna — Disparo v6</title>
+  <!-- Build: 2026-08-10T16:58 FORCE-RELOAD -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+  <script>
+    // Force reload se estiver com versão antiga no cache
+    const CURRENT_VERSION = 6;
+    const stored = localStorage.getItem('luna_version');
+    if (!stored || parseInt(stored) < CURRENT_VERSION) {
+      localStorage.setItem('luna_version', CURRENT_VERSION);
+      if (stored) location.replace(location.href + '?v=' + Date.now());
+    }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -279,7 +288,7 @@ async function api(path, opts) {
 
 // ── Status do servidor ───────────────────────────────────────────────────────
 async function verificarServidor() {
-  const buildVersion = 'v5-cloudflare-16h47';
+  const buildVersion = 'v6-force-reload-16h58';
   console.log(`[Luna ${buildVersion}] verificando servidor via /health-check`);
   try {
     // Adiciona timestamp para evitar cache
