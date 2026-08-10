@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Luna — Disparo</title>
+  <title>Luna — Disparo v2</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -268,9 +268,11 @@ async function api(path, opts) {
 
 // ── Status do servidor ───────────────────────────────────────────────────────
 async function verificarServidor() {
+  console.log('[Luna] verificando servidor via /health-check');
   try {
     const r = await fetch('/health-check');
     const data = await r.json();
+    console.log('[Luna] health-check resposta:', data);
     if (data.ok) {
       document.getElementById('server-dot').className      = 'dot dot-green';
       document.getElementById('server-status').textContent = 'Luna Server Online';
@@ -278,7 +280,8 @@ async function verificarServidor() {
       return true;
     }
     throw new Error(data.erro || 'offline');
-  } catch {
+  } catch(e) {
+    console.error('[Luna] servidor offline:', e.message);
     document.getElementById('server-dot').className      = 'dot dot-red';
     document.getElementById('server-status').textContent = 'Servidor Offline';
     document.getElementById('offline-banner').classList.add('show');
