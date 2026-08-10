@@ -21,6 +21,20 @@ app.get('/diagnostico', (req, res) => {
   });
 });
 
+// Health check — repassa /health do backend
+app.get('/health-check', async (req, res) => {
+  try {
+    const r = await fetch(`${LUNA_API}/health`, {
+      headers: { 'ngrok-skip-browser-warning': 'true' },
+      timeout: 5000,
+    });
+    const data = await r.json();
+    res.json({ ok: true, backend: data });
+  } catch (err) {
+    res.status(503).json({ ok: false, erro: err.message });
+  }
+});
+
 // ─── Proxy para o Luna Server local ──────────────────────────────────────────
 // Qualquer chamada /api/* é repassada para o computador local via Tailscale
 

@@ -269,13 +269,17 @@ async function api(path, opts) {
 // ── Status do servidor ───────────────────────────────────────────────────────
 async function verificarServidor() {
   try {
-    await api('/api/health');
-    document.getElementById('server-dot').className   = 'dot dot-green';
-    document.getElementById('server-status').textContent = 'Luna Server Online';
-    document.getElementById('offline-banner').classList.remove('show');
-    return true;
+    const r = await fetch('/health-check');
+    const data = await r.json();
+    if (data.ok) {
+      document.getElementById('server-dot').className      = 'dot dot-green';
+      document.getElementById('server-status').textContent = 'Luna Server Online';
+      document.getElementById('offline-banner').classList.remove('show');
+      return true;
+    }
+    throw new Error(data.erro || 'offline');
   } catch {
-    document.getElementById('server-dot').className   = 'dot dot-red';
+    document.getElementById('server-dot').className      = 'dot dot-red';
     document.getElementById('server-status').textContent = 'Servidor Offline';
     document.getElementById('offline-banner').classList.add('show');
     return false;
