@@ -7,7 +7,7 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 // URL do Luna Server local (via Tailscale)
-const LUNA_API = process.env.LUNA_API_URL || 'https://saying-gardening-optimize-rotation.trycloudflare.com';
+const LUNA_API = process.env.LUNA_API_URL || 'https://antarctica-reached-pmc-conventions.trycloudflare.com';
 
 app.use(express.json());
 

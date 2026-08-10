@@ -6,4 +6,4 @@ services:
     startCommand: npm start
     envVars:
       - key: LUNA_API_URL
-        value: https://saying-gardening-optimize-rotation.trycloudflare.com
+        value: https://antarctica-reached-pmc-conventions.trycloudflare.com
