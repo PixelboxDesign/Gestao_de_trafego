@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Luna — Disparo v6</title>
-  <!-- Build: 2026-08-10T16:58 FORCE-RELOAD -->
+  <title>Luna — Disparo v7</title>
+  <!-- Build: 2026-08-10T18:15 LAZY-LOAD -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 6;
+    const CURRENT_VERSION = 7;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -466,7 +466,7 @@
 <!-- Tabs -->
 <nav class="tabs">
   <button class="tab active" onclick="trocarAba('whatsapp', this)">💬 WhatsApp</button>
-  <button class="tab" onclick="trocarAba('catalogo', this)">📦 Catálogo</button>
+  <button class="tab" onclick="trocarAba('catalogo', this)">💰 Precificação</button>
 </nav>
 
 <!-- Content -->
@@ -835,7 +835,13 @@ function renderKits(lista) {
     <div class="kit-card" onclick="abrirModalKit('${esc(kit.nome)}')">
       <div class="kit-img-area">
         ${kit.tem_imagem 
-          ? `<img src="/api/catalogo/imagem/${encodeURIComponent(kit.nome)}?t=${Date.now()}" alt="${esc(kit.nome)}" onerror="this.parentElement.innerHTML='<span class=\\'kit-img-placeholder\\'>📦</span>'">`
+          ? `<img 
+              loading="lazy" 
+              data-src="/api/catalogo/imagem/${encodeURIComponent(kit.nome)}" 
+              alt="${esc(kit.nome)}" 
+              class="lazy-img"
+              style="background:var(--bg3)"
+            />`
           : `<span class="kit-img-placeholder">📦</span>`
         }
       </div>
@@ -854,6 +860,9 @@ function renderKits(lista) {
       </div>
     </div>
   `).join('');
+
+  // Inicializa lazy loading
+  initLazyLoad();
 }
 
 function filtrarKits(busca) {
@@ -879,9 +888,10 @@ function abrirModalKit(nomeKit) {
 
   const imgWrap = document.getElementById('modal-kit-img-wrap');
   if (kitAtual.tem_imagem) {
+    // Usar cache da imagem se já foi carregada
     imgWrap.innerHTML = `
       <div class="modal-img-preview">
-        <img src="/api/catalogo/imagem/${encodeURIComponent(kitAtual.nome)}?t=${Date.now()}" alt="${esc(kitAtual.nome)}"/>
+        <img src="/api/catalogo/imagem/${encodeURIComponent(kitAtual.nome)}" alt="${esc(kitAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
       </div>`;
   } else {
     imgWrap.innerHTML = `
@@ -1003,6 +1013,51 @@ trocarAba = function(id, btn) {
     carregarCatalogo();
   }
 };
+
+// ── Lazy loading de imagens ──────────────────────────────────────────────────
+let lazyLoadObserver = null;
+
+function initLazyLoad() {
+  if (lazyLoadObserver) {
+    lazyLoadObserver.disconnect();
+  }
+
+  const lazyImages = document.querySelectorAll('img.lazy-img[data-src]');
+  
+  if ('IntersectionObserver' in window) {
+    lazyLoadObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.getAttribute('data-src');
+          
+          // Carrega imagem
+          img.src = src;
+          img.removeAttribute('data-src');
+          img.classList.remove('lazy-img');
+          
+          // Para de observar esta imagem
+          observer.unobserve(img);
+          
+          // Fallback se der erro
+          img.onerror = function() {
+            this.parentElement.innerHTML = '<span class="kit-img-placeholder">📦</span>';
+          };
+        }
+      });
+    }, {
+      rootMargin: '50px' // Começa a carregar 50px antes de entrar na tela
+    });
+
+    lazyImages.forEach(img => lazyLoadObserver.observe(img));
+  } else {
+    // Fallback para browsers antigos
+    lazyImages.forEach(img => {
+      img.src = img.getAttribute('data-src');
+      img.removeAttribute('data-src');
+    });
+  }
+}
 </script>
 </body>
 </html>

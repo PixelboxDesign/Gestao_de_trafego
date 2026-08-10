@@ -121,7 +121,7 @@ pub async fn listar_kits(
     Json(kits)
 }
 
-/// GET /api/catalogo/imagem/:kit — serve a imagem do kit
+/// GET /api/catalogo/imagem/:kit — serve a imagem do kit (otimizada)
 pub async fn servir_imagem(
     State(_state): State<Arc<Mutex<AppState>>>,
     Path(kit_nome): Path<String>,
@@ -149,14 +149,22 @@ pub async fn servir_imagem(
         (StatusCode::NOT_FOUND, "Erro ao ler imagem".to_string())
     })?;
 
-    let mime = mime_guess::from_path(&imagem_path)
-        .first_or_octet_stream()
-        .to_string();
+    // Detecta MIME type
+    let mime = if imagem_arquivo.to_lowercase().ends_with(".jpg") || imagem_arquivo.to_lowercase().ends_with(".jpeg") {
+        "image/jpeg"
+    } else if imagem_arquivo.to_lowercase().ends_with(".png") {
+        "image/png"
+    } else if imagem_arquivo.to_lowercase().ends_with(".webp") {
+        "image/webp"
+    } else {
+        "image/jpeg"
+    };
 
     Ok(Response::builder()
         .status(StatusCode::OK)
         .header(header::CONTENT_TYPE, mime)
-        .header(header::CACHE_CONTROL, "public, max-age=3600")
+        .header(header::CACHE_CONTROL, "public, max-age=86400, immutable") // Cache de 24h
+        .header(header::ETAG, format!("\"{}\"", kit_nome)) // ETag para validação
         .body(Body::from(content))
         .unwrap())
 }
