@@ -25,7 +25,7 @@ tauri-plugin-http = "2"
 tauri-plugin-notification = "2"
 
 # HTTP Server (API REST interna)
-axum = { version = "0.7", features = ["json", "ws"] }
+axum = { version = "0.7", features = ["json", "ws", "multipart"] }
 tokio = { version = "1", features = ["full"] }
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 tower = "0.4"
