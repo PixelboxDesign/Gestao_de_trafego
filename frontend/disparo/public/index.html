@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Luna — Disparo v7</title>
-  <!-- Build: 2026-08-10T18:15 LAZY-LOAD -->
+  <title>Luna — Disparo v8</title>
+  <!-- Build: 2026-08-10T20:35 MARCAS -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 7;
+    const CURRENT_VERSION = 8;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -796,10 +796,11 @@ setInterval(tick, 4000); // atualiza a cada 4s
 let kitsData = [];
 let kitAtual = null;
 let arquivoSelecionado = null;
+const MARCA_PADRAO = 'Alphahall'; // Marca padrão por enquanto
 
 async function carregarCatalogo() {
   try {
-    const data = await api('/api/catalogo/kits');
+    const data = await api(`/api/catalogo/kits/${encodeURIComponent(MARCA_PADRAO)}`);
     kitsData = data;
     renderKits(kitsData);
   } catch (e) {
@@ -837,7 +838,7 @@ function renderKits(lista) {
         ${kit.tem_imagem 
           ? `<img 
               loading="lazy" 
-              data-src="/api/catalogo/imagem/${encodeURIComponent(kit.nome)}" 
+              data-src="/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}" 
               alt="${esc(kit.nome)}" 
               class="lazy-img"
               style="background:var(--bg3)"
@@ -891,7 +892,7 @@ function abrirModalKit(nomeKit) {
     // Usar cache da imagem se já foi carregada
     imgWrap.innerHTML = `
       <div class="modal-img-preview">
-        <img src="/api/catalogo/imagem/${encodeURIComponent(kitAtual.nome)}" alt="${esc(kitAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
+        <img src="/api/catalogo/imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}" alt="${esc(kitAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
       </div>`;
   } else {
     imgWrap.innerHTML = `
@@ -953,6 +954,7 @@ async function salvarKit() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        marca: kitAtual.marca,
         kit: kitAtual.nome,
         preco,
         mensagem
@@ -969,7 +971,7 @@ async function salvarKit() {
       const formData = new FormData();
       formData.append('imagem', arquivoSelecionado);
 
-      const uploadRes = await fetch(`/api/catalogo/upload-imagem/${encodeURIComponent(kitAtual.nome)}`, {
+      const uploadRes = await fetch(`/api/catalogo/upload-imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}`, {
         method: 'POST',
         body: formData
       });

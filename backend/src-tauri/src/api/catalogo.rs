@@ -16,8 +16,15 @@ const CATALOGO_BASE: &str = "f:\\luna_cosmeticos\\catalogos";
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Serialize)]
+pub struct Marca {
+    pub nome: String,
+    pub total_kits: usize,
+}
+
+#[derive(Debug, Serialize)]
 pub struct Kit {
     pub nome: String,
+    pub marca: String,
     pub tem_imagem: bool,
     pub imagem_ext: Option<String>,
     pub info: KitInfo,
@@ -42,6 +49,7 @@ impl Default for KitInfo {
 
 #[derive(Debug, Deserialize)]
 pub struct SalvarInfoBody {
+    pub marca: String,
     pub kit: String,
     pub preco: String,
     pub mensagem: String,
@@ -78,12 +86,12 @@ async fn ler_info(kit_path: &PathBuf) -> KitInfo {
 
 // ─── Handlers ────────────────────────────────────────────────────────────────
 
-/// GET /api/catalogo/kits — lista todas as subpastas como kits
-pub async fn listar_kits(
+/// GET /api/catalogo/marcas — lista todas as marcas disponíveis
+pub async fn listar_marcas(
     State(_state): State<Arc<Mutex<AppState>>>,
-) -> Json<Vec<Kit>> {
+) -> Json<Vec<Marca>> {
     let base = catalogo_path();
-    let mut kits = Vec::new();
+    let mut marcas = Vec::new();
 
     // Cria a pasta se não existir
     let _ = fs::create_dir_all(&base).await;
@@ -97,7 +105,51 @@ pub async fn listar_kits(
             }
 
             let nome = entry.file_name().to_string_lossy().to_string();
-            let kit_path = base.join(&nome);
+            let marca_path = base.join(&nome);
+
+            // Conta quantos kits tem na marca
+            let mut total_kits = 0;
+            if let Ok(mut kits_entries) = fs::read_dir(&marca_path).await {
+                while let Ok(Some(_)) = kits_entries.next_entry().await {
+                    total_kits += 1;
+                }
+            }
+
+            marcas.push(Marca {
+                nome,
+                total_kits,
+            });
+        }
+    }
+
+    marcas.sort_by(|a, b| a.nome.cmp(&b.nome));
+    Json(marcas)
+}
+
+/// GET /api/catalogo/kits/:marca — lista kits de uma marca específica
+pub async fn listar_kits(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Path(marca_nome): Path<String>,
+) -> Json<Vec<Kit>> {
+    let base = catalogo_path();
+    let marca_path = base.join(&marca_nome);
+    let mut kits = Vec::new();
+
+    // Valida que a marca existe
+    if !marca_path.exists() {
+        return Json(kits);
+    }
+
+    if let Ok(mut entries) = fs::read_dir(&marca_path).await {
+        while let Ok(Some(entry)) = entries.next_entry().await {
+            if let Ok(meta) = entry.metadata().await {
+                if !meta.is_dir() {
+                    continue;
+                }
+            }
+
+            let nome = entry.file_name().to_string_lossy().to_string();
+            let kit_path = marca_path.join(&nome);
 
             let imagem_arquivo = encontrar_imagem(&kit_path).await;
             let imagem_ext = imagem_arquivo.clone().and_then(|f| {
@@ -110,6 +162,7 @@ pub async fn listar_kits(
 
             kits.push(Kit {
                 nome,
+                marca: marca_nome.clone(),
                 tem_imagem: imagem_arquivo.is_some(),
                 imagem_ext,
                 info,
@@ -121,20 +174,21 @@ pub async fn listar_kits(
     Json(kits)
 }
 
-/// GET /api/catalogo/imagem/:kit — serve a imagem do kit (otimizada)
+/// GET /api/catalogo/imagem/:marca/:kit — serve a imagem do kit (otimizada)
 pub async fn servir_imagem(
     State(_state): State<Arc<Mutex<AppState>>>,
-    Path(kit_nome): Path<String>,
+    Path((marca_nome, kit_nome)): Path<(String, String)>,
 ) -> Result<Response<Body>, (StatusCode, String)> {
     let base = catalogo_path();
-    let kit_path = base.join(&kit_nome);
+    let marca_path = base.join(&marca_nome);
+    let kit_path = marca_path.join(&kit_nome);
 
     // Segurança: garante que está dentro do catálogo
     let canonical_base = base.canonicalize().map_err(|_| {
         (StatusCode::INTERNAL_SERVER_ERROR, "Catálogo não encontrado".to_string())
     })?;
     let canonical_kit = kit_path.canonicalize().map_err(|_| {
-        (StatusCode::NOT_FOUND, format!("Kit '{}' não encontrado", kit_nome))
+        (StatusCode::NOT_FOUND, format!("Kit '{}/{}' não encontrado", marca_nome, kit_nome))
     })?;
     if !canonical_kit.starts_with(&canonical_base) {
         return Err((StatusCode::FORBIDDEN, "Acesso negado".to_string()));
@@ -164,7 +218,7 @@ pub async fn servir_imagem(
         .status(StatusCode::OK)
         .header(header::CONTENT_TYPE, mime)
         .header(header::CACHE_CONTROL, "public, max-age=86400, immutable") // Cache de 24h
-        .header(header::ETAG, format!("\"{}\"", kit_nome)) // ETag para validação
+        .header(header::ETAG, format!("\"{}/{}\"", marca_nome, kit_nome)) // ETag para validação
         .body(Body::from(content))
         .unwrap())
 }
@@ -175,7 +229,8 @@ pub async fn salvar_info(
     Json(body): Json<SalvarInfoBody>,
 ) -> Json<serde_json::Value> {
     let base = catalogo_path();
-    let kit_path = base.join(&body.kit);
+    let marca_path = base.join(&body.marca);
+    let kit_path = marca_path.join(&body.kit);
 
     // Segurança
     let canonical_base = match base.canonicalize() {
@@ -240,14 +295,15 @@ pub async fn serve_file(
         .unwrap())
 }
 
-/// POST /api/catalogo/upload-imagem/:kit — faz upload de imagem para o kit
+/// POST /api/catalogo/upload-imagem/:marca/:kit — faz upload de imagem para o kit
 pub async fn upload_imagem(
     State(_state): State<Arc<Mutex<AppState>>>,
-    Path(kit_nome): Path<String>,
+    Path((marca_nome, kit_nome)): Path<(String, String)>,
     mut multipart: Multipart,
 ) -> Json<serde_json::Value> {
     let base = catalogo_path();
-    let kit_path = base.join(&kit_nome);
+    let marca_path = base.join(&marca_nome);
+    let kit_path = marca_path.join(&kit_nome);
 
     // Segurança: valida que o kit existe e está dentro do catálogo
     let canonical_base = match base.canonicalize() {
