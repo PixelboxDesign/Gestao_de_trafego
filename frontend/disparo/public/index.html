@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Luna — Disparo v3</title>
-  <!-- Build: 2026-08-10T13:00 -->
+  <title>Luna — Disparo v4</title>
+  <!-- Build: 2026-08-10T14:33 -->
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -271,7 +271,13 @@ async function api(path, opts) {
 async function verificarServidor() {
   console.log('[Luna] verificando servidor via /health-check');
   try {
-    const r = await fetch('/health-check');
+    // Timeout maior para dar tempo do Render acordar (plano gratuito dorme rápido)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    
+    const r = await fetch('/health-check', { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
     const data = await r.json();
     console.log('[Luna] health-check resposta:', data);
     if (data.ok) {
