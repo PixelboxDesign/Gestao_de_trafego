@@ -13,57 +13,49 @@ use tracing::info;
 
 pub use state::AppState;
 
-/// Inicia o ngrok em background apontando para a porta 3001
-fn iniciar_ngrok() {
-    let dominio = "repackage-backstage-snowcap.ngrok-free.dev";
-    info!("🟢 Iniciando ngrok → {}", dominio);
-    match std::process::Command::new("ngrok")
-        .args(["http", &format!("--url={}", dominio), "3001"])
-        .spawn()
-    {
-        Ok(_) => info!("✅ ngrok iniciado — https://{}", dominio),
-        Err(e) => tracing::warn!("⚠️ ngrok não encontrado ou falhou: {} — API só acessível localmente", e),
+/// Spawna um processo sem janela de terminal visível no Windows
+fn spawn_oculto(programa: &str, args: &[&str], envs: &[(&str, &str)]) -> bool {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x08000000;
+
+    let mut cmd = std::process::Command::new(programa);
+    cmd.args(args);
+    for (k, v) in envs {
+        cmd.env(k, v);
+    }
+    cmd.creation_flags(CREATE_NO_WINDOW);
+
+    match cmd.spawn() {
+        Ok(_)  => { info!("✅ {} iniciado (sem janela)", programa); true }
+        Err(e) => { tracing::warn!("⚠️ Falha ao iniciar {}: {}", programa, e); false }
     }
 }
 
-/// Inicia o sidecar Node.js do WhatsApp em background
+/// Inicia o ngrok em background sem janela
+fn iniciar_ngrok() {
+    let dominio = "repackage-backstage-snowcap.ngrok-free.dev";
+    info!("🟢 Iniciando ngrok → {}", dominio);
+    spawn_oculto("ngrok", &["http", &format!("--url={}", dominio), "3001"], &[]);
+}
+
+/// Inicia o sidecar Node.js do WhatsApp em background sem janela
 fn iniciar_whatsapp_sidecar() {
     let exe_dir = std::env::current_exe()
         .ok()
         .and_then(|p| p.parent().map(|d| d.to_path_buf()))
         .unwrap_or_else(|| std::path::PathBuf::from("."));
 
-    // Caminhos possíveis — release bundle primeiro, depois dev
     let sidecar_paths = vec![
-        // Release: recursos bundled pelo Tauri ficam em _up/resources
-        exe_dir.join("_up_").join("resources").join("whatsapp-sidecar").join("server.js"),
-        // Release Windows: junto ao .exe
         exe_dir.join("whatsapp-sidecar").join("server.js"),
-        // Dev: pasta do workspace
         std::path::PathBuf::from("f:\\luna_cosmeticos\\backend\\whatsapp-sidecar\\server.js"),
     ];
 
-    let server_path = sidecar_paths.into_iter().find(|p| {
-        let exists = p.exists();
-        info!("Verificando sidecar em {}: {}", p.display(), exists);
-        exists
-    });
-
-    match server_path {
+    match sidecar_paths.into_iter().find(|p| p.exists()) {
         Some(path) => {
             info!("🟢 Iniciando WhatsApp sidecar: {}", path.display());
-            match std::process::Command::new("node")
-                .arg(&path)
-                .env("WHATSAPP_PORT", "3002")
-                .spawn()
-            {
-                Ok(_) => info!("✅ WhatsApp sidecar iniciado"),
-                Err(e) => tracing::error!("❌ Falha ao iniciar WhatsApp sidecar: {}", e),
-            }
+            spawn_oculto("node", &[path.to_str().unwrap_or("")], &[("WHATSAPP_PORT", "3002")]);
         }
-        None => {
-            tracing::warn!("⚠️ WhatsApp sidecar não encontrado — WhatsApp não disponível");
-        }
+        None => tracing::warn!("⚠️ WhatsApp sidecar não encontrado"),
     }
 }
 
