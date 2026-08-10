@@ -7,7 +7,7 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 // URL do Luna Server local (via Tailscale)
-const LUNA_API = process.env.LUNA_API_URL || 'https://repackage-backstage-snowcap.ngrok-free.dev';
+const LUNA_API = process.env.LUNA_API_URL || 'https://saying-gardening-optimize-rotation.trycloudflare.com';
 
 app.use(express.json());
 

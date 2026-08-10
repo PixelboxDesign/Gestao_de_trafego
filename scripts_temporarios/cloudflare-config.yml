@@ -1,0 +1,7 @@
+tunnel: a5f62c53-c629-4fbb-a427-c063cbe11fc3
+credentials-file: C:\Users\Matheus Maia\.cloudflared\a5f62c53-c629-4fbb-a427-c063cbe11fc3.json
+
+ingress:
+  - hostname: disparo-luna.trycloudflare.com
+    service: http://localhost:3001
+  - service: http_status:404
