@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Luna — Disparo v8</title>
-  <!-- Build: 2026-08-10T20:35 MARCAS -->
+  <title>Luna — Disparo v9</title>
+  <!-- Build: 2026-08-10T21:45 CAMPOS-COMPLETOS -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 8;
+    const CURRENT_VERSION = 9;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -539,7 +539,13 @@
     
     <!-- Header -->
     <div class="modal-header">
-      <h2 class="modal-title" id="modal-kit-nome">Kit</h2>
+      <input
+        type="text"
+        id="modal-kit-nome-edit"
+        class="form-input"
+        placeholder="Nome do kit"
+        style="font-size:16px;font-weight:700;flex:1;margin-right:1rem"
+      />
       <button class="modal-close" onclick="fecharModalKit()">✕</button>
     </div>
 
@@ -547,7 +553,7 @@
     <div id="modal-kit-img-wrap"></div>
 
     <!-- Body -->
-    <div class="modal-body">
+    <div class="modal-body" style="max-height:400px;overflow-y:auto">
       
       <div class="form-group">
         <label class="form-label">Preço</label>
@@ -560,13 +566,33 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Mensagem presetada</label>
+        <label class="form-label">Descrição do Produto</label>
         <textarea
-          id="modal-kit-mensagem"
+          id="modal-kit-descricao"
           class="form-textarea"
-          placeholder="Mensagem que será enviada com este kit..."
+          placeholder="Descrição do produto..."
           rows="4"
         ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">SKU do Kit</label>
+        <input
+          type="text"
+          id="modal-kit-sku"
+          class="form-input"
+          placeholder="SKU principal do kit"
+        />
+      </div>
+
+      <div class="form-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+          <label class="form-label" style="margin:0">SKUs dos Itens</label>
+          <button class="btn btn-secondary" onclick="adicionarSkuItem()" style="padding:.25rem .5rem;font-size:12px">
+            ➕ Adicionar SKU
+          </button>
+        </div>
+        <div id="skus-itens-container" style="display:flex;flex-direction:column;gap:.5rem"></div>
       </div>
 
       <div class="form-group">
@@ -849,8 +875,8 @@ function renderKits(lista) {
       <div class="kit-info">
         <h3 class="kit-nome">${esc(kit.nome)}</h3>
         ${kit.info.preco ? `<span class="kit-preco">${esc(kit.info.preco)}</span>` : ''}
-        ${kit.info.mensagem 
-          ? `<p class="kit-mensagem">${esc(kit.info.mensagem)}</p>` 
+        ${kit.info.descricao 
+          ? `<p class="kit-mensagem">${esc(kit.info.descricao)}</p>` 
           : !kit.info.preco 
             ? '<span style="font-size:11px;color:var(--border);font-style:italic">Clique para editar</span>' 
             : ''
@@ -883,9 +909,13 @@ function abrirModalKit(nomeKit) {
   document.getElementById('modal-kit-file').value = '';
   document.getElementById('modal-save-success').style.display = 'none';
 
-  document.getElementById('modal-kit-nome').textContent = kitAtual.nome;
+  document.getElementById('modal-kit-nome-edit').value = kitAtual.nome;
   document.getElementById('modal-kit-preco').value = kitAtual.info.preco || '';
-  document.getElementById('modal-kit-mensagem').value = kitAtual.info.mensagem || '';
+  document.getElementById('modal-kit-descricao').value = kitAtual.info.descricao || '';
+  document.getElementById('modal-kit-sku').value = kitAtual.info.sku_kit || '';
+  
+  // Renderiza SKUs dos itens
+  renderSkusItens(kitAtual.info.skus_itens || []);
 
   const imgWrap = document.getElementById('modal-kit-img-wrap');
   if (kitAtual.tem_imagem) {
@@ -903,6 +933,47 @@ function abrirModalKit(nomeKit) {
   }
 
   document.getElementById('modal-kit').style.display = 'flex';
+}
+
+function renderSkusItens(skus) {
+  const container = document.getElementById('skus-itens-container');
+  if (skus.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic">Nenhum SKU de item. Clique em "Adicionar SKU".</p>';
+    return;
+  }
+  
+  container.innerHTML = skus.map((sku, idx) => `
+    <div style="display:flex;gap:.5rem;align-items:center">
+      <input
+        type="text"
+        class="form-input sku-item-input"
+        value="${esc(sku)}"
+        placeholder="SKU do item ${idx + 1}"
+        data-index="${idx}"
+        style="flex:1"
+      />
+      <button
+        onclick="removerSkuItem(${idx})"
+        style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:4px;padding:.25rem .5rem;cursor:pointer;font-size:12px"
+      >
+        🗑️
+      </button>
+    </div>
+  `).join('');
+}
+
+function adicionarSkuItem() {
+  const inputs = document.querySelectorAll('.sku-item-input');
+  const skusAtuais = Array.from(inputs).map(inp => inp.value);
+  skusAtuais.push('');
+  renderSkusItens(skusAtuais);
+}
+
+function removerSkuItem(idx) {
+  const inputs = document.querySelectorAll('.sku-item-input');
+  const skusAtuais = Array.from(inputs).map(inp => inp.value);
+  skusAtuais.splice(idx, 1);
+  renderSkusItens(skusAtuais);
 }
 
 function fecharModalKit() {
@@ -942,8 +1013,14 @@ async function salvarKit() {
   if (!kitAtual) return;
 
   const btn = document.getElementById('modal-save-btn');
+  const novoNome = document.getElementById('modal-kit-nome-edit').value.trim();
   const preco = document.getElementById('modal-kit-preco').value.trim();
-  const mensagem = document.getElementById('modal-kit-mensagem').value.trim();
+  const descricao = document.getElementById('modal-kit-descricao').value.trim();
+  const skuKit = document.getElementById('modal-kit-sku').value.trim();
+  
+  // Coleta os SKUs dos itens
+  const inputs = document.querySelectorAll('.sku-item-input');
+  const skusItens = Array.from(inputs).map(inp => inp.value.trim()).filter(s => s);
 
   btn.disabled = true;
   btn.textContent = 'Salvando...';
@@ -956,8 +1033,11 @@ async function salvarKit() {
       body: JSON.stringify({
         marca: kitAtual.marca,
         kit: kitAtual.nome,
+        novo_nome: novoNome !== kitAtual.nome ? novoNome : undefined,
         preco,
-        mensagem
+        descricao,
+        sku_kit: skuKit,
+        skus_itens: skusItens
       })
     });
 
@@ -971,7 +1051,8 @@ async function salvarKit() {
       const formData = new FormData();
       formData.append('imagem', arquivoSelecionado);
 
-      const uploadRes = await fetch(`/api/catalogo/upload-imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      const nomeParaUpload = data.novo_nome || kitAtual.nome;
+      const uploadRes = await fetch(`/api/catalogo/upload-imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(nomeParaUpload)}`, {
         method: 'POST',
         body: formData
       });
@@ -983,8 +1064,11 @@ async function salvarKit() {
     }
 
     // Atualiza kit na lista local
+    kitAtual.nome = data.novo_nome || kitAtual.nome;
     kitAtual.info.preco = preco;
-    kitAtual.info.mensagem = mensagem;
+    kitAtual.info.descricao = descricao;
+    kitAtual.info.sku_kit = skuKit;
+    kitAtual.info.skus_itens = skusItens;
     if (arquivoSelecionado) {
       kitAtual.tem_imagem = true;
     }

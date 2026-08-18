@@ -10,14 +10,19 @@ interface Kit {
   imagem_ext: string | null;
   info: {
     preco: string;
-    mensagem: string;
+    descricao: string;
+    sku_kit: string;
+    skus_itens: string[];
   };
 }
 
 interface ModalState {
   kit: Kit;
+  nomeEditavel: string;
   preco: string;
-  mensagem: string;
+  descricao: string;
+  skuKit: string;
+  skusItens: string[];
   salvando: boolean;
   salvo: boolean;
 }
@@ -48,8 +53,11 @@ export default function AbaCatalogo() {
   function abrirModal(kit: Kit) {
     setModal({
       kit,
-      preco: kit.info.preco,
-      mensagem: kit.info.mensagem,
+      nomeEditavel: kit.nome,
+      preco: kit.info.preco || "",
+      descricao: kit.info.descricao || "",
+      skuKit: kit.info.sku_kit || "",
+      skusItens: kit.info.skus_itens || [],
       salvando: false,
       salvo: false,
     });
@@ -64,25 +72,42 @@ export default function AbaCatalogo() {
     setModal(m => m ? { ...m, salvando: true, salvo: false } : m);
 
     try {
+      const novoNome = modal.nomeEditavel.trim() !== modal.kit.nome ? modal.nomeEditavel.trim() : undefined;
+
       const res = await fetch(`${API}/api/catalogo/salvar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           marca: modal.kit.marca,
           kit: modal.kit.nome,
+          novo_nome: novoNome,
           preco: modal.preco,
-          mensagem: modal.mensagem,
+          descricao: modal.descricao,
+          sku_kit: modal.skuKit,
+          skus_itens: modal.skusItens,
         }),
       });
       const data = await res.json();
       if (data.ok) {
         setModal(m => m ? { ...m, salvando: false, salvo: true } : m);
+        
         // Atualiza o kit na lista local
-        setKits(prev => prev.map(k =>
-          k.nome === modal.kit.nome
-            ? { ...k, info: { preco: modal.preco, mensagem: modal.mensagem } }
-            : k
-        ));
+        setKits(prev => prev.map(k => {
+          if (k.nome === modal.kit.nome) {
+            return {
+              ...k,
+              nome: data.novo_nome || k.nome,
+              info: {
+                preco: modal.preco,
+                descricao: modal.descricao,
+                sku_kit: modal.skuKit,
+                skus_itens: modal.skusItens,
+              }
+            };
+          }
+          return k;
+        }));
+
         setTimeout(() => setModal(m => m ? { ...m, salvo: false } : m), 2000);
       } else {
         alert("Erro ao salvar: " + (data.erro ?? "desconhecido"));
@@ -183,9 +208,13 @@ export default function AbaCatalogo() {
               borderBottom: "1px solid var(--border)",
               display: "flex", alignItems: "center", justifyContent: "space-between"
             }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--text)" }}>
-                {modal.kit.nome}
-              </h2>
+              <input
+                className="input"
+                value={modal.nomeEditavel}
+                onChange={e => setModal(m => m ? { ...m, nomeEditavel: e.target.value } : m)}
+                style={{ fontSize: 16, fontWeight: 700, flex: 1, marginRight: "1rem" }}
+                placeholder="Nome do kit"
+              />
               <button
                 onClick={fecharModal}
                 style={{ background: "none", border: "none", color: "var(--text2)", cursor: "pointer", fontSize: 20, lineHeight: 1 }}
@@ -222,7 +251,7 @@ export default function AbaCatalogo() {
             )}
 
             {/* Campos editáveis */}
-            <div style={{ padding: "1.25rem 1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <div style={{ padding: "1.25rem 1.5rem", display: "flex", flexDirection: "column", gap: "1rem", maxHeight: "400px", overflowY: "auto" }}>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
@@ -239,16 +268,81 @@ export default function AbaCatalogo() {
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Mensagem presetada
+                  Descrição do Produto
                 </label>
                 <textarea
                   className="input"
-                  value={modal.mensagem}
-                  onChange={e => setModal(m => m ? { ...m, mensagem: e.target.value } : m)}
-                  placeholder="Mensagem que será enviada com este kit..."
+                  value={modal.descricao}
+                  onChange={e => setModal(m => m ? { ...m, descricao: e.target.value } : m)}
+                  placeholder="Descrição do produto..."
                   rows={4}
                   style={{ resize: "vertical", fontFamily: "inherit", fontSize: 13, lineHeight: 1.6 }}
                 />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  SKU do Kit
+                </label>
+                <input
+                  className="input"
+                  value={modal.skuKit}
+                  onChange={e => setModal(m => m ? { ...m, skuKit: e.target.value } : m)}
+                  placeholder="SKU principal do kit"
+                  style={{ fontSize: 13 }}
+                />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    SKUs dos Itens
+                  </label>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => setModal(m => m ? { ...m, skusItens: [...m.skusItens, ""] } : m)}
+                    style={{ padding: "0.25rem 0.5rem", fontSize: 12 }}
+                  >
+                    ➕ Adicionar SKU
+                  </button>
+                </div>
+                {modal.skusItens.length === 0 && (
+                  <p style={{ fontSize: 12, color: "var(--text2)", fontStyle: "italic" }}>
+                    Nenhum SKU de item adicionado. Clique em "Adicionar SKU" para incluir.
+                  </p>
+                )}
+                {modal.skusItens.map((sku, idx) => (
+                  <div key={idx} style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                    <input
+                      className="input"
+                      value={sku}
+                      onChange={e => {
+                        const novos = [...modal.skusItens];
+                        novos[idx] = e.target.value;
+                        setModal(m => m ? { ...m, skusItens: novos } : m);
+                      }}
+                      placeholder={`SKU do item ${idx + 1}`}
+                      style={{ fontSize: 13, flex: 1 }}
+                    />
+                    <button
+                      onClick={() => {
+                        const novos = modal.skusItens.filter((_, i) => i !== idx);
+                        setModal(m => m ? { ...m, skusItens: novos } : m);
+                      }}
+                      style={{
+                        background: "none",
+                        border: "1px solid var(--danger)",
+                        color: "var(--danger)",
+                        borderRadius: 4,
+                        padding: "0.25rem 0.5rem",
+                        cursor: "pointer",
+                        fontSize: 12,
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                ))}
               </div>
 
             </div>
@@ -343,7 +437,7 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
           </span>
         )}
 
-        {kit.info.mensagem && (
+        {kit.info.descricao && (
           <p style={{
             fontSize: 11, color: "var(--text2)", lineHeight: 1.5,
             margin: 0, overflow: "hidden",
@@ -351,11 +445,11 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
           } as React.CSSProperties}>
-            {kit.info.mensagem}
+            {kit.info.descricao}
           </p>
         )}
 
-        {!kit.info.preco && !kit.info.mensagem && (
+        {!kit.info.preco && !kit.info.descricao && (
           <span style={{ fontSize: 11, color: "var(--border)", fontStyle: "italic" }}>
             Clique para editar
           </span>

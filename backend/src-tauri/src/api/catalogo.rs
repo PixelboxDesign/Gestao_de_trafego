@@ -35,14 +35,20 @@ pub struct KitInfo {
     #[serde(default)]
     pub preco: String,
     #[serde(default)]
-    pub mensagem: String,
+    pub descricao: String,
+    #[serde(default)]
+    pub sku_kit: String,
+    #[serde(default)]
+    pub skus_itens: Vec<String>,
 }
 
 impl Default for KitInfo {
     fn default() -> Self {
         Self {
             preco: String::new(),
-            mensagem: String::new(),
+            descricao: String::new(),
+            sku_kit: String::new(),
+            skus_itens: Vec::new(),
         }
     }
 }
@@ -51,8 +57,11 @@ impl Default for KitInfo {
 pub struct SalvarInfoBody {
     pub marca: String,
     pub kit: String,
+    pub novo_nome: Option<String>, // Nome novo para renomear pasta
     pub preco: String,
-    pub mensagem: String,
+    pub descricao: String,
+    pub sku_kit: String,
+    pub skus_itens: Vec<String>,
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -223,7 +232,7 @@ pub async fn servir_imagem(
         .unwrap())
 }
 
-/// POST /api/catalogo/salvar — salva info.json no kit
+/// POST /api/catalogo/salvar — salva info.json no kit e renomeia pasta se necessário
 pub async fn salvar_info(
     State(_state): State<Arc<Mutex<AppState>>>,
     Json(body): Json<SalvarInfoBody>,
@@ -245,9 +254,52 @@ pub async fn salvar_info(
         return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
     }
 
+    // Se tiver novo_nome, renomeia a pasta primeiro
+    let kit_path_final = if let Some(ref novo_nome) = body.novo_nome {
+        let novo_nome_clean = novo_nome.trim();
+        if novo_nome_clean.is_empty() || novo_nome_clean == body.kit {
+            canonical_kit.clone()
+        } else {
+            // Valida o novo nome (sem caracteres especiais perigosos)
+            if novo_nome_clean.contains(['/', '\\', ':', '*', '?', '"', '<', '>', '|']) {
+                return Json(serde_json::json!({ 
+                    "ok": false, 
+                    "erro": "Nome inválido. Evite caracteres especiais: / \\ : * ? \" < > |" 
+                }));
+            }
+
+            let novo_path = marca_path.join(novo_nome_clean);
+            
+            // Verifica se já existe uma pasta com esse nome
+            if novo_path.exists() {
+                return Json(serde_json::json!({ 
+                    "ok": false, 
+                    "erro": format!("Já existe um kit com o nome '{}'", novo_nome_clean) 
+                }));
+            }
+
+            // Renomeia a pasta
+            match fs::rename(&canonical_kit, &novo_path).await {
+                Ok(_) => novo_path,
+                Err(e) => return Json(serde_json::json!({ 
+                    "ok": false, 
+                    "erro": format!("Erro ao renomear pasta: {}", e) 
+                })),
+            }
+        }
+    } else {
+        canonical_kit.clone()
+    };
+
+    // Salva o info.json
     let info = KitInfo {
         preco: body.preco.trim().to_string(),
-        mensagem: body.mensagem.trim().to_string(),
+        descricao: body.descricao.trim().to_string(),
+        sku_kit: body.sku_kit.trim().to_string(),
+        skus_itens: body.skus_itens.iter()
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect(),
     };
 
     let json_str = match serde_json::to_string_pretty(&info) {
@@ -255,9 +307,24 @@ pub async fn salvar_info(
         Err(e) => return Json(serde_json::json!({ "ok": false, "erro": e.to_string() })),
     };
 
-    let info_path = canonical_kit.join("info.json");
+    let info_path = kit_path_final.join("info.json");
     match fs::write(&info_path, json_str).await {
-        Ok(_) => Json(serde_json::json!({ "ok": true })),
+        Ok(_) => {
+            let novo_nome_resposta = if let Some(ref nn) = body.novo_nome {
+                if !nn.trim().is_empty() && nn.trim() != body.kit {
+                    Some(nn.trim().to_string())
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
+            Json(serde_json::json!({ 
+                "ok": true,
+                "novo_nome": novo_nome_resposta
+            }))
+        },
         Err(e) => Json(serde_json::json!({ "ok": false, "erro": e.to_string() })),
     }
 }
