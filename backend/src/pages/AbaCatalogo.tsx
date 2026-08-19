@@ -6,8 +6,9 @@ const MARCA_PADRAO = "Alphahall"; // Marca padrão
 interface Kit {
   nome: string;
   marca: string;
-  tem_imagem: boolean;
-  imagem_ext: string | null;
+  tem_thumb: boolean;
+  thumb_ext: string | null;
+  imagens_carrossel: string[];
   info: {
     preco: string;
     descricao: string;
@@ -65,6 +66,100 @@ export default function AbaCatalogo() {
 
   function fecharModal() {
     setModal(null);
+  }
+
+  async function handleThumbUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!modal) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Valida tipo
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      alert('Tipo inválido. Use JPG, PNG ou WebP.');
+      return;
+    }
+
+    // Valida tamanho (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Arquivo muito grande. Máximo 5MB.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('imagem', file);
+
+    try {
+      const res = await fetch(`${API}/api/catalogo/upload-thumb/${encodeURIComponent(modal.kit.marca)}/${encodeURIComponent(modal.kit.nome)}`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.ok) {
+        alert('Thumbnail atualizada com sucesso!');
+        carregar(); // Recarrega a lista
+      } else {
+        alert('Erro: ' + data.erro);
+      }
+    } catch (err) {
+      alert('Erro ao fazer upload');
+    }
+  }
+
+  async function handleCarrosselUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!modal) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      alert('Tipo inválido. Use JPG, PNG ou WebP.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Arquivo muito grande. Máximo 5MB.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('imagem', file);
+
+    try {
+      const res = await fetch(`${API}/api/catalogo/upload-carrossel/${encodeURIComponent(modal.kit.marca)}/${encodeURIComponent(modal.kit.nome)}`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.ok) {
+        alert('Imagem adicionada ao carrossel!');
+        carregar(); // Recarrega a lista
+      } else {
+        alert('Erro: ' + data.erro);
+      }
+    } catch (err) {
+      alert('Erro ao fazer upload');
+    }
+  }
+
+  async function deletarImagemCarrossel(arquivo: string) {
+    if (!modal) return;
+    if (!confirm(`Deletar a imagem ${arquivo}?`)) return;
+
+    try {
+      const res = await fetch(`${API}/api/catalogo/deletar-imagem/${encodeURIComponent(modal.kit.marca)}/${encodeURIComponent(modal.kit.nome)}/${encodeURIComponent(arquivo)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (data.ok) {
+        alert('Imagem deletada!');
+        carregar(); // Recarrega a lista
+      } else {
+        alert('Erro: ' + data.erro);
+      }
+    } catch (err) {
+      alert('Erro ao deletar');
+    }
   }
 
   async function salvar() {
@@ -224,10 +319,10 @@ export default function AbaCatalogo() {
             </div>
 
             {/* Imagem */}
-            {modal.kit.tem_imagem && (
+            {modal.kit.tem_thumb && (
               <div style={{ background: "var(--bg3)", display: "flex", justifyContent: "center", padding: "1rem" }}>
                 <img
-                  src={`${API}/api/catalogo/imagem/${encodeURIComponent(modal.kit.marca)}/${encodeURIComponent(modal.kit.nome)}?t=${Date.now()}`}
+                  src={`${API}/api/catalogo/imagem/${encodeURIComponent(modal.kit.marca)}/${encodeURIComponent(modal.kit.nome)}/thumb.${modal.kit.thumb_ext}?t=${Date.now()}`}
                   alt={modal.kit.nome}
                   style={{
                     maxHeight: 200, maxWidth: "100%",
@@ -238,7 +333,7 @@ export default function AbaCatalogo() {
             )}
 
             {/* Sem imagem */}
-            {!modal.kit.tem_imagem && (
+            {!modal.kit.tem_thumb && (
               <div style={{
                 background: "var(--bg3)", height: 120,
                 display: "flex", flexDirection: "column",
@@ -246,7 +341,7 @@ export default function AbaCatalogo() {
                 color: "var(--text2)", fontSize: 12,
               }}>
                 <span style={{ fontSize: 32 }}>🖼️</span>
-                <span>Coloque uma imagem .jpg na pasta do kit</span>
+                <span>Escolha uma thumb abaixo</span>
               </div>
             )}
 
@@ -345,6 +440,83 @@ export default function AbaCatalogo() {
                 ))}
               </div>
 
+              {/* Upload de Thumbnail */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", borderTop: "1px solid var(--border)", paddingTop: "1rem" }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  📸 Imagem Thumbnail (Capa)
+                </label>
+                <input
+                  type="file"
+                  id="upload-thumb"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  style={{ display: "none" }}
+                  onChange={handleThumbUpload}
+                />
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => document.getElementById('upload-thumb')?.click()}
+                  style={{ width: "100%" }}
+                >
+                  {modal.kit.tem_thumb ? "🔄 Alterar Thumbnail" : "➕ Adicionar Thumbnail"}
+                </button>
+              </div>
+
+              {/* Upload de Imagens do Carrossel */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    🖼️ Imagens do Carrossel
+                  </label>
+                  <input
+                    type="file"
+                    id="upload-carrossel"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    style={{ display: "none" }}
+                    onChange={handleCarrosselUpload}
+                  />
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => document.getElementById('upload-carrossel')?.click()}
+                    style={{ padding: "0.25rem 0.5rem", fontSize: 12 }}
+                  >
+                    ➕ Adicionar Imagem
+                  </button>
+                </div>
+                {modal.kit.imagens_carrossel.length === 0 && (
+                  <p style={{ fontSize: 12, color: "var(--text2)", fontStyle: "italic" }}>
+                    Nenhuma imagem no carrossel. Clique em "Adicionar Imagem".
+                  </p>
+                )}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: "0.5rem" }}>
+                  {modal.kit.imagens_carrossel.map((img, idx) => (
+                    <div key={idx} style={{ position: "relative", aspectRatio: "1", borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)" }}>
+                      <img
+                        src={`${API}/api/catalogo/imagem/${encodeURIComponent(modal.kit.marca)}/${encodeURIComponent(modal.kit.nome)}/${img}`}
+                        alt={`Carrossel ${idx + 1}`}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                      <button
+                        onClick={() => deletarImagemCarrossel(img)}
+                        style={{
+                          position: "absolute",
+                          top: 4,
+                          right: 4,
+                          background: "rgba(239,68,68,0.9)",
+                          color: "white",
+                          border: "none",
+                          borderRadius: 4,
+                          padding: "0.25rem 0.35rem",
+                          cursor: "pointer",
+                          fontSize: 10,
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
 
             {/* Footer do modal */}
@@ -413,9 +585,9 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
         display: "flex", alignItems: "center", justifyContent: "center",
         overflow: "hidden",
       }}>
-        {kit.tem_imagem && !imgErro ? (
+        {kit.tem_thumb && !imgErro ? (
           <img
-            src={`${API}/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}`}
+            src={`${API}/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}`}
             alt={kit.nome}
             onError={() => setImgErro(true)}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
