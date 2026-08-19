@@ -49,9 +49,11 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         // Rotas de catálogo
         .route("/api/catalogo/marcas", get(catalogo::listar_marcas))
         .route("/api/catalogo/kits/:marca", get(catalogo::listar_kits))
-        .route("/api/catalogo/imagem/:marca/:kit", get(catalogo::servir_imagem))
+        .route("/api/catalogo/imagem/:marca/:kit/:nome", get(catalogo::servir_imagem))
         .route("/api/catalogo/salvar", axum::routing::post(catalogo::salvar_info))
-        .route("/api/catalogo/upload-imagem/:marca/:kit", axum::routing::post(catalogo::upload_imagem))
+        .route("/api/catalogo/upload-thumb/:marca/:kit", axum::routing::post(catalogo::upload_thumb))
+        .route("/api/catalogo/upload-carrossel/:marca/:kit", axum::routing::post(catalogo::upload_carrossel))
+        .route("/api/catalogo/deletar-imagem/:marca/:kit/:arquivo", axum::routing::delete(catalogo::deletar_imagem))
         .route("/api/catalogo/files/*path", get(catalogo::serve_file))
         // Rotas de WhatsApp
         .route("/api/whatsapp/status", get(whatsapp::status))

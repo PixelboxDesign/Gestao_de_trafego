@@ -25,8 +25,9 @@ pub struct Marca {
 pub struct Kit {
     pub nome: String,
     pub marca: String,
-    pub tem_imagem: bool,
-    pub imagem_ext: Option<String>,
+    pub tem_thumb: bool,
+    pub thumb_ext: Option<String>,
+    pub imagens_carrossel: Vec<String>,
     pub info: KitInfo,
 }
 
@@ -70,17 +71,34 @@ fn catalogo_path() -> PathBuf {
     PathBuf::from(CATALOGO_BASE)
 }
 
-/// Encontra a primeira imagem jpg/jpeg dentro de uma pasta de kit
-async fn encontrar_imagem(kit_path: &PathBuf) -> Option<String> {
+/// Encontra a imagem thumb dentro de uma pasta de kit
+async fn encontrar_thumb(kit_path: &PathBuf) -> Option<String> {
     if let Ok(mut entries) = fs::read_dir(kit_path).await {
         while let Ok(Some(entry)) = entries.next_entry().await {
             let nome = entry.file_name().to_string_lossy().to_lowercase();
-            if nome.ends_with(".jpg") || nome.ends_with(".jpeg") || nome.ends_with(".png") || nome.ends_with(".webp") {
+            if nome.starts_with("thumb") && 
+               (nome.ends_with(".jpg") || nome.ends_with(".jpeg") || nome.ends_with(".png") || nome.ends_with(".webp")) {
                 return Some(entry.file_name().to_string_lossy().to_string());
             }
         }
     }
     None
+}
+
+/// Lista todas as imagens que NÃO são thumb (para o carrossel)
+async fn listar_imagens_carrossel(kit_path: &PathBuf) -> Vec<String> {
+    let mut imagens = Vec::new();
+    if let Ok(mut entries) = fs::read_dir(kit_path).await {
+        while let Ok(Some(entry)) = entries.next_entry().await {
+            let nome = entry.file_name().to_string_lossy().to_lowercase();
+            if !nome.starts_with("thumb") && !nome.starts_with("info.json") &&
+               (nome.ends_with(".jpg") || nome.ends_with(".jpeg") || nome.ends_with(".png") || nome.ends_with(".webp")) {
+                imagens.push(entry.file_name().to_string_lossy().to_string());
+            }
+        }
+    }
+    imagens.sort();
+    imagens
 }
 
 /// Lê o info.json de um kit, retorna default se não existir
@@ -160,20 +178,22 @@ pub async fn listar_kits(
             let nome = entry.file_name().to_string_lossy().to_string();
             let kit_path = marca_path.join(&nome);
 
-            let imagem_arquivo = encontrar_imagem(&kit_path).await;
-            let imagem_ext = imagem_arquivo.clone().and_then(|f| {
+            let thumb_arquivo = encontrar_thumb(&kit_path).await;
+            let thumb_ext = thumb_arquivo.clone().and_then(|f| {
                 std::path::Path::new(&f)
                     .extension()
                     .map(|e| e.to_string_lossy().to_string())
             });
 
+            let imagens_carrossel = listar_imagens_carrossel(&kit_path).await;
             let info = ler_info(&kit_path).await;
 
             kits.push(Kit {
                 nome,
                 marca: marca_nome.clone(),
-                tem_imagem: imagem_arquivo.is_some(),
-                imagem_ext,
+                tem_thumb: thumb_arquivo.is_some(),
+                thumb_ext,
+                imagens_carrossel,
                 info,
             });
         }
@@ -183,10 +203,10 @@ pub async fn listar_kits(
     Json(kits)
 }
 
-/// GET /api/catalogo/imagem/:marca/:kit — serve a imagem do kit (otimizada)
+/// GET /api/catalogo/imagem/:marca/:kit/:nome — serve imagem específica do kit
 pub async fn servir_imagem(
     State(_state): State<Arc<Mutex<AppState>>>,
-    Path((marca_nome, kit_nome)): Path<(String, String)>,
+    Path((marca_nome, kit_nome, img_nome)): Path<(String, String, String)>,
 ) -> Result<Response<Body>, (StatusCode, String)> {
     let base = catalogo_path();
     let marca_path = base.join(&marca_nome);
@@ -203,21 +223,22 @@ pub async fn servir_imagem(
         return Err((StatusCode::FORBIDDEN, "Acesso negado".to_string()));
     }
 
-    // Procura a imagem dentro do kit
-    let imagem_arquivo = encontrar_imagem(&canonical_kit).await
-        .ok_or_else(|| (StatusCode::NOT_FOUND, "Imagem não encontrada".to_string()))?;
+    // Busca a imagem pelo nome
+    let imagem_path = canonical_kit.join(&img_nome);
+    if !imagem_path.exists() {
+        return Err((StatusCode::NOT_FOUND, format!("Imagem '{}' não encontrada", img_nome)));
+    }
 
-    let imagem_path = canonical_kit.join(&imagem_arquivo);
     let content = fs::read(&imagem_path).await.map_err(|_| {
         (StatusCode::NOT_FOUND, "Erro ao ler imagem".to_string())
     })?;
 
     // Detecta MIME type
-    let mime = if imagem_arquivo.to_lowercase().ends_with(".jpg") || imagem_arquivo.to_lowercase().ends_with(".jpeg") {
+    let mime = if img_nome.to_lowercase().ends_with(".jpg") || img_nome.to_lowercase().ends_with(".jpeg") {
         "image/jpeg"
-    } else if imagem_arquivo.to_lowercase().ends_with(".png") {
+    } else if img_nome.to_lowercase().ends_with(".png") {
         "image/png"
-    } else if imagem_arquivo.to_lowercase().ends_with(".webp") {
+    } else if img_nome.to_lowercase().ends_with(".webp") {
         "image/webp"
     } else {
         "image/jpeg"
@@ -226,8 +247,8 @@ pub async fn servir_imagem(
     Ok(Response::builder()
         .status(StatusCode::OK)
         .header(header::CONTENT_TYPE, mime)
-        .header(header::CACHE_CONTROL, "public, max-age=86400, immutable") // Cache de 24h
-        .header(header::ETAG, format!("\"{}/{}\"", marca_nome, kit_nome)) // ETag para validação
+        .header(header::CACHE_CONTROL, "public, max-age=86400, immutable")
+        .header(header::ETAG, format!("\"{}/{}/{}\"", marca_nome, kit_nome, img_nome))
         .body(Body::from(content))
         .unwrap())
 }
@@ -362,8 +383,8 @@ pub async fn serve_file(
         .unwrap())
 }
 
-/// POST /api/catalogo/upload-imagem/:marca/:kit — faz upload de imagem para o kit
-pub async fn upload_imagem(
+/// POST /api/catalogo/upload-thumb/:marca/:kit — faz upload da thumbnail
+pub async fn upload_thumb(
     State(_state): State<Arc<Mutex<AppState>>>,
     Path((marca_nome, kit_nome)): Path<(String, String)>,
     mut multipart: Multipart,
@@ -372,7 +393,7 @@ pub async fn upload_imagem(
     let marca_path = base.join(&marca_nome);
     let kit_path = marca_path.join(&kit_nome);
 
-    // Segurança: valida que o kit existe e está dentro do catálogo
+    // Segurança
     let canonical_base = match base.canonicalize() {
         Ok(p) => p,
         Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Catálogo não encontrado" })),
@@ -385,25 +406,21 @@ pub async fn upload_imagem(
         return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
     }
 
-    // Processa o upload
     while let Ok(Some(field)) = multipart.next_field().await {
         let name = field.name().unwrap_or("").to_string();
         if name != "imagem" {
             continue;
         }
 
-        // Lê os bytes do arquivo
         let data = match field.bytes().await {
             Ok(bytes) => bytes,
-            Err(e) => return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao ler arquivo: {}", e) })),
+            Err(e) => return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao ler: {}", e) })),
         };
 
-        // Valida tamanho (5MB)
         if data.len() > 5 * 1024 * 1024 {
             return Json(serde_json::json!({ "ok": false, "erro": "Arquivo muito grande (máx 5MB)" }));
         }
 
-        // Detecta extensão pelo magic bytes
         let ext = if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
             "jpg"
         } else if data.starts_with(&[0x89, 0x50, 0x4E, 0x47]) {
@@ -411,26 +428,135 @@ pub async fn upload_imagem(
         } else if data.starts_with(b"RIFF") && data.len() > 12 && &data[8..12] == b"WEBP" {
             "webp"
         } else {
-            return Json(serde_json::json!({ "ok": false, "erro": "Formato de imagem inválido (use JPG, PNG ou WebP)" }));
+            return Json(serde_json::json!({ "ok": false, "erro": "Formato inválido (JPG, PNG ou WebP)" }));
         };
 
-        // Remove imagens antigas do kit
+        // Remove thumb antiga
         if let Ok(mut entries) = fs::read_dir(&canonical_kit).await {
             while let Ok(Some(entry)) = entries.next_entry().await {
                 let nome = entry.file_name().to_string_lossy().to_lowercase();
-                if nome.ends_with(".jpg") || nome.ends_with(".jpeg") || nome.ends_with(".png") || nome.ends_with(".webp") {
+                if nome.starts_with("thumb") {
                     let _ = fs::remove_file(entry.path()).await;
                 }
             }
         }
 
-        // Salva nova imagem
-        let img_path = canonical_kit.join(format!("imagem.{}", ext));
+        // Salva nova thumb
+        let img_path = canonical_kit.join(format!("thumb.{}", ext));
         match fs::write(&img_path, &data).await {
-            Ok(_) => return Json(serde_json::json!({ "ok": true, "caminho": img_path.to_string_lossy() })),
+            Ok(_) => return Json(serde_json::json!({ "ok": true, "arquivo": format!("thumb.{}", ext) })),
             Err(e) => return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao salvar: {}", e) })),
         }
     }
 
     Json(serde_json::json!({ "ok": false, "erro": "Nenhum arquivo recebido" }))
+}
+
+/// POST /api/catalogo/upload-carrossel/:marca/:kit — adiciona imagem ao carrossel
+pub async fn upload_carrossel(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Path((marca_nome, kit_nome)): Path<(String, String)>,
+    mut multipart: Multipart,
+) -> Json<serde_json::Value> {
+    let base = catalogo_path();
+    let marca_path = base.join(&marca_nome);
+    let kit_path = marca_path.join(&kit_nome);
+
+    // Segurança
+    let canonical_base = match base.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Catálogo não encontrado" })),
+    };
+    let canonical_kit = match kit_path.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Kit não encontrado" })),
+    };
+    if !canonical_kit.starts_with(&canonical_base) {
+        return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
+    }
+
+    while let Ok(Some(field)) = multipart.next_field().await {
+        let name = field.name().unwrap_or("").to_string();
+        if name != "imagem" {
+            continue;
+        }
+
+        let data = match field.bytes().await {
+            Ok(bytes) => bytes,
+            Err(e) => return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao ler: {}", e) })),
+        };
+
+        if data.len() > 5 * 1024 * 1024 {
+            return Json(serde_json::json!({ "ok": false, "erro": "Arquivo muito grande (máx 5MB)" }));
+        }
+
+        let ext = if data.starts_with(&[0xFF, 0xD8, 0xFF]) {
+            "jpg"
+        } else if data.starts_with(&[0x89, 0x50, 0x4E, 0x47]) {
+            "png"
+        } else if data.starts_with(b"RIFF") && data.len() > 12 && &data[8..12] == b"WEBP" {
+            "webp"
+        } else {
+            return Json(serde_json::json!({ "ok": false, "erro": "Formato inválido (JPG, PNG ou WebP)" }));
+        };
+
+        // Gera nome único (timestamp + contador)
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+        
+        let mut contador = 1;
+        let mut img_path;
+        loop {
+            img_path = canonical_kit.join(format!("img_{}_{}.{}", timestamp, contador, ext));
+            if !img_path.exists() {
+                break;
+            }
+            contador += 1;
+        }
+
+        match fs::write(&img_path, &data).await {
+            Ok(_) => return Json(serde_json::json!({ 
+                "ok": true, 
+                "arquivo": format!("img_{}_{}.{}", timestamp, contador, ext) 
+            })),
+            Err(e) => return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao salvar: {}", e) })),
+        }
+    }
+
+    Json(serde_json::json!({ "ok": false, "erro": "Nenhum arquivo recebido" }))
+}
+
+/// DELETE /api/catalogo/deletar-imagem/:marca/:kit/:arquivo — deleta imagem do carrossel
+pub async fn deletar_imagem(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Path((marca_nome, kit_nome, arquivo)): Path<(String, String, String)>,
+) -> Json<serde_json::Value> {
+    let base = catalogo_path();
+    let marca_path = base.join(&marca_nome);
+    let kit_path = marca_path.join(&kit_nome);
+
+    // Segurança: não permite deletar thumb
+    if arquivo.to_lowercase().starts_with("thumb") {
+        return Json(serde_json::json!({ "ok": false, "erro": "Não é permitido deletar a thumbnail por aqui" }));
+    }
+
+    let canonical_base = match base.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Catálogo não encontrado" })),
+    };
+    let canonical_kit = match kit_path.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Kit não encontrado" })),
+    };
+    if !canonical_kit.starts_with(&canonical_base) {
+        return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
+    }
+
+    let img_path = canonical_kit.join(&arquivo);
+    match fs::remove_file(&img_path).await {
+        Ok(_) => Json(serde_json::json!({ "ok": true })),
+        Err(e) => Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao deletar: {}", e) })),
+    }
 }
