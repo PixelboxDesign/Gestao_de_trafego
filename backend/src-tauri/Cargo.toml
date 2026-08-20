@@ -1,3 +1,10 @@
+# BUILD: v10-THUMB-CARROSSEL
+# Sistema de thumb + carrossel implementado
+# - Thumb separada (thumb.*) para capa
+# - Múltiplas imagens de carrossel (img_timestamp_contador.ext)
+# - Upload/delete separados para cada tipo
+# - Painel controle + frontend site atualizados
+
 [package]
 name = "luna-server"
 version = "0.1.0"

@@ -10,7 +10,7 @@
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 9;
+    const CURRENT_VERSION = 10;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -595,19 +595,36 @@
         <div id="skus-itens-container" style="display:flex;flex-direction:column;gap:.5rem"></div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Alterar Imagem</label>
+      <div class="form-group" style="border-top:1px solid var(--border);padding-top:1rem">
+        <label class="form-label">📸 Imagem Thumbnail (Capa)</label>
         <input
           type="file"
-          id="modal-kit-file"
+          id="modal-kit-file-thumb"
           class="form-file"
           accept="image/jpeg,image/jpg,image/png,image/webp"
-          onchange="handleFileSelect(this)"
+          onchange="handleThumbSelect(this)"
         />
-        <button class="btn btn-secondary" onclick="document.getElementById('modal-kit-file').click()">
-          📷 Escolher imagem
+        <button class="btn btn-secondary" onclick="document.getElementById('modal-kit-file-thumb').click()" style="width:100%">
+          <span id="thumb-btn-text">🔄 Alterar Thumbnail</span>
         </button>
-        <span id="file-name" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
+        <span id="file-name-thumb" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
+      </div>
+
+      <div class="form-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+          <label class="form-label" style="margin:0">🖼️ Imagens do Carrossel</label>
+          <input
+            type="file"
+            id="modal-kit-file-carrossel"
+            class="form-file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            onchange="handleCarrosselSelect(this)"
+          />
+          <button class="btn btn-secondary" onclick="document.getElementById('modal-kit-file-carrossel').click()" style="padding:.25rem .5rem;font-size:12px">
+            ➕ Adicionar Imagem
+          </button>
+        </div>
+        <div id="carrossel-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem"></div>
       </div>
 
     </div>
@@ -821,8 +838,14 @@ setInterval(tick, 4000); // atualiza a cada 4s
 // ── Catálogo ─────────────────────────────────────────────────────────────────
 let kitsData = [];
 let kitAtual = null;
-let arquivoSelecionado = null;
+let arquivoThumb = null;
+let arquivoCarrossel = null;
 const MARCA_PADRAO = 'Alphahall'; // Marca padrão por enquanto
+
+function showToast(message, type = 'info') {
+  // Simples alert por enquanto, pode ser melhorado com um toast bonito
+  console.log(`[${type.toUpperCase()}] ${message}`);
+}
 
 async function carregarCatalogo() {
   try {
@@ -861,10 +884,10 @@ function renderKits(lista) {
   grid.innerHTML = lista.map(kit => `
     <div class="kit-card" onclick="abrirModalKit('${esc(kit.nome)}')">
       <div class="kit-img-area">
-        ${kit.tem_imagem 
+        ${kit.tem_thumb 
           ? `<img 
               loading="lazy" 
-              data-src="/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}" 
+              data-src="/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}" 
               alt="${esc(kit.nome)}" 
               class="lazy-img"
               style="background:var(--bg3)"
@@ -904,9 +927,11 @@ function abrirModalKit(nomeKit) {
   kitAtual = kitsData.find(k => k.nome === nomeKit);
   if (!kitAtual) return;
 
-  arquivoSelecionado = null;
-  document.getElementById('file-name').textContent = '';
-  document.getElementById('modal-kit-file').value = '';
+  arquivoThumb = null;
+  arquivoCarrossel = null;
+  document.getElementById('file-name-thumb').textContent = '';
+  document.getElementById('modal-kit-file-thumb').value = '';
+  document.getElementById('modal-kit-file-carrossel').value = '';
   document.getElementById('modal-save-success').style.display = 'none';
 
   document.getElementById('modal-kit-nome-edit').value = kitAtual.nome;
@@ -914,25 +939,54 @@ function abrirModalKit(nomeKit) {
   document.getElementById('modal-kit-descricao').value = kitAtual.info.descricao || '';
   document.getElementById('modal-kit-sku').value = kitAtual.info.sku_kit || '';
   
+  // Atualiza texto do botão thumb
+  document.getElementById('thumb-btn-text').textContent = kitAtual.tem_thumb ? '🔄 Alterar Thumbnail' : '➕ Adicionar Thumbnail';
+  
   // Renderiza SKUs dos itens
   renderSkusItens(kitAtual.info.skus_itens || []);
+  
+  // Renderiza carrossel
+  renderCarrossel(kitAtual.imagens_carrossel || []);
 
   const imgWrap = document.getElementById('modal-kit-img-wrap');
-  if (kitAtual.tem_imagem) {
-    // Usar cache da imagem se já foi carregada
+  if (kitAtual.tem_thumb) {
     imgWrap.innerHTML = `
       <div class="modal-img-preview">
-        <img src="/api/catalogo/imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}" alt="${esc(kitAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
+        <img src="/api/catalogo/imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}/thumb.${kitAtual.thumb_ext}" alt="${esc(kitAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
       </div>`;
   } else {
     imgWrap.innerHTML = `
       <div class="modal-no-img">
         <span style="font-size:32px">🖼️</span>
-        <span>Nenhuma imagem cadastrada</span>
+        <span>Escolha uma thumb abaixo</span>
       </div>`;
   }
 
   document.getElementById('modal-kit').style.display = 'flex';
+}
+
+function renderCarrossel(imagens) {
+  const container = document.getElementById('carrossel-container');
+  if (imagens.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic;grid-column:1/-1">Nenhuma imagem. Clique em "Adicionar Imagem".</p>';
+    return;
+  }
+  
+  container.innerHTML = imagens.map(img => `
+    <div style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
+      <img
+        src="/api/catalogo/imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}/${encodeURIComponent(img)}"
+        alt="Carrossel"
+        style="width:100%;height:100%;object-fit:cover"
+      />
+      <button
+        onclick="deletarImagemCarrossel('${esc(img)}')"
+        style="position:absolute;top:4px;right:4px;background:rgba(239,68,68,0.9);color:white;border:none;border-radius:4px;padding:.25rem .35rem;cursor:pointer;font-size:10px"
+      >
+        🗑️
+      </button>
+    </div>
+  `).join('');
 }
 
 function renderSkusItens(skus) {
@@ -1009,6 +1063,128 @@ function handleFileSelect(input) {
   document.getElementById('file-name').textContent = `✓ ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;
 }
 
+function handleThumbSelect(input) {
+  const file = input.files?.[0];
+  if (!file) {
+    arquivoThumb = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    return;
+  }
+
+  // Validação de tipo
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
+    input.value = '';
+    arquivoThumb = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    return;
+  }
+
+  // Validação de tamanho (5MB)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
+    input.value = '';
+    arquivoThumb = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    return;
+  }
+
+  arquivoThumb = file;
+  document.getElementById('file-name-thumb').textContent = `✓ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+}
+
+function handleCarrosselSelect(input) {
+  const file = input.files?.[0];
+  if (!file) {
+    arquivoCarrossel = null;
+    return;
+  }
+
+  // Validação de tipo
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
+    input.value = '';
+    arquivoCarrossel = null;
+    return;
+  }
+
+  // Validação de tamanho (5MB)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
+    input.value = '';
+    arquivoCarrossel = null;
+    return;
+  }
+
+  arquivoCarrossel = file;
+  // Upload automático após seleção
+  uploadCarrossel();
+}
+
+async function uploadCarrossel() {
+  if (!arquivoCarrossel || !kitAtual) return;
+
+  const formData = new FormData();
+  formData.append('file', arquivoCarrossel);
+
+  try {
+    const res = await fetch(`/api/catalogo/upload-carrossel/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Recarrega dados do kit
+    await carregarKits();
+    kitAtual = kitsData.find(k => k.nome === kitAtual.nome);
+    renderCarrossel(kitAtual.imagens_carrossel || []);
+    
+    // Limpa input
+    document.getElementById('modal-kit-file-carrossel').value = '';
+    arquivoCarrossel = null;
+
+    showToast('✓ Imagem adicionada ao carrossel', 'success');
+  } catch (err) {
+    console.error('Erro ao upload carrossel:', err);
+    alert('❌ Erro ao adicionar imagem: ' + err.message);
+  }
+}
+
+async function deletarImagemCarrossel(arquivo) {
+  if (!kitAtual) return;
+  
+  if (!confirm(`Deletar imagem "${arquivo}"?`)) return;
+
+  try {
+    const res = await fetch(`/api/catalogo/deletar-imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}/${encodeURIComponent(arquivo)}`, {
+      method: 'DELETE'
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Recarrega dados do kit
+    await carregarKits();
+    kitAtual = kitsData.find(k => k.nome === kitAtual.nome);
+    renderCarrossel(kitAtual.imagens_carrossel || []);
+
+    showToast('✓ Imagem deletada', 'success');
+  } catch (err) {
+    console.error('Erro ao deletar imagem:', err);
+    alert('❌ Erro ao deletar: ' + err.message);
+  }
+}
+
 async function salvarKit() {
   if (!kitAtual) return;
 
@@ -1046,38 +1222,40 @@ async function salvarKit() {
       throw new Error(data.erro || 'Erro ao salvar');
     }
 
-    // 2. Upload de imagem (se selecionou)
-    if (arquivoSelecionado) {
+    // 2. Upload de thumbnail (se selecionou)
+    if (arquivoThumb) {
       const formData = new FormData();
-      formData.append('imagem', arquivoSelecionado);
+      formData.append('file', arquivoThumb);
 
       const nomeParaUpload = data.novo_nome || kitAtual.nome;
-      const uploadRes = await fetch(`/api/catalogo/upload-imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(nomeParaUpload)}`, {
+      const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(nomeParaUpload)}`, {
         method: 'POST',
         body: formData
       });
 
-      const uploadData = await uploadRes.json();
-      if (!uploadData.ok) {
-        throw new Error(uploadData.erro || 'Erro no upload');
+      if (!uploadRes.ok) {
+        const err = await uploadRes.text();
+        throw new Error('Erro no upload da thumb: ' + err);
       }
     }
 
-    // Atualiza kit na lista local
-    kitAtual.nome = data.novo_nome || kitAtual.nome;
-    kitAtual.info.preco = preco;
-    kitAtual.info.descricao = descricao;
-    kitAtual.info.sku_kit = skuKit;
-    kitAtual.info.skus_itens = skusItens;
-    if (arquivoSelecionado) {
-      kitAtual.tem_imagem = true;
-    }
+    // Recarrega os kits para pegar as atualizações
+    await carregarKits();
+    
+    // Atualiza kitAtual com os novos dados
+    kitAtual = kitsData.find(k => k.nome === (data.novo_nome || kitAtual.nome));
 
     // Mostra sucesso
+    showToast('✓ Kit salvo com sucesso', 'success');
     document.getElementById('modal-save-success').style.display = 'block';
     setTimeout(() => {
       document.getElementById('modal-save-success').style.display = 'none';
     }, 2000);
+
+    // Limpa arquivo thumb selecionado
+    arquivoThumb = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    document.getElementById('modal-kit-file-thumb').value = '';
 
     // Atualiza grid
     const busca = document.getElementById('catalogo-busca').value;
