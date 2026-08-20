@@ -670,11 +670,11 @@ async function api(path, opts) {
 
 // ── Status do servidor ───────────────────────────────────────────────────────
 async function verificarServidor() {
-  const buildVersion = 'v6-force-reload-16h58';
-  console.log(`[Luna ${buildVersion}] verificando servidor via /health-check`);
+  const buildVersion = 'v10-thumb-carrossel';
+  console.log(`[Luna ${buildVersion}] verificando servidor via /health`);
   try {
     // Adiciona timestamp para evitar cache
-    const url = `/health-check?_=${Date.now()}`;
+    const url = `/health?_=${Date.now()}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
     
