@@ -66,6 +66,22 @@ fn iniciar_whatsapp_sidecar() {
     }
 }
 
+/// Inicia o Tunnel Keep-Alive (Ngrok/Cloudflare) em background sem janela
+fn iniciar_tunnel_keepalive() {
+    let keepalive_paths = vec![
+        std::path::PathBuf::from("f:\\luna_cosmeticos\\scripts_permanentes\\tunnel-keepalive.js"),
+        std::path::PathBuf::from("..\\..\\scripts_permanentes\\tunnel-keepalive.js"),
+    ];
+
+    match keepalive_paths.into_iter().find(|p| p.exists()) {
+        Some(path) => {
+            info!("🟢 Iniciando Tunnel Keep-Alive: {}", path.display());
+            spawn_oculto("node", &[path.to_str().unwrap_or("")], &[]);
+        }
+        None => tracing::warn!("⚠️ Tunnel Keep-Alive não encontrado"),
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Inicializar logs
@@ -112,6 +128,9 @@ pub fn run() {
 
             // Iniciar sidecar WhatsApp
             iniciar_whatsapp_sidecar();
+
+            // Iniciar Tunnel Keep-Alive (mantém tunnel ativo)
+            iniciar_tunnel_keepalive();
 
             // Configurar system tray
             let quit = MenuItem::with_id(app, "quit", "Encerrar Luna Server", true, None::<&str>)?;
