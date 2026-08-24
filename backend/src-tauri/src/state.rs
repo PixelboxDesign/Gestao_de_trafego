@@ -5,6 +5,15 @@ pub struct AppState {
     pub db: MySqlPool,
     pub whatsapp_status: WhatsAppStatus,
     pub logs: Vec<LogEntry>,
+    pub tunnel_url: Option<String>,
+    pub render_config: Option<RenderConfig>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct RenderConfig {
+    pub api_key: String,
+    pub service_id: String,
+    pub env_var_name: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -38,7 +47,17 @@ impl AppState {
             db,
             whatsapp_status: WhatsAppStatus::Disconnected,
             logs: Vec::new(),
+            tunnel_url: None,
+            render_config: None,
         }
+    }
+
+    pub fn set_tunnel_url(&mut self, url: String) {
+        self.tunnel_url = Some(url);
+    }
+
+    pub fn get_tunnel_url(&self) -> Option<String> {
+        self.tunnel_url.clone()
     }
 
     pub fn add_log(&mut self, level: LogLevel, module: &str, message: &str) {

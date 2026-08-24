@@ -3,8 +3,9 @@ import AbaClientes from "./pages/AbaClientes";
 import AbaWhatsApp from "./pages/AbaWhatsApp";
 import AbaLogs from "./pages/AbaLogs";
 import AbaCatalogo from "./pages/AbaCatalogo";
+import AbaTunnel from "./pages/AbaTunnel";
 
-type Aba = "clientes" | "catalogo" | "whatsapp" | "logs";
+type Aba = "clientes" | "catalogo" | "whatsapp" | "tunnel" | "logs";
 
 export default function App() {
   const [abaAtiva, setAbaAtiva] = useState<Aba>("clientes");
@@ -42,6 +43,12 @@ export default function App() {
           💬 WhatsApp
         </button>
         <button
+          className={`tab ${abaAtiva === "tunnel" ? "active" : ""}`}
+          onClick={() => setAbaAtiva("tunnel")}
+        >
+          🌐 Tunnel
+        </button>
+        <button
           className={`tab ${abaAtiva === "logs" ? "active" : ""}`}
           onClick={() => setAbaAtiva("logs")}
         >
@@ -54,6 +61,7 @@ export default function App() {
         {abaAtiva === "clientes"  && <AbaClientes />}
         {abaAtiva === "catalogo"  && <AbaCatalogo />}
         {abaAtiva === "whatsapp"  && <AbaWhatsApp />}
+        {abaAtiva === "tunnel"    && <AbaTunnel />}
         {abaAtiva === "logs"      && <AbaLogs />}
       </main>
     </div>

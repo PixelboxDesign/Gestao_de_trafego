@@ -1,12 +1,13 @@
 mod api;
 mod db;
 mod state;
+mod commands;
 
 use std::sync::Arc;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    Manager,
+    Manager, Emitter,
 };
 use tokio::sync::Mutex;
 use tracing::info;
@@ -14,7 +15,8 @@ use tracing::info;
 pub use state::AppState;
 
 /// Spawna um processo sem janela de terminal visível no Windows
-fn spawn_oculto(programa: &str, args: &[&str], envs: &[(&str, &str)]) -> bool {
+/// Retorna um handle para o processo spawned
+fn spawn_oculto(programa: &str, args: &[&str], envs: &[(&str, &str)]) -> Option<std::process::Child> {
     use std::os::windows::process::CommandExt;
     const CREATE_NO_WINDOW: u32 = 0x08000000;
 
@@ -24,10 +26,18 @@ fn spawn_oculto(programa: &str, args: &[&str], envs: &[(&str, &str)]) -> bool {
         cmd.env(k, v);
     }
     cmd.creation_flags(CREATE_NO_WINDOW);
+    cmd.stdout(std::process::Stdio::piped());
+    cmd.stderr(std::process::Stdio::piped());
 
     match cmd.spawn() {
-        Ok(_)  => { info!("✅ {} iniciado (sem janela)", programa); true }
-        Err(e) => { tracing::warn!("⚠️ Falha ao iniciar {}: {}", programa, e); false }
+        Ok(child) => {
+            info!("✅ {} iniciado (sem janela)", programa);
+            Some(child)
+        }
+        Err(e) => {
+            tracing::warn!("⚠️ Falha ao iniciar {}: {}", programa, e);
+            None
+        }
     }
 }
 
@@ -39,10 +49,47 @@ fn _iniciar_ngrok() {
 }
 
 /// Inicia o Cloudflare Tunnel em background sem janela
-fn iniciar_cloudflare_tunnel() {
+fn iniciar_cloudflare_tunnel(app_handle: tauri::AppHandle) {
     info!("🟢 Iniciando Cloudflare Tunnel (Quick Tunnel)");
     // Quick Tunnel: URL temporária, sem configuração, inicia instantaneamente
-    spawn_oculto("cloudflared", &["tunnel", "--url", "http://localhost:3001"], &[]);
+    if let Some(mut child) = spawn_oculto("cloudflared", &["tunnel", "--url", "http://localhost:3001"], &[]) {
+        // Spawna thread para ler stdout e capturar URL
+        if let Some(stdout) = child.stdout.take() {
+            use std::io::{BufRead, BufReader};
+            std::thread::spawn(move || {
+                let reader = BufReader::new(stdout);
+                for line in reader.lines() {
+                    if let Ok(line) = line {
+                        info!("[Cloudflare] {}", line);
+                        
+                        // Regex para capturar URL do Cloudflare
+                        if line.contains("trycloudflare.com") {
+                            if let Some(url) = extract_cloudflare_url(&line) {
+                                info!("🌐 URL do Cloudflare detectada: {}", url);
+                                
+                                // Atualiza estado global
+                                if let Some(state) = app_handle.try_state::<Arc<Mutex<AppState>>>() {
+                                    if let Ok(mut state_guard) = state.try_lock() {
+                                        state_guard.set_tunnel_url(url.clone());
+                                    }
+                                }
+                                
+                                // Emite evento para o frontend
+                                let _ = app_handle.emit("tunnel-url-detected", url);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+}
+
+/// Extrai URL do Cloudflare de uma linha de log
+fn extract_cloudflare_url(line: &str) -> Option<String> {
+    use regex::Regex;
+    let re = Regex::new(r"https://[a-z0-9-]+\.trycloudflare\.com").ok()?;
+    re.find(line).map(|m| m.as_str().to_string())
 }
 
 /// Inicia o sidecar Node.js do WhatsApp em background sem janela
@@ -99,9 +146,18 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_notification::init())
+        .invoke_handler(tauri::generate_handler![
+            commands::get_tunnel_url,
+            commands::save_render_config,
+            commands::load_render_config,
+            commands::test_render_connection,
+            commands::update_render_env,
+        ])
         .setup(|app| {
             // Conectar ao banco e iniciar API em background
             let app_handle = app.handle().clone();
+            let app_handle_tunnel = app_handle.clone();
+            
             tauri::async_runtime::spawn(async move {
                 let pool = db::connect()
                     .await
@@ -111,6 +167,14 @@ pub fn run() {
 
                 let state = Arc::new(Mutex::new(AppState::new(pool)));
                 let state_clone = state.clone();
+
+                // Tentar carregar configuração do Render
+                if let Ok(config) = commands::load_render_config_from_file() {
+                    if let Ok(mut s) = state.try_lock() {
+                        s.render_config = Some(config);
+                        info!("✅ Configuração do Render carregada");
+                    }
+                }
 
                 // Guardar estado no app
                 app_handle.manage(state);
@@ -124,7 +188,7 @@ pub fn run() {
             });
 
             // Iniciar Cloudflare Tunnel (expõe porta 3001 publicamente)
-            iniciar_cloudflare_tunnel();
+            iniciar_cloudflare_tunnel(app_handle_tunnel);
 
             // Iniciar sidecar WhatsApp
             iniciar_whatsapp_sidecar();
