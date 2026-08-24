@@ -142,11 +142,12 @@ pub async fn update_render_env(state: State<'_, Arc<Mutex<AppState>>>) -> Result
     tracing::info!("Atualizando variável '{}' no Render com URL: {}", config.env_var_name, tunnel_url);
 
     let response = client
-        .patch(format!(
+        .put(format!(
             "https://api.render.com/v1/services/{}/env-vars",
             config.service_id
         ))
         .header("Authorization", format!("Bearer {}", config.api_key))
+        .header("Content-Type", "application/json")
         .json(&body)
         .send()
         .await
