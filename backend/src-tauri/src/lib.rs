@@ -53,14 +53,15 @@ fn iniciar_cloudflare_tunnel(app_handle: tauri::AppHandle) {
     info!("🟢 Iniciando Cloudflare Tunnel (Quick Tunnel)");
     // Quick Tunnel: URL temporária, sem configuração, inicia instantaneamente
     if let Some(mut child) = spawn_oculto("cloudflared", &["tunnel", "--url", "http://localhost:3001"], &[]) {
-        // Spawna thread para ler stdout e capturar URL
+        // Spawna thread para ler stdout E stderr
         if let Some(stdout) = child.stdout.take() {
-            use std::io::{BufRead, BufReader};
+            let app_handle_stdout = app_handle.clone();
             std::thread::spawn(move || {
+                use std::io::{BufRead, BufReader};
                 let reader = BufReader::new(stdout);
                 for line in reader.lines() {
                     if let Ok(line) = line {
-                        info!("[Cloudflare] {}", line);
+                        info!("[Cloudflare OUT] {}", line);
                         
                         // Regex para capturar URL do Cloudflare
                         if line.contains("trycloudflare.com") {
@@ -68,14 +69,45 @@ fn iniciar_cloudflare_tunnel(app_handle: tauri::AppHandle) {
                                 info!("🌐 URL do Cloudflare detectada: {}", url);
                                 
                                 // Atualiza estado global
-                                if let Some(state) = app_handle.try_state::<Arc<Mutex<AppState>>>() {
+                                if let Some(state) = app_handle_stdout.try_state::<Arc<Mutex<AppState>>>() {
                                     if let Ok(mut state_guard) = state.try_lock() {
                                         state_guard.set_tunnel_url(url.clone());
                                     }
                                 }
                                 
                                 // Emite evento para o frontend
-                                let _ = app_handle.emit("tunnel-url-detected", url);
+                                let _ = app_handle_stdout.emit("tunnel-url-detected", url);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Ler stderr também
+        if let Some(stderr) = child.stderr.take() {
+            let app_handle_stderr = app_handle.clone();
+            std::thread::spawn(move || {
+                use std::io::{BufRead, BufReader};
+                let reader = BufReader::new(stderr);
+                for line in reader.lines() {
+                    if let Ok(line) = line {
+                        info!("[Cloudflare ERR] {}", line);
+                        
+                        // Regex para capturar URL do Cloudflare (pode estar no stderr)
+                        if line.contains("trycloudflare.com") {
+                            if let Some(url) = extract_cloudflare_url(&line) {
+                                info!("🌐 URL do Cloudflare detectada (stderr): {}", url);
+                                
+                                // Atualiza estado global
+                                if let Some(state) = app_handle_stderr.try_state::<Arc<Mutex<AppState>>>() {
+                                    if let Ok(mut state_guard) = state.try_lock() {
+                                        state_guard.set_tunnel_url(url.clone());
+                                    }
+                                }
+                                
+                                // Emite evento para o frontend
+                                let _ = app_handle_stderr.emit("tunnel-url-detected", url);
                             }
                         }
                     }
@@ -152,6 +184,7 @@ pub fn run() {
             commands::load_render_config,
             commands::test_render_connection,
             commands::update_render_env,
+            commands::fetch_cloudflare_url_manual,
         ])
         .setup(|app| {
             // Conectar ao banco e iniciar API em background

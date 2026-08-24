@@ -92,7 +92,28 @@ pub async fn test_render_connection(
     }
 }
 
-/// Atualiza variável de ambiente no Render com a URL do tunnel
+/// Busca URL do Cloudflare manualmente via API local (fallback)
+#[tauri::command]
+pub async fn fetch_cloudflare_url_manual() -> Result<Option<String>, String> {
+    // Cloudflare Tunnel expõe métricas em http://localhost:2000/metrics
+    match reqwest::get("http://127.0.0.1:2000/metrics").await {
+        Ok(response) => {
+            if let Ok(text) = response.text().await {
+                // Procura por URL no formato trycloudflare.com
+                use regex::Regex;
+                let re = Regex::new(r"https://[a-z0-9-]+\.trycloudflare\.com")
+                    .map_err(|e| e.to_string())?;
+                
+                if let Some(m) = re.find(&text) {
+                    return Ok(Some(m.as_str().to_string()));
+                }
+            }
+            Ok(None)
+        }
+        Err(_) => Ok(None)
+    }
+}
+
 #[tauri::command]
 pub async fn update_render_env(state: State<'_, Arc<Mutex<AppState>>>) -> Result<String, String> {
     let state = state.lock().await;

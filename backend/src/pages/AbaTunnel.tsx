@@ -36,10 +36,27 @@ export default function AbaTunnel() {
       showMessage('success', '🌐 Nova URL do Cloudflare detectada!');
     });
 
+    // Fallback: tentar buscar URL manualmente a cada 5 segundos se não detectou
+    const interval = setInterval(async () => {
+      if (!tunnelUrl) {
+        try {
+          const url = await invoke<string | null>('fetch_cloudflare_url_manual');
+          if (url) {
+            setTunnelUrl(url);
+            showMessage('success', '🌐 URL do Cloudflare detectada (fallback)!');
+            clearInterval(interval);
+          }
+        } catch (error) {
+          // Silencioso - não precisa logar erro
+        }
+      }
+    }, 5000);
+
     return () => {
       unlisten.then(fn => fn());
+      clearInterval(interval);
     };
-  }, []);
+  }, [tunnelUrl]);
 
   const loadTunnelUrl = async () => {
     try {
