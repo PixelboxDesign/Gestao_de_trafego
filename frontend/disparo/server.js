@@ -77,7 +77,7 @@ app.all('/api/*', async (req, res) => {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
       },
-      timeout: 10000,
+      timeout: 30000, // 30s para imagens grandes
     };
     if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
       opcoes.body = JSON.stringify(req.body);
