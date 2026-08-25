@@ -249,6 +249,8 @@ pub async fn servir_imagem(
         .header(header::CONTENT_TYPE, mime)
         .header(header::CACHE_CONTROL, "public, max-age=86400, immutable")
         .header(header::ETAG, format!("\"{}/{}/{}\"", marca_nome, kit_nome, img_nome))
+        .header(header::ACCESS_CONTROL_ALLOW_ORIGIN, "*")
+        .header(header::ACCESS_CONTROL_ALLOW_METHODS, "GET, OPTIONS")
         .body(Body::from(content))
         .unwrap())
 }
