@@ -65,6 +65,13 @@ pub struct SalvarInfoBody {
     pub skus_itens: Vec<String>,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct ReordenarCarrosselBody {
+    pub marca: String,
+    pub kit: String,
+    pub ordem: Vec<String>,
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 fn catalogo_path() -> PathBuf {
@@ -561,4 +568,75 @@ pub async fn deletar_imagem(
         Ok(_) => Json(serde_json::json!({ "ok": true })),
         Err(e) => Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao deletar: {}", e) })),
     }
+}
+
+/// POST /api/catalogo/reordenar-carrossel — reordena as imagens do carrossel renomeando os arquivos
+pub async fn reordenar_carrossel(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Json(body): Json<ReordenarCarrosselBody>,
+) -> Json<serde_json::Value> {
+    let base = catalogo_path();
+    let marca_path = base.join(&body.marca);
+    let kit_path = marca_path.join(&body.kit);
+
+    // Segurança
+    let canonical_base = match base.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Catálogo não encontrado" })),
+    };
+    let canonical_kit = match kit_path.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Kit não encontrado" })),
+    };
+    if !canonical_kit.starts_with(&canonical_base) {
+        return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
+    }
+
+    // Renomeia os arquivos para refletir a ordem
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis();
+
+    // Primeiro renomeia tudo para nomes temporários para evitar colisões
+    let mut temp_files = Vec::new();
+    for (idx, arquivo) in body.ordem.iter().enumerate() {
+        let old_path = canonical_kit.join(arquivo);
+        if !old_path.exists() {
+            continue;
+        }
+
+        let temp_name = format!("temp_{}_{}", timestamp, idx);
+        let temp_path = canonical_kit.join(&temp_name);
+
+        match fs::rename(&old_path, &temp_path).await {
+            Ok(_) => temp_files.push((temp_path, idx, arquivo.clone())),
+            Err(e) => return Json(serde_json::json!({ 
+                "ok": false, 
+                "erro": format!("Erro ao renomear temporário: {}", e) 
+            })),
+        }
+    }
+
+    // Agora renomeia para os nomes finais com a ordem correta
+    for (temp_path, idx, arquivo_original) in temp_files {
+        // Extrai a extensão do arquivo original
+        let ext = std::path::Path::new(&arquivo_original)
+            .extension()
+            .and_then(|e| e.to_str())
+            .unwrap_or("jpg");
+
+        let final_name = format!("img_{:03}.{}", idx + 1, ext);
+        let final_path = canonical_kit.join(&final_name);
+
+        match fs::rename(&temp_path, &final_path).await {
+            Ok(_) => {},
+            Err(e) => return Json(serde_json::json!({ 
+                "ok": false, 
+                "erro": format!("Erro ao renomear final: {}", e) 
+            })),
+        }
+    }
+
+    Json(serde_json::json!({ "ok": true }))
 }

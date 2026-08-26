@@ -972,13 +972,26 @@ function renderCarrossel(imagens) {
     return;
   }
   
-  container.innerHTML = imagens.map(img => `
-    <div style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border)">
+  container.innerHTML = imagens.map((img, idx) => `
+    <div 
+      draggable="true"
+      data-index="${idx}"
+      data-filename="${esc(img)}"
+      class="carrossel-item"
+      style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);cursor:move"
+      ondragstart="handleDragStart(event)"
+      ondragover="handleDragOver(event)"
+      ondrop="handleDrop(event)"
+      ondragend="handleDragEnd(event)"
+    >
       <img
         src="/api/catalogo/imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}/${encodeURIComponent(img)}"
         alt="Carrossel"
-        style="width:100%;height:100%;object-fit:cover"
+        style="width:100%;height:100%;object-fit:cover;pointer-events:none"
       />
+      <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.6);color:white;border-radius:4px;padding:.15rem .35rem;font-size:10px;font-weight:700">
+        ${idx + 1}
+      </div>
       <button
         onclick="deletarImagemCarrossel('${esc(img)}')"
         style="position:absolute;top:4px;right:4px;background:rgba(239,68,68,0.9);color:white;border:none;border-radius:4px;padding:.25rem .35rem;cursor:pointer;font-size:10px"
@@ -987,6 +1000,104 @@ function renderCarrossel(imagens) {
       </button>
     </div>
   `).join('');
+}
+
+// ── Drag and Drop para Carrossel ─────────────────────────────────────────────
+let draggedElement = null;
+
+function handleDragStart(e) {
+  draggedElement = e.target;
+  e.target.style.opacity = '0.4';
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault();
+  }
+  e.dataTransfer.dropEffect = 'move';
+  
+  // Visual feedback
+  const target = e.target.closest('.carrossel-item');
+  if (target && target !== draggedElement) {
+    target.style.borderColor = '#3b82f6';
+    target.style.borderWidth = '2px';
+  }
+  
+  return false;
+}
+
+function handleDrop(e) {
+  if (e.stopPropagation) {
+    e.stopPropagation();
+  }
+  
+  const target = e.target.closest('.carrossel-item');
+  if (!target || !draggedElement || target === draggedElement) {
+    return false;
+  }
+  
+  // Remove visual feedback
+  target.style.borderColor = '';
+  target.style.borderWidth = '';
+  
+  // Pega índices
+  const fromIndex = parseInt(draggedElement.getAttribute('data-index'));
+  const toIndex = parseInt(target.getAttribute('data-index'));
+  
+  // Reordena array de imagens
+  const imagens = [...(kitAtual.imagens_carrossel || [])];
+  const [movedImage] = imagens.splice(fromIndex, 1);
+  imagens.splice(toIndex, 0, movedImage);
+  
+  // Atualiza kitAtual
+  kitAtual.imagens_carrossel = imagens;
+  
+  // Re-renderiza
+  renderCarrossel(imagens);
+  
+  // Salva automaticamente a nova ordem
+  salvarOrdemCarrossel(imagens);
+  
+  return false;
+}
+
+function handleDragEnd(e) {
+  e.target.style.opacity = '1';
+  
+  // Remove todos os feedbacks visuais
+  document.querySelectorAll('.carrossel-item').forEach(item => {
+    item.style.borderColor = '';
+    item.style.borderWidth = '';
+  });
+  
+  draggedElement = null;
+}
+
+async function salvarOrdemCarrossel(imagens) {
+  if (!kitAtual) return;
+  
+  try {
+    const res = await fetch('/api/catalogo/reordenar-carrossel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        marca: kitAtual.marca,
+        kit: kitAtual.nome,
+        ordem: imagens
+      })
+    });
+    
+    const data = await res.json();
+    if (!data.ok) {
+      throw new Error(data.erro || 'Erro ao salvar ordem');
+    }
+    
+    showToast('✓ Ordem atualizada', 'success');
+  } catch (err) {
+    console.error('Erro ao salvar ordem:', err);
+    showToast('❌ Erro ao salvar ordem', 'error');
+  }
 }
 
 function renderSkusItens(skus) {
@@ -1036,32 +1147,7 @@ function fecharModalKit() {
   arquivoSelecionado = null;
 }
 
-function handleFileSelect(input) {
-  const file = input.files[0];
-  if (!file) {
-    arquivoSelecionado = null;
-    document.getElementById('file-name').textContent = '';
-    return;
-  }
-
-  // Valida tipo
-  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-  if (!validTypes.includes(file.type)) {
-    alert('Tipo de arquivo inválido. Use JPG, PNG ou WebP.');
-    input.value = '';
-    return;
-  }
-
-  // Valida tamanho (5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    alert('Arquivo muito grande. Máximo 5MB.');
-    input.value = '';
-    return;
-  }
-
-  arquivoSelecionado = file;
-  document.getElementById('file-name').textContent = `✓ ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`;
-}
+// Função removida - não é mais utilizada
 
 function handleThumbSelect(input) {
   const file = input.files?.[0];
@@ -1129,7 +1215,7 @@ async function uploadCarrossel() {
   if (!arquivoCarrossel || !kitAtual) return;
 
   const formData = new FormData();
-  formData.append('file', arquivoCarrossel);
+  formData.append('imagem', arquivoCarrossel);
 
   try {
     const res = await fetch(`/api/catalogo/upload-carrossel/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}`, {
@@ -1225,7 +1311,7 @@ async function salvarKit() {
     // 2. Upload de thumbnail (se selecionou)
     if (arquivoThumb) {
       const formData = new FormData();
-      formData.append('file', arquivoThumb);
+      formData.append('imagem', arquivoThumb);
 
       const nomeParaUpload = data.novo_nome || kitAtual.nome;
       const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(nomeParaUpload)}`, {

@@ -54,6 +54,7 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .route("/api/catalogo/upload-thumb/:marca/:kit", axum::routing::post(catalogo::upload_thumb))
         .route("/api/catalogo/upload-carrossel/:marca/:kit", axum::routing::post(catalogo::upload_carrossel))
         .route("/api/catalogo/deletar-imagem/:marca/:kit/:arquivo", axum::routing::delete(catalogo::deletar_imagem))
+        .route("/api/catalogo/reordenar-carrossel", axum::routing::post(catalogo::reordenar_carrossel))
         .route("/api/catalogo/files/*path", get(catalogo::serve_file))
         // Rotas de WhatsApp
         .route("/api/whatsapp/status", get(whatsapp::status))
