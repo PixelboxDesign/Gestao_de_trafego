@@ -139,8 +139,9 @@ pub async fn update_render_env(state: State<'_, Arc<Mutex<AppState>>>) -> Result
         }
     ]);
 
-    tracing::info!("Atualizando variável '{}' no Render com URL: {}", config.env_var_name, tunnel_url);
+    tracing::info!("🔄 Passo 1/2: Atualizando variável '{}' no Render com URL: {}", config.env_var_name, tunnel_url);
 
+    // Passo 1: Atualizar variável de ambiente
     let response = client
         .put(format!(
             "https://api.render.com/v1/services/{}/env-vars",
@@ -151,17 +152,71 @@ pub async fn update_render_env(state: State<'_, Arc<Mutex<AppState>>>) -> Result
         .json(&body)
         .send()
         .await
-        .map_err(|e| format!("Erro ao atualizar: {}", e))?;
+        .map_err(|e| format!("Erro ao atualizar variável: {}", e))?;
 
-    if response.status().is_success() {
-        Ok(format!(
-            "✅ Variável '{}' atualizada no Render!\n🔄 Deploy será iniciado automaticamente (~2min)",
-            config.env_var_name
-        ))
-    } else {
+    if !response.status().is_success() {
         let status = response.status();
         let error_text = response.text().await.unwrap_or_default();
-        Err(format!("❌ Erro HTTP {}: {}", status, error_text))
+        return Err(format!("❌ Erro ao atualizar variável HTTP {}: {}", status, error_text));
+    }
+
+    tracing::info!("✅ Variável atualizada com sucesso!");
+    tracing::info!("🚀 Passo 2/2: Triggerando deploy no Render...");
+
+    // Passo 2: Triggerar deploy manual
+    let deploy_body = serde_json::json!({
+        "clearCache": "do_not_clear"
+    });
+
+    let deploy_response = client
+        .post(format!(
+            "https://api.render.com/v1/services/{}/deploys",
+            config.service_id
+        ))
+        .header("Authorization", format!("Bearer {}", config.api_key))
+        .header("Content-Type", "application/json")
+        .json(&deploy_body)
+        .send()
+        .await
+        .map_err(|e| format!("Erro ao triggerar deploy: {}", e))?;
+
+    if deploy_response.status().is_success() {
+        let deploy_info: serde_json::Value = deploy_response
+            .json()
+            .await
+            .unwrap_or(serde_json::json!({}));
+        
+        let deploy_id = deploy_info
+            .get("id")
+            .and_then(|id| id.as_str())
+            .unwrap_or("N/A");
+
+        tracing::info!("✅ Deploy triggerado com sucesso! ID: {}", deploy_id);
+
+        Ok(format!(
+            "✅ Sucesso!\n\n\
+            📝 Variável '{}' atualizada\n\
+            🚀 Deploy iniciado (ID: {})\n\n\
+            ⏱️ Tempo estimado: 2-5 minutos\n\
+            🌐 Acompanhe em: https://dashboard.render.com/web/{}",
+            config.env_var_name,
+            deploy_id,
+            config.service_id
+        ))
+    } else {
+        let status = deploy_response.status();
+        let error_text = deploy_response.text().await.unwrap_or_default();
+        
+        // Se o deploy falhou mas a variável foi atualizada, informa isso
+        Ok(format!(
+            "⚠️ Variável atualizada, mas erro ao triggerar deploy:\n\
+            HTTP {}: {}\n\n\
+            💡 Você pode fazer deploy manual em:\n\
+            https://dashboard.render.com/web/{}/deploys",
+            status,
+            error_text,
+            config.service_id
+        ))
     }
 }
 
