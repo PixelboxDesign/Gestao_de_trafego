@@ -15,10 +15,294 @@
 
 | Versão | Data | Título | Commit original | Commit atual | Amends |
 |---|---|---|---|---|---|
+| [v12-edit-catalogo-drag-reorder](#checkpoint-v12-edit-catalogo-drag-reorder) | 26/08/2026 | Modal de Edição Funcional + Drag-and-Drop para Reordenar Carrossel | `7bb3b8a` | `7bb3b8a` | — |
 | [v11-deploy-automatico](#checkpoint-v11-deploy-automatico) | 26/08/2026 | Deploy Automático no Render + Restart Tunnel | `7115b7c` | `7115b7c` | — |
 | [v10-thumb-carrossel](#checkpoint-v10-thumb-carrossel) | 25/08/2026 | Sistema de Thumbnails Otimizadas + Carrossel de Imagens | `e9a40b1` | `e9a40b1` | — |
 
 > ⚠️ **Regra de restauração:** Sempre use o **Commit atual** para rollback. Quando há amends, o commit original deixa de existir no Git e é substituído pelo mais recente.
+
+---
+
+## CHECKPOINT v12-edit-catalogo-drag-reorder
+
+**Título:** Modal de Edição Funcional + Drag-and-Drop para Reordenar Carrossel
+
+**Data:** 26/08/2026 | **Commit:** `7bb3b8a` | **Status:** ✅ ESTÁVEL
+
+**O que foi implementado:**
+
+### 1. **Correção de Erros no Modal de Edição**
+
+**Problema anterior:**
+- Ao clicar em "Editar" em qualquer kit, modal mostrava erro "campotext is not defined"
+- Erro causado por função obsoleta `handleFileSelect()` tentando acessar elemento inexistente `document.getElementById('file-name')`
+- Upload de imagens não funcionava corretamente
+
+**Solução implementada:**
+- **Removida função obsoleta `handleFileSelect()`** — não era mais utilizada pelo sistema
+- **Corrigido campo FormData** de `'file'` para `'imagem'` em ambos uploads:
+  - `uploadCarrossel()` → `formData.append('imagem', arquivoCarrossel)`
+  - `salvarKit()` → `formData.append('imagem', arquivoThumb)`
+- Backend já esperava campo `'imagem'`, frontend estava enviando `'file'`
+- Modal agora abre corretamente sem erros
+
+**Arquivos modificados (frontend):**
+```javascript
+// frontend/disparo/public/index.html
+
+// ANTES (causava erro):
+function handleFileSelect(input) {
+  document.getElementById('file-name').textContent = '';  // elemento não existe
+}
+
+// DEPOIS (removido completamente):
+// Função removida - não é mais utilizada
+
+// ANTES (campo errado):
+formData.append('file', arquivoThumb);
+
+// DEPOIS (campo correto):
+formData.append('imagem', arquivoThumb);
+```
+
+### 2. **Sistema de Drag-and-Drop para Reordenar Carrossel**
+
+**Problema anterior:**
+- Usuário não podia reordenar imagens do carrossel
+- Ordem era fixa (apenas pela data de upload)
+- Para mudar ordem precisava deletar e fazer upload novamente
+
+**Solução implementada:**
+
+**A. Frontend (HTML5 Drag API):**
+- Elementos `.carrossel-item` tornados arrastáveis (`draggable="true"`)
+- 4 handlers implementados:
+  - `handleDragStart(e)` — marca elemento sendo arrastado, aplica opacidade 40%
+  - `handleDragOver(e)` — feedback visual (borda azul 2px) durante arraste
+  - `handleDrop(e)` — reordena array, re-renderiza, salva automaticamente
+  - `handleDragEnd(e)` — limpa feedbacks visuais, restaura opacidade 100%
+- **Numeração visual:** cada imagem mostra sua posição (1, 2, 3...) no canto superior esquerdo
+- **Cursor:** `cursor: move` indica que elemento é arrastável
+- **Salvamento automático:** ao soltar, chama `salvarOrdemCarrossel()` via API
+
+**B. Backend (Rust):**
+- Novo struct `ReordenarCarrosselBody`:
+  ```rust
+  pub struct ReordenarCarrosselBody {
+      pub marca: String,
+      pub kit: String,
+      pub ordem: Vec<String>,  // Array com nomes dos arquivos na ordem desejada
+  }
+  ```
+
+- Nova rota `POST /api/catalogo/reordenar-carrossel`:
+  ```rust
+  pub async fn reordenar_carrossel(
+      State(_state): State<Arc<Mutex<AppState>>>,
+      Json(body): Json<ReordenarCarrosselBody>,
+  ) -> Json<serde_json::Value>
+  ```
+
+- Algoritmo de renomeação segura em 2 passos:
+  1. **Renomeia para temporários** — evita colisões de nomes
+     ```rust
+     temp_file_001.jpg
+     temp_file_002.png
+     temp_file_003.webp
+     ```
+  2. **Renomeia para finais** — ordem sequencial
+     ```rust
+     img_001.jpg   // posição 1
+     img_002.png   // posição 2
+     img_003.webp  // posição 3
+     ```
+
+- **Preserva extensões originais** — mantém JPG, PNG, WebP
+
+**C. Rota registrada no servidor:**
+```rust
+// backend/src-tauri/src/api/mod.rs
+.route("/api/catalogo/reordenar-carrossel", axum::routing::post(catalogo::reordenar_carrossel))
+```
+
+### 3. **Melhorias na Renderização do Carrossel**
+
+**Antes:**
+```html
+<div style="position:relative...">
+  <img src="..." />
+  <button>🗑️</button>
+</div>
+```
+
+**Depois:**
+```html
+<div 
+  draggable="true"
+  data-index="0"
+  data-filename="img_123.jpg"
+  class="carrossel-item"
+  style="cursor:move..."
+  ondragstart="handleDragStart(event)"
+  ondragover="handleDragOver(event)"
+  ondrop="handleDrop(event)"
+  ondragend="handleDragEnd(event)"
+>
+  <img src="..." style="pointer-events:none" />
+  <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.6)">
+    1  <!-- numeração da posição -->
+  </div>
+  <button onclick="deletarImagemCarrossel(...)">🗑️</button>
+</div>
+```
+
+**Mudanças visuais:**
+- Cada imagem mostra número da posição (1, 2, 3...)
+- Cursor muda para "move" ao passar mouse
+- Borda azul aparece quando arrasta sobre outra imagem
+- Opacidade 40% enquanto arrasta
+- Transições suaves ao reordenar
+
+### 4. **Fluxo Completo de Edição**
+
+**Agora o usuário pode:**
+1. ✅ **Clicar em "Editar"** — modal abre sem erros
+2. ✅ **Renomear o kit** — pasta é renomeada automaticamente
+3. ✅ **Editar preço** — atualizado no info.json
+4. ✅ **Editar descrição** — atualizada no info.json
+5. ✅ **Editar SKU do kit** — atualizado no info.json
+6. ✅ **Adicionar/remover SKUs de itens** — lista editável
+7. ✅ **Trocar thumbnail** — upload e substituição automática
+8. ✅ **Adicionar imagens ao carrossel** — upload com nome timestampado
+9. ✅ **Deletar imagens do carrossel** — confirmação + remoção do arquivo
+10. ✅ **Reordenar imagens do carrossel** — arrastar e soltar
+11. ✅ **Salvar tudo** — backend persiste todas as alterações
+
+**Persistência garantida:**
+- ✅ Renomear kit → pasta física é renomeada
+- ✅ Upload de thumb → substitui `thumb.jpg` na pasta
+- ✅ Upload de carrossel → cria `img_[timestamp]_[contador].jpg`
+- ✅ Deletar carrossel → remove arquivo físico
+- ✅ Reordenar carrossel → renomeia arquivos para `img_001.jpg`, `img_002.jpg`...
+- ✅ Editar info → atualiza `info.json` na pasta
+
+---
+
+**Reverter:**
+```bash
+git checkout 7bb3b8a
+git checkout -b rollback-v12-edit-catalogo-drag-reorder
+```
+
+**Validação:**
+1. ✅ Modal de edição abre sem erros (nenhum elemento indefinido)
+2. ✅ Upload de thumbnail funciona com campo `'imagem'` correto
+3. ✅ Upload de imagens para carrossel funciona
+4. ✅ Drag-and-drop reordena imagens visualmente
+5. ✅ Ordem é salva automaticamente via API
+6. ✅ Backend renomeia arquivos para refletir nova ordem
+7. ✅ Numeração das imagens atualiza após reordenar
+8. ✅ Feedback visual durante o arraste (borda azul, opacidade)
+9. ✅ Todas as edições persistem (pasta, JSON, arquivos)
+
+**Funcionalidades garantidas (além das anteriores):**
+- ✅ Modal de edição funcional sem erros
+- ✅ Sistema completo de CRUD para kits do catálogo
+- ✅ Upload e gerenciamento de imagens (thumb + carrossel)
+- ✅ Drag-and-drop para reordenar carrossel intuitivamente
+- ✅ Persistência de todas as alterações no sistema de arquivos
+- ✅ Todos os checkpoints anteriores preservados
+
+**Arquivos modificados/criados:**
+```
+frontend/disparo/public/index.html                  — correções + drag-and-drop
+backend/src-tauri/src/api/catalogo.rs               — struct + função reordenar
+backend/src-tauri/src/api/mod.rs                    — rota registrada
+backend/INICIAR-LUNA-SERVER.bat                     — script de inicialização
+documentacao/CHECKPOINTS.md                         — este checkpoint
+```
+
+**Código implementado (drag-and-drop frontend):**
+```javascript
+// Variável global
+let draggedElement = null;
+
+// Handler de início do arraste
+function handleDragStart(e) {
+  draggedElement = e.target;
+  e.target.style.opacity = '0.4';
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+// Handler de passar sobre elemento
+function handleDragOver(e) {
+  if (e.preventDefault) e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  
+  const target = e.target.closest('.carrossel-item');
+  if (target && target !== draggedElement) {
+    target.style.borderColor = '#3b82f6';
+    target.style.borderWidth = '2px';
+  }
+  return false;
+}
+
+// Handler de soltar
+function handleDrop(e) {
+  if (e.stopPropagation) e.stopPropagation();
+  
+  const target = e.target.closest('.carrossel-item');
+  if (!target || !draggedElement || target === draggedElement) {
+    return false;
+  }
+  
+  // Pega índices
+  const fromIndex = parseInt(draggedElement.getAttribute('data-index'));
+  const toIndex = parseInt(target.getAttribute('data-index'));
+  
+  // Reordena array
+  const imagens = [...(kitAtual.imagens_carrossel || [])];
+  const [movedImage] = imagens.splice(fromIndex, 1);
+  imagens.splice(toIndex, 0, movedImage);
+  
+  // Atualiza e renderiza
+  kitAtual.imagens_carrossel = imagens;
+  renderCarrossel(imagens);
+  salvarOrdemCarrossel(imagens);
+  
+  return false;
+}
+
+// Handler de fim do arraste
+function handleDragEnd(e) {
+  e.target.style.opacity = '1';
+  document.querySelectorAll('.carrossel-item').forEach(item => {
+    item.style.borderColor = '';
+    item.style.borderWidth = '';
+  });
+  draggedElement = null;
+}
+
+// Salva ordem via API
+async function salvarOrdemCarrossel(imagens) {
+  const res = await fetch('/api/catalogo/reordenar-carrossel', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      marca: kitAtual.marca,
+      kit: kitAtual.nome,
+      ordem: imagens
+    })
+  });
+  
+  const data = await res.json();
+  if (!data.ok) {
+    throw new Error(data.erro || 'Erro ao salvar ordem');
+  }
+  
+  showToast('✓ Ordem atualizada', 'success');
+}
+```
 
 ---
 
