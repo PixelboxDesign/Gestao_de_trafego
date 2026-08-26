@@ -15,7 +15,7 @@
 
 | Versão | Data | Título | Commit original | Commit atual | Amends |
 |---|---|---|---|---|---|
-| [v10-thumb-carrossel](#checkpoint-v10-thumb-carrossel) | 25/08/2026 | Sistema de Thumbnails Otimizadas + Carrossel de Imagens | `pendente` | `pendente` | — |
+| [v10-thumb-carrossel](#checkpoint-v10-thumb-carrossel) | 25/08/2026 | Sistema de Thumbnails Otimizadas + Carrossel de Imagens | `e9a40b1` | `e9a40b1` | — |
 
 > ⚠️ **Regra de restauração:** Sempre use o **Commit atual** para rollback. Quando há amends, o commit original deixa de existir no Git e é substituído pelo mais recente.
 
@@ -25,7 +25,7 @@
 
 **Título:** Sistema de Thumbnails Otimizadas + Carrossel de Imagens dos Kits
 
-**Data:** 25/08/2026 | **Commit:** `pendente` | **Status:** ✅ ESTÁVEL
+**Data:** 25/08/2026 | **Commit:** `e9a40b1` | **Status:** ✅ ESTÁVEL
 
 **O que foi implementado:**
 
@@ -225,7 +225,7 @@ app.use('/api', createProxyMiddleware({
 
 **Reverter:**
 ```bash
-git checkout [commit_hash]
+git checkout e9a40b1
 git checkout -b rollback-v10-thumb-carrossel
 ```
 
