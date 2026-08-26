@@ -1,6 +1,6 @@
 use crate::state::{AppState, RenderConfig};
 use std::sync::Arc;
-use tauri::State;
+use tauri::{State, Manager};
 use tokio::sync::Mutex;
 
 /// Retorna a URL atual do Cloudflare Tunnel
