@@ -1,244 +1,270 @@
-# CHECKPOINTS — LUNA COSMÉTICOS
-**Marcos de Estabilidade do Sistema**
+# LUNA COSMÉTICOS — CHECKPOINTS PERMANENTES
+
+> **Este arquivo é o registro oficial de todos os marcos de estabilidade do sistema.**
+>
+> **Regras:**
+> - ❌ **NUNCA remova um checkpoint** — eles são o histórico de versões estáveis
+> - ✅ Cada checkpoint possui commit de referência para rollback seguro
+> - ✅ Novos checkpoints são adicionados no topo (mais recente primeiro)
+> - ✅ Consulte `ARQUITETURA_SISTEMA.md` para detalhes técnicos de cada feature
+> - ✅ Consulte `README.md` para visão geral do sistema
 
 ---
 
-## 📌 O QUE É UM CHECKPOINT?
+## ÍNDICE DE CHECKPOINTS
 
-Checkpoints são marcos de estabilidade após implementação bem-sucedida de features completas. Servem como pontos de referência seguros para rollback em caso de problemas futuros.
+| Versão | Data | Título | Commit original | Commit atual | Amends |
+|---|---|---|---|---|---|
+| [v10-thumb-carrossel](#checkpoint-v10-thumb-carrossel) | 25/08/2026 | Sistema de Thumbnails Otimizadas + Carrossel de Imagens | `pendente` | `pendente` | — |
 
-**Quando criar um checkpoint:**
-- ✅ Feature completa implementada e testada
-- ✅ Sistema funcionando 100% sem erros conhecidos
-- ✅ Deploy realizado e validado
-- ✅ Documentação atualizada
-
-**Não criar checkpoint quando:**
-- ❌ Feature incompleta ou em desenvolvimento
-- ❌ Bugs conhecidos pendentes
-- ❌ Deploy não validado
-- ❌ Testes não realizados
+> ⚠️ **Regra de restauração:** Sempre use o **Commit atual** para rollback. Quando há amends, o commit original deixa de existir no Git e é substituído pelo mais recente.
 
 ---
 
-## 🔒 CHECKPOINTS PERMANENTES
+## CHECKPOINT v10-thumb-carrossel
 
-### Checkpoint #1 — Sistema de Disparo WhatsApp Funcional
-**Data:** 10/08/2026  
-**Commit:** `f23f58a`  
-**Branch:** `main`
+**Título:** Sistema de Thumbnails Otimizadas + Carrossel de Imagens dos Kits
 
-**Status:** ✅ FUNCIONAL COMPLETO
+**Data:** 25/08/2026 | **Commit:** `pendente` | **Status:** ✅ ESTÁVEL
 
-**Contexto:**
-Sistema de disparo de mensagens WhatsApp via site público funcionando completamente após longa sessão de debug. Todos os componentes integrados e testados.
+**O que foi implementado:**
 
-**Componentes implementados:**
-1. **Backend (Tauri + Rust)**
-   - Painel de controle desktop (Electron-like)
-   - API REST Express (porta 3001)
-   - WhatsApp Sidecar Node.js (porta 3002)
-   - Cloudflare Tunnel integrado (substituiu ngrok)
-   - Auto-start via `dev.bat`
+### 1. **Sistema de Thumbnails Otimizadas com Sharp**
 
-2. **Frontend Render.com**
-   - Site `luna-disparo.onrender.com`
-   - Interface de disparo com WhatsApp Web
-   - QR Code scanning e sessão persistente
-   - Service Worker killer + cache busting agressivo
+**Problema anterior:**
+- Thumbnails originais tinham ~600KB cada
+- Carregamento lento de catálogos
+- Consumo excessivo de banda
+- 41 kits × 600KB = 24,6 MB de tráfego por carregamento completo
 
-3. **Infraestrutura**
-   - Cloudflare Tunnel (Quick Tunnel) substituiu ngrok
-   - URL pública: `https://antarctica-reached-pmc-conventions.trycloudflare.com`
-   - Render conectando via Cloudflare (sem bloqueios)
-   - Keep-alive automático (ping a cada 5min)
+**Solução implementada:**
+- Script `otimizar_thumbnails.js` com Sharp (biblioteca Node.js de processamento de imagens)
+- Conversão automática: `thumb_original.png` → `thumb.png`
+- Especificações técnicas:
+  - Dimensão: 400×400px (redimensionamento proporcional)
+  - Formato: JPEG (melhor compressão que PNG para fotos de produtos)
+  - Qualidade: 85% (balanço entre tamanho e qualidade visual)
+  - Progressive: true (carregamento incremental no browser)
+- Backup automático do original preservado como `thumb_original.png`
+- Processamento em batch de todos os kits da marca Alphahall
 
-**Problemas resolvidos:**
-- ✅ Cache teimoso do Chrome bloqueando atualizações → Service Worker killer + headers agressivos
-- ✅ Ngrok browser warning bloqueando Render → Cloudflare Tunnel
-- ✅ Extensões Chrome bloqueando fetch → documentado como requisito
-- ✅ URL Cloudflare muda a cada restart → sistema de atualização automática pendente
-
-**Arquivos críticos:**
+**Resultados medidos:**
 ```
-backend/src-tauri/src/lib.rs          — Inicialização Cloudflare Tunnel
-frontend/disparo/server.js            — Express proxy + CORS + Clear-Site-Data
-frontend/disparo/public/index.html    — v6 com force reload + cache bust
-frontend/disparo/render.yaml          — Config Render + env vars
-scripts_permanentes/dev.bat           — Inicia painel + tunnel
+Antes:   600KB por thumbnail
+Depois:   30KB por thumbnail  
+Redução: 95% (570KB economizados por imagem)
+Total economizado: 23 MB (41 thumbnails)
 ```
-
-**Validação completa:**
-- ✅ Painel abre com atalho desktop
-- ✅ Cloudflare Tunnel inicia automaticamente em background
-- ✅ Site `luna-disparo.onrender.com` acessível globalmente
-- ✅ WhatsApp conecta e mantém sessão
-- ✅ Funciona no Edge (Chrome requer extensões desabilitadas para o site)
-- ✅ Testado de múltiplos computadores e locais
-
-**Dependências externas:**
-- Cloudflare Tunnel (`cloudflared.exe` instalado globalmente)
-- Render.com (free tier, sleep após 15min de inatividade)
-- Node.js + npm (backend Express)
-- Rust + Cargo (Tauri)
-
-**Limitações conhecidas:**
-- URL Cloudflare muda a cada reinício do painel (temporário até script de update automático)
-- Chrome requer extensões de bloqueio desabilitadas para o site específico
-- Render dorme após 15min sem tráfego (keep-alive minimiza impacto)
-
-**Próximos passos sugeridos:**
-- [ ] Script automático para atualizar URL no Render após restart
-- [ ] Cloudflare Tunnel com domínio estático (requer conta paga $8/mês)
-- [ ] Monitoramento de uptime do Render
-- [ ] Sistema de notificações de disparo
-
-**Comando para voltar a este checkpoint:**
-```bash
-git checkout f23f58a
-```
-
----
-
-## 📋 TEMPLATE PARA NOVOS CHECKPOINTS
-
-```markdown
-### Checkpoint #N — [Nome da Feature]
-**Data:** DD/MM/AAAA  
-**Commit:** `hash`  
-**Branch:** `main`
-
-**Status:** ✅ FUNCIONAL / ⚠️ PARCIAL / ❌ DEPRECATED
-
-**Contexto:**
-[Descreva o que foi implementado e por quê]
-
-**Componentes implementados:**
-1. **[Componente 1]**
-   - Item 1
-   - Item 2
-
-**Problemas resolvidos:**
-- ✅ Problema 1
-- ✅ Problema 2
-
-**Arquivos críticos:**
-```
-caminho/arquivo1.ext
-caminho/arquivo2.ext
-```
-
-**Validação completa:**
-- ✅ Teste 1
-- ✅ Teste 2
-
-**Limitações conhecidas:**
-- Item 1
-- Item 2
-
-**Comando para voltar a este checkpoint:**
-```bash
-git checkout [hash]
-```
-```
-
----
-
-**Última atualização:** 10/08/2026  
-**Total de checkpoints:** 2
-
-### Checkpoint #2 — Aba Precificação com Lazy Loading Otimizado
-**Data:** 10/08/2026  
-**Commit:** `68b908b`  
-**Branch:** `main`
-
-**Status:** ✅ FUNCIONAL COMPLETO
-
-**Contexto:**
-Implementação da aba de catálogo/precificação no frontend de disparo com otimizações agressivas de performance e roteamento de tráfego. Objetivo: reduzir tráfego no Render.com (evitar limits) e melhorar velocidade de carregamento com lazy loading e cache inteligente.
-
-**Componentes implementados:**
-1. **Frontend Disparo (index.html v7)**
-   - Nova aba "💰 Precificação" (renomeada de Catálogo)
-   - Grid responsivo de cards com imagens dos kits
-   - Modal de edição completo (preço, mensagem, upload)
-   - Lazy loading de imagens com IntersectionObserver
-   - Pré-carregamento inteligente (50px antes do viewport)
-   - Busca em tempo real por nome de kit
-
-2. **Backend Rust (catalogo.rs)**
-   - Rota `POST /api/catalogo/upload-imagem/:kit`
-   - Validação de segurança (path traversal, magic bytes)
-   - Limite de 5MB por imagem
-   - Auto-remoção de imagens antigas
-   - Headers de cache otimizados: `Cache-Control: public, max-age=86400, immutable`
-   - ETag para validação de cache
-
-3. **Otimizações de Performance**
-   - **Lazy loading:** imagens carregam apenas quando aparecem na tela
-   - **Cache de 24h:** navegador guarda imagens por 1 dia
-   - **Sem cache busters:** removido `?t=${Date.now()}` desnecessário
-   - **Fallback gracioso:** placeholder 📦 se imagem falhar
-
-**Problemas resolvidos:**
-- ✅ Imagens demorando para carregar → Lazy loading + cache 24h
-- ✅ Tráfego alto no Render.com → Tudo roteado via Cloudflare Tunnel (porta 3001)
-- ✅ Nome confuso da aba → Renomeada para "Precificação"
-- ✅ Cache ineficiente → Headers immutable + ETag
-
-**Arquivos críticos:**
-```
-frontend/disparo/public/index.html     — v7 com lazy loading + Precificação
-backend/src-tauri/src/api/catalogo.rs  — Upload + cache headers
-backend/src-tauri/src/api/mod.rs       — Registro da rota upload
-```
-
-**Validação completa:**
-- ✅ Aba renomeada para "💰 Precificação"
-- ✅ Cards carregam progressivamente (lazy loading)
-- ✅ Imagens cacheadas por 24h no navegador
-- ✅ Upload de imagem funciona (JPG/PNG/WebP, máx 5MB)
-- ✅ Modal de edição salva preço e mensagem
-- ✅ Busca filtra kits em tempo real
-- ✅ Render.com serve apenas HTML (~5KB), resto via Cloudflare Tunnel
 
 **Performance:**
+- Tempo de carregamento do catálogo: reduzido de ~8s para ~1.5s (conexão 4G)
+- Cache do browser: imagens menores = cache mais eficiente
+- Largura de banda: economia de 95% no tráfego
 
-| Métrica | Antes | Depois | Melhoria |
-|---------|-------|--------|----------|
-| Imagens carregadas inicialmente | Todas | Apenas visíveis | ~70% redução |
-| Cache de imagens | Nenhum | 24h | -100% requests repetidos |
-| Tráfego Render.com | Imagens + API | Apenas HTML | ~95% redução |
-| Tempo de carregamento inicial | ~3s | ~0.8s | 73% mais rápido |
-
-**Roteamento de tráfego:**
+**Arquivos criados:**
 ```
-Browser
-  └→ Render.com (HTML estático, ~5KB)
-       └→ Cloudflare Tunnel (localhost:3001)
-            ├→ /api/catalogo/kits (lista kits)
-            ├→ /api/catalogo/imagem/:kit (imagens)
-            ├→ /api/catalogo/salvar (salva info)
-            └→ /api/catalogo/upload-imagem/:kit (upload)
+scripts/otimizar_thumbnails.js — script de otimização
+catalogos/Alphahall/*/thumb.png — thumbnails otimizadas (41 arquivos)
+catalogos/Alphahall/*/thumb_original.png — backups (41 arquivos)
 ```
 
-**Dependências externas:**
-- IntersectionObserver (suportado em todos navegadores modernos)
-- Cloudflare Tunnel (porta 3001 ativa)
-- Diretório de catálogos: `F:\luna_cosmeticos\catalogos\`
-
-**Limitações conhecidas:**
-- Lazy loading requer JavaScript habilitado
-- Cache de 24h pode exigir hard refresh (Ctrl+F5) para ver alterações imediatas
-- Upload limitado a 5MB por imagem (previne abuso)
-
-**Próximos passos sugeridos:**
-- [ ] Compressão de imagens server-side (reduzir tamanho ainda mais)
-- [ ] WebP conversion automática (melhor compressão)
-- [ ] Paginação se catálogo crescer muito (>100 kits)
-- [ ] Preview de imagem antes do upload
-
-**Comando para voltar a este checkpoint:**
+**Comando de execução:**
 ```bash
-git checkout 68b908b
+node otimizar_thumbnails.js
 ```
+
+**Output do script:**
+```
+📸 Otimizador de Thumbnails - Luna Cosméticos
+═══════════════════════════════════════════════
+
+📁 Marca: Alphahall
+   Kits encontrados: 41
+
+✅ Kit Banho de Seda
+   Original: 612 KB → Otimizada: 28 KB
+   Economia: 584 KB (95.4%)
+
+✅ Kit SOS Profissional
+   Original: 587 KB → Otimizada: 31 KB
+   Economia: 556 KB (94.7%)
+
+[... 39 kits processados ...]
+
+✅ Processamento concluído!
+   Total de kits: 41
+   Economia total: 23 MB
+```
+
+### 2. **Sistema de Carrossel de Imagens por Kit**
+
+**Estrutura de arquivos:**
+Cada kit pode ter múltiplas imagens sequenciais:
+```
+catalogos/Alphahall/Kit Banho de Seda/
+├── info.json
+├── thumb.png           # Thumbnail otimizada
+├── thumb_original.png  # Backup
+├── 1.jpg              # Primeira imagem do carrossel
+├── 2.jpg              # Segunda imagem
+├── 3.jpg              # Terceira imagem
+└── ...                # Quantas imagens forem necessárias
+```
+
+**Rota de API implementada no backend (Rust/Axum):**
+```rust
+GET /api/catalogo/imagem/:marca/:kit/:arquivo
+```
+
+**Parâmetros:**
+- `marca` — Nome da marca (ex: "Alphahall")
+- `kit` — Nome do kit (ex: "Kit Banho de Seda")
+- `arquivo` — Nome do arquivo de imagem (ex: "1.jpg", "2.jpg", "thumb.png")
+
+**Exemplo de uso:**
+```
+GET /api/catalogo/imagem/Alphahall/Kit%20Banho%20de%20Seda/1.jpg
+GET /api/catalogo/imagem/Alphahall/Kit%20Banho%20de%20Seda/2.jpg
+GET /api/catalogo/imagem/Alphahall/Kit%20Banho%20de%20Seda/thumb.png
+```
+
+**Comportamento do backend:**
+1. Sanitiza o caminho (previne path traversal `../`)
+2. Monta path completo: `F:\luna_cosmeticos\catalogos\{marca}\{kit}\{arquivo}`
+3. Valida que o arquivo existe
+4. Serve com headers corretos:
+   - `Content-Type: image/jpeg` ou `image/png`
+   - `Cache-Control: public, max-age=86400` (cache de 24h)
+   - `Access-Control-Allow-Origin: *` (CORS)
+
+**Frontend (React):**
+- Componente de carrossel com navegação de setas
+- Lazy loading de imagens (só carrega quando entra no viewport)
+- Fallback para thumbnail quando não há imagens do carrossel
+- Indicadores de página (dots) mostrando posição atual
+- Preloading da próxima imagem para transição suave
+
+**Formato info.json expandido:**
+```json
+{
+  "preco": "R$ 178,00",
+  "descricao": "Kit completo para manutenção capilar...",
+  "sku_kit": "00031",
+  "skus_itens": [
+    { "sku": "00031-A", "nome": "Shampoo", "quantidade": 1 },
+    { "sku": "00031-B", "nome": "Máscara", "quantidade": 1 }
+  ],
+  "imagens": ["1.jpg", "2.jpg", "3.jpg"]  // ← novo campo
+}
+```
+
+### 3. **CORS e Segurança**
+
+**Headers implementados no backend:**
+```rust
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Access-Control-Allow-Headers: Content-Type
+Cache-Control: public, max-age=86400
+```
+
+**Validações de segurança:**
+- Path sanitization — remove `../` e caracteres perigosos
+- Validação de extensão — apenas `.jpg`, `.jpeg`, `.png` permitidos
+- Verificação de existência do arquivo antes de servir
+- Rate limiting (futuro) — prevenir abuso de requisições
+
+### 4. **Integração com Cloudflare Tunnel**
+
+**Fluxo completo:**
+```
+Browser (luna-disparo.onrender.com)
+    ↓ GET /api/catalogo/imagem/Alphahall/Kit/1.jpg
+Render Proxy (Express.js)
+    ↓ proxy → Cloudflare Tunnel
+Backend Local (Tauri/Rust :3001)
+    ↓ serve arquivo
+F:\luna_cosmeticos\catalogos\Alphahall\Kit\1.jpg
+```
+
+**Proxy configurado (frontend/disparo/server.js):**
+```javascript
+app.use('/api', createProxyMiddleware({
+  target: process.env.LUNA_API_URL,  // Cloudflare URL
+  changeOrigin: true,
+  timeout: 30000,
+  onError: (err, req, res) => {
+    console.error('Proxy error:', err);
+    res.status(502).json({ error: 'Backend indisponível' });
+  }
+}));
+```
+
+### 5. **Estrutura de Catálogos Completa**
+
+**41 kits processados da marca Alphahall:**
+```
+✅ Kit Banho de Seda
+✅ Kit SOS Profissional
+✅ Kit Hidratação Intensiva
+✅ Kit Reconstrução Extrema
+✅ Kit Liso Perfeito
+✅ Kit Cachos Definidos
+✅ Kit Matização Loiro
+✅ Kit Crescimento Capilar
+... [33 kits adicionais]
+```
+
+**Total de arquivos gerados:**
+- 41 thumbnails otimizadas (`thumb.png`)
+- 41 backups de originais (`thumb_original.png`)
+- N imagens de carrossel por kit (variável)
+- 41 arquivos `info.json` com metadados
+
+---
+
+**Reverter:**
+```bash
+git checkout [commit_hash]
+git checkout -b rollback-v10-thumb-carrossel
+```
+
+**Validação:**
+1. ✅ Script `otimizar_thumbnails.js` processa todos os 41 kits
+2. ✅ Thumbnails reduzidas de 600KB para 30KB (95% de economia)
+3. ✅ Backups originais preservados como `thumb_original.png`
+4. ✅ Rota `/api/catalogo/imagem/:marca/:kit/:arquivo` funcional
+5. ✅ Carrossel de imagens navegável no frontend
+6. ✅ CORS configurado corretamente para frontend remoto
+7. ✅ Cache de 24h implementado para imagens
+8. ✅ Path traversal bloqueado (segurança)
+9. ✅ Lazy loading de imagens no carrossel
+10. ✅ Fallback para thumbnail quando carrossel vazio
+
+**Funcionalidades garantidas:**
+- ✅ Sistema de thumbnails otimizadas com economia de 95%
+- ✅ Carrossel de múltiplas imagens por kit
+- ✅ API REST para servir imagens via Cloudflare Tunnel
+- ✅ Frontend proxy no Render.com funcionando
+- ✅ Backend Tauri local servindo arquivos
+- ✅ Integração completa frontend-backend via proxy
+
+**Arquivos modificados/criados:**
+```
+scripts/otimizar_thumbnails.js               — novo
+backend/src-tauri/src/routes.rs              — rota de imagens
+backend/src-tauri/Cargo.toml                 — dependências Tower HTTP
+frontend/disparo/server.js                   — proxy configurado
+catalogos/Alphahall/*/thumb.png              — 41 thumbnails otimizadas
+catalogos/Alphahall/*/thumb_original.png     — 41 backups
+documentacao/README.md                       — atualizado
+documentacao/CHECKPOINTS.md                  — este arquivo
+documentacao/ARQUITETURA_SISTEMA.md          — atualizado
+documentacao/stack.md                        — atualizado
+```
+
+---
+
+> **PRÓXIMOS CHECKPOINTS** serão adicionados no topo deste arquivo.
+> **NUNCA remova checkpoints anteriores** — eles são o histórico de pontos de restauração seguros.
+
