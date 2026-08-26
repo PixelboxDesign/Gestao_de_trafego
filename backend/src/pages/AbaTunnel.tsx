@@ -69,6 +69,31 @@ export default function AbaTunnel() {
     }
   };
 
+  const forceReloadUrl = async () => {
+    setLoading(true);
+    try {
+      // Primeiro tenta via API de métricas
+      const url = await invoke<string | null>('fetch_cloudflare_url_manual');
+      if (url) {
+        setTunnelUrl(url);
+        showMessage('success', '🌐 URL do Cloudflare carregada!');
+      } else {
+        // Se não encontrou, tenta pelo estado
+        const stateUrl = await invoke<string | null>('get_tunnel_url');
+        if (stateUrl) {
+          setTunnelUrl(stateUrl);
+          showMessage('success', '🌐 URL do Cloudflare carregada!');
+        } else {
+          showMessage('error', '⚠️ URL não detectada. Verifique se o Cloudflare Tunnel está rodando.');
+        }
+      }
+    } catch (error) {
+      showMessage('error', String(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const loadRenderConfig = async () => {
     try {
       const config = await invoke<RenderConfig | null>('load_render_config');
@@ -268,9 +293,25 @@ export default function AbaTunnel() {
             <p style={{ margin: 0, fontSize: '16px' }}>
               ⏳ Aguardando Cloudflare Tunnel iniciar...
             </p>
-            <p style={{ margin: '8px 0 0 0', fontSize: '14px', color: '#666' }}>
+            <p style={{ margin: '8px 0 16px 0', fontSize: '14px', color: '#666' }}>
               A URL aparecerá automaticamente quando o tunnel estiver ativo
             </p>
+            <button
+              onClick={forceReloadUrl}
+              disabled={loading}
+              style={{
+                padding: '12px 24px',
+                borderRadius: '8px',
+                border: '1px solid #4a9eff',
+                backgroundColor: loading ? '#666' : 'transparent',
+                color: loading ? '#aaa' : '#4a9eff',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontWeight: 'bold',
+                fontSize: '14px'
+              }}
+            >
+              {loading ? '⏳ Buscando...' : '🔄 Recarregar URL Manualmente'}
+            </button>
           </div>
         )}
       </div>
