@@ -39,10 +39,11 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": {
-      "../whatsapp-sidecar/server.js": "whatsapp-sidecar/server.js",
-      "../whatsapp-sidecar/node_modules": "whatsapp-sidecar/node_modules",
-      "../whatsapp-sidecar/package.json": "whatsapp-sidecar/package.json"
-    }
+    "resources": [
+      "../dist/*",
+      "../whatsapp-sidecar/server.js",
+      "../whatsapp-sidecar/node_modules",
+      "../whatsapp-sidecar/package.json"
+    ]
   }
 }
