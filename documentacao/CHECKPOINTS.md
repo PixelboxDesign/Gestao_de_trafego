@@ -15,9 +15,203 @@
 
 | Versão | Data | Título | Commit original | Commit atual | Amends |
 |---|---|---|---|---|---|
+| [v11-deploy-automatico](#checkpoint-v11-deploy-automatico) | 26/08/2026 | Deploy Automático no Render + Restart Tunnel | `7115b7c` | `7115b7c` | — |
 | [v10-thumb-carrossel](#checkpoint-v10-thumb-carrossel) | 25/08/2026 | Sistema de Thumbnails Otimizadas + Carrossel de Imagens | `e9a40b1` | `e9a40b1` | — |
 
 > ⚠️ **Regra de restauração:** Sempre use o **Commit atual** para rollback. Quando há amends, o commit original deixa de existir no Git e é substituído pelo mais recente.
+
+---
+
+## CHECKPOINT v11-deploy-automatico
+
+**Título:** Deploy Automático no Render + Restart Completo do Cloudflare Tunnel
+
+**Data:** 26/08/2026 | **Commit:** `7115b7c` | **Status:** ✅ ESTÁVEL
+
+**O que foi implementado:**
+
+### 1. **Deploy Automático no Render.com**
+
+**Problema anterior:**
+- Botão "Atualizar URL no Render" apenas atualizava a variável de ambiente
+- Deploy precisava ser feito manualmente no dashboard do Render
+- Processo manual e demorado
+
+**Solução implementada:**
+- Função `update_render_env` agora executa 2 passos automaticamente:
+  1. **PUT** `/services/{serviceId}/env-vars` - Atualiza variável `LUNA_API_URL`
+  2. **POST** `/services/{serviceId}/deploys` - Triggera deploy automático
+
+**Código implementado (commands.rs):**
+```rust
+// Passo 1: Atualizar variável
+client.put(format!("https://api.render.com/v1/services/{}/env-vars", service_id))
+    .json(&[{"key": env_var_name, "value": tunnel_url}])
+    .send().await?;
+
+// Passo 2: Triggerar deploy
+client.post(format!("https://api.render.com/v1/services/{}/deploys", service_id))
+    .json(&{"clearCache": "do_not_clear"})
+    .send().await?;
+```
+
+**Mensagem de sucesso mostrada:**
+```
+✅ Sucesso!
+
+📝 Variável 'LUNA_API_URL' atualizada
+🚀 Deploy iniciado (ID: dep-xxx)
+
+⏱️ Tempo estimado: 2-5 minutos
+🌐 Acompanhe em: https://dashboard.render.com/web/srv-xxx
+```
+
+### 2. **Restart Completo do Cloudflare Tunnel**
+
+**Problema anterior:**
+- URL do Cloudflare não aparecia quando painel abria
+- Processos cloudflared antigos impediam captura de nova URL
+- Botão "Recarregar URL" não funcionava
+
+**Solução implementada:**
+- Novo comando Tauri: `restart_cloudflare_tunnel`
+- Mata processos cloudflared antigos (3 tentativas)
+- Aguarda 1 segundo
+- Inicia novo cloudflared via `spawn_oculto`
+- Captura URL do stdout do processo novo
+- Aguarda até 30 segundos pela URL
+- Atualiza estado global e emite evento para frontend
+
+**Código implementado (commands.rs):**
+```rust
+#[tauri::command]
+pub async fn restart_cloudflare_tunnel(app: tauri::AppHandle) -> Result<String, String> {
+    // Mata processos antigos
+    for _ in 0..3 {
+        Command::new("taskkill").args(&["/F", "/IM", "cloudflared.exe"]).output();
+        tokio::time::sleep(Duration::from_millis(300)).await;
+    }
+    
+    // Limpa URL antiga
+    if let Some(state) = app.try_state::<Arc<Mutex<AppState>>>() {
+        state.lock().await.tunnel_url = None;
+    }
+    
+    // Inicia novo tunnel
+    iniciar_cloudflare_tunnel(app.clone());
+    
+    // Aguarda URL (até 30s)
+    for i in 0..30 {
+        tokio::time::sleep(Duration::from_secs(1)).await;
+        if let Some(url) = app.state::<AppState>().tunnel_url {
+            return Ok(format!("Tunnel reiniciado! Nova URL: {}", url));
+        }
+    }
+    
+    Err("Timeout: URL não detectada após 30s".to_string())
+}
+```
+
+### 3. **Melhorias no Inicialização do Tunnel**
+
+**Modificações em `iniciar_cloudflare_tunnel` (lib.rs):**
+- Mata processos cloudflared 3 vezes (antes apenas 1 vez)
+- Aguarda 1 segundo (antes 500ms)
+- Garante que não há conflito de processos
+
+**Antes:**
+```rust
+let _ = Command::new("taskkill").args(&["/F", "/IM", "cloudflared.exe"]).output();
+thread::sleep(Duration::from_millis(500));
+```
+
+**Depois:**
+```rust
+for _ in 0..3 {
+    let _ = Command::new("taskkill").args(&["/F", "/IM", "cloudflared.exe"]).output();
+    thread::sleep(Duration::from_millis(300));
+}
+thread::sleep(Duration::from_secs(1));
+```
+
+### 4. **Scripts Utilitários Criados**
+
+**INICIAR-LUNA-SERVER.bat:**
+```batch
+@echo off
+cd /d "f:\luna_cosmeticos\backend"
+taskkill /F /IM luna-server.exe >nul 2>&1
+taskkill /F /IM cloudflared.exe >nul 2>&1
+timeout /t 2 >nul
+npm run tauri dev
+```
+- Mata processos antigos
+- Inicia painel em modo dev
+- Modo dev funciona 100% (frontend carrega corretamente)
+
+**obter-url-cloudflare.ps1:**
+- Inicia cloudflared temporário com log redirecionado
+- Captura URL do log
+- Salva em `backend/tunnel-url.txt`
+- Copia para clipboard
+
+**scripts_permanentes/rebuild-luna-server.ps1:**
+- Mata processos
+- Faz `cargo build --release`
+- Verifica executável
+- Atualiza atalho
+
+### 5. **Correções de Compilação**
+
+**Import Manager adicionado:**
+```rust
+use tauri::{State, Manager};  // Manager era necessário para try_state
+```
+
+**Bundle resources atualizado (tauri.conf.json):**
+```json
+"resources": [
+  "../dist/*",  // Adiciona frontend ao bundle
+  "../whatsapp-sidecar/server.js",
+  "../whatsapp-sidecar/node_modules",
+  "../whatsapp-sidecar/package.json"
+]
+```
+
+---
+
+**Reverter:**
+```bash
+git checkout 7115b7c
+git checkout -b rollback-v11-deploy-automatico
+```
+
+**Validação:**
+1. ✅ Botão "Atualizar URL no Render" triggera deploy automático
+2. ✅ Mostra ID do deploy e link de acompanhamento
+3. ✅ Botão "Recarregar URL" reinicia tunnel completamente
+4. ✅ URL é capturada em até 30 segundos
+5. ✅ Processos cloudflared antigos são eliminados
+6. ✅ Scripts utilitários funcionam corretamente
+
+**Funcionalidades garantidas:**
+- ✅ Deploy automático no Render sem intervenção manual
+- ✅ Restart completo do Cloudflare Tunnel via botão
+- ✅ Captura garantida da URL do stdout do processo novo
+- ✅ Eliminação de processos antigos que impediam captura
+- ✅ Scripts BAT e PowerShell para facilitar debug
+
+**Arquivos modificados/criados:**
+```
+backend/src-tauri/src/commands.rs           — deploy automático + restart tunnel
+backend/src-tauri/src/lib.rs                — melhorias no iniciar_cloudflare_tunnel
+backend/src-tauri/tauri.conf.json           — bundle resources atualizado
+backend/src/pages/AbaTunnel.tsx             — botão chama restart_cloudflare_tunnel
+INICIAR-LUNA-SERVER.bat                     — script de inicialização
+obter-url-cloudflare.ps1                    — captura URL manual
+scripts_permanentes/rebuild-luna-server.ps1 — rebuild automatizado
+documentacao/CHECKPOINTS.md                 — este checkpoint
+```
 
 ---
 
