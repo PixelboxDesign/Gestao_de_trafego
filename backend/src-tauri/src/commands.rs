@@ -95,6 +95,15 @@ pub async fn test_render_connection(
 /// Busca URL do Cloudflare manualmente via API local (fallback)
 #[tauri::command]
 pub async fn fetch_cloudflare_url_manual() -> Result<Option<String>, String> {
+    // Tenta ler do arquivo primeiro (se foi salvo por script externo)
+    if let Ok(url) = std::fs::read_to_string("f:\\luna_cosmeticos\\backend\\tunnel-url.txt") {
+        let url = url.trim().to_string();
+        if url.starts_with("https://") && url.contains(".trycloudflare.com") {
+            tracing::info!("URL carregada do arquivo tunnel-url.txt: {}", url);
+            return Ok(Some(url));
+        }
+    }
+    
     // Cloudflare Tunnel expõe métricas em http://localhost:2000/metrics
     match reqwest::get("http://127.0.0.1:2000/metrics").await {
         Ok(response) => {
@@ -112,6 +121,52 @@ pub async fn fetch_cloudflare_url_manual() -> Result<Option<String>, String> {
         }
         Err(_) => Ok(None)
     }
+}
+
+/// Reinicia o Cloudflare Tunnel e captura nova URL
+#[tauri::command]
+pub async fn restart_cloudflare_tunnel(app: tauri::AppHandle) -> Result<String, String> {
+    tracing::info!("🔄 Reiniciando Cloudflare Tunnel...");
+    
+    // Mata todos os processos cloudflared
+    for _ in 0..3 {
+        let _ = std::process::Command::new("taskkill")
+            .args(&["/F", "/IM", "cloudflared.exe"])
+            .output();
+        tokio::time::sleep(tokio::time::Duration::from_millis(300)).await;
+    }
+    
+    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+    
+    // Limpa URL antiga do estado
+    if let Some(state) = app.try_state::<Arc<Mutex<AppState>>>() {
+        if let Ok(mut state_guard) = state.try_lock() {
+            state_guard.tunnel_url = None;
+        }
+    }
+    
+    // Inicia novo tunnel
+    crate::iniciar_cloudflare_tunnel(app.clone());
+    
+    // Aguarda até 30 segundos pela URL
+    for i in 0..30 {
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        
+        if let Some(state) = app.try_state::<Arc<Mutex<AppState>>>() {
+            if let Ok(state_guard) = state.try_lock() {
+                if let Some(url) = &state_guard.tunnel_url {
+                    tracing::info!("✅ Nova URL capturada: {}", url);
+                    return Ok(format!("Tunnel reiniciado! Nova URL: {}", url));
+                }
+            }
+        }
+        
+        if i % 5 == 0 {
+            tracing::info!("Aguardando URL... {}s", i);
+        }
+    }
+    
+    Err("Timeout: URL não foi detectada após 30 segundos".to_string())
 }
 
 #[tauri::command]

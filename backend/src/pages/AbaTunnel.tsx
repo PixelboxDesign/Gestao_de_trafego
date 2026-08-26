@@ -72,20 +72,20 @@ export default function AbaTunnel() {
   const forceReloadUrl = async () => {
     setLoading(true);
     try {
-      // Primeiro tenta via API de métricas
-      const url = await invoke<string | null>('fetch_cloudflare_url_manual');
+      // Tenta reiniciar o tunnel completamente
+      showMessage('info', '🔄 Reiniciando Cloudflare Tunnel... (aguarde até 30s)');
+      
+      const result = await invoke<string>('restart_cloudflare_tunnel');
+      
+      // Aguarda 2s e recarrega URL
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      const url = await invoke<string | null>('get_tunnel_url');
+      
       if (url) {
         setTunnelUrl(url);
-        showMessage('success', '🌐 URL do Cloudflare carregada!');
+        showMessage('success', `✅ ${result}`);
       } else {
-        // Se não encontrou, tenta pelo estado
-        const stateUrl = await invoke<string | null>('get_tunnel_url');
-        if (stateUrl) {
-          setTunnelUrl(stateUrl);
-          showMessage('success', '🌐 URL do Cloudflare carregada!');
-        } else {
-          showMessage('error', '⚠️ URL não detectada. Verifique se o Cloudflare Tunnel está rodando.');
-        }
+        showMessage('error', '⚠️ Tunnel reiniciado mas URL ainda não apareceu. Aguarde mais alguns segundos.');
       }
     } catch (error) {
       showMessage('error', String(error));

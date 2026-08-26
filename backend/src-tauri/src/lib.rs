@@ -49,15 +49,18 @@ fn _iniciar_ngrok() {
 }
 
 /// Inicia o Cloudflare Tunnel em background sem janela
-fn iniciar_cloudflare_tunnel(app_handle: tauri::AppHandle) {
+pub fn iniciar_cloudflare_tunnel(app_handle: tauri::AppHandle) {
     info!("🟢 Iniciando Cloudflare Tunnel (Quick Tunnel)");
     
-    // Mata processos cloudflared existentes para evitar conflito
-    let _ = std::process::Command::new("taskkill")
-        .args(&["/F", "/IM", "cloudflared.exe"])
-        .output();
+    // Mata processos cloudflared existentes para evitar conflito (tenta 3 vezes)
+    for _ in 0..3 {
+        let _ = std::process::Command::new("taskkill")
+            .args(&["/F", "/IM", "cloudflared.exe"])
+            .output();
+        std::thread::sleep(std::time::Duration::from_millis(300));
+    }
     
-    std::thread::sleep(std::time::Duration::from_millis(500)); // Aguarda 500ms
+    std::thread::sleep(std::time::Duration::from_millis(1000)); // Aguarda 1s
     
     // Quick Tunnel: URL temporária, sem configuração, inicia instantaneamente
     if let Some(mut child) = spawn_oculto("cloudflared", &["tunnel", "--url", "http://localhost:3001"], &[]) {
@@ -193,6 +196,7 @@ pub fn run() {
             commands::test_render_connection,
             commands::update_render_env,
             commands::fetch_cloudflare_url_manual,
+            commands::restart_cloudflare_tunnel,
         ])
         .setup(|app| {
             // Conectar ao banco e iniciar API em background
