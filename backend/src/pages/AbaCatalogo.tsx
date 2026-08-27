@@ -89,8 +89,8 @@ export default function AbaCatalogo() {
       return;
     }
 
-    // Monta o nome da pasta: KIT_SKU_NOME
-    const nomePasta = `KIT_${modal.kit.sku}_${modal.kit.nome.replace(/[<>:"/\\|?*]/g, '')}`.substring(0, 150);
+    // Nome da pasta = nome do produto (sem SKU, sem prefixo)
+    const nomePasta = modal.kit.nome.replace(/[<>:"/\\|?*]/g, '').trim();
 
     const formData = new FormData();
     formData.append('imagem', file);
@@ -104,6 +104,7 @@ export default function AbaCatalogo() {
       if (data.ok) {
         alert('Thumbnail atualizada com sucesso!');
         carregar(); // Recarrega a lista
+        fecharModal(); // Fecha o modal para recarregar a imagem
       } else {
         alert('Erro: ' + data.erro);
       }
@@ -286,7 +287,7 @@ export default function AbaCatalogo() {
             {modal.kit.tem_thumb && (
               <div style={{ background: "var(--bg3)", display: "flex", justifyContent: "center", padding: "1rem" }}>
                 <img
-                  src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(`KIT_${modal.kit.sku}_${modal.kit.nome.replace(/[<>:"/\\|?*]/g, '')}`)}/thumb.${modal.kit.thumb_ext}?t=${Date.now()}`}
+                  src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(modal.kit.nome.replace(/[<>:"/\\|?*]/g, '').trim())}/thumb.${modal.kit.thumb_ext}?t=${Date.now()}`}
                   alt={modal.kit.nome}
                   style={{
                     maxHeight: 200, maxWidth: "100%",
@@ -309,18 +310,18 @@ export default function AbaCatalogo() {
               </div>
             )}
 
-            {/* Campos de informação (somente leitura) */}
+            {/* Campos de informação (com SKUs visíveis) */}
             <div style={{ padding: "1.25rem 1.5rem", display: "flex", flexDirection: "column", gap: "1rem", maxHeight: "400px", overflowY: "auto" }}>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  SKU
+                  SKU do Kit
                 </label>
                 <input
                   className="input"
-                  value={modal.kit.sku}
+                  value={modal.kit.sku || "Sem SKU cadastrado"}
                   readOnly
-                  style={{ fontSize: 15, background: "var(--bg3)", cursor: "not-allowed" }}
+                  style={{ fontSize: 15, background: "var(--bg3)", cursor: "not-allowed", fontWeight: 700, color: "var(--primary)" }}
                 />
               </div>
 
@@ -351,28 +352,54 @@ export default function AbaCatalogo() {
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Componentes do Kit
+                  Produtos que Compõem Este Kit ({modal.kit.componentes.length})
                 </label>
                 {modal.kit.componentes.length === 0 && (
-                  <p style={{ fontSize: 12, color: "var(--text2)", fontStyle: "italic" }}>
-                    Nenhum componente cadastrado no banco de dados.
+                  <p style={{ fontSize: 12, color: "var(--text2)", fontStyle: "italic", padding: "0.75rem", background: "var(--bg3)", borderRadius: 6 }}>
+                    ⚠️ Nenhum componente cadastrado no banco de dados.
                   </p>
                 )}
-                {modal.kit.componentes.map((comp, idx) => (
-                  <div key={idx} style={{ 
-                    padding: "0.5rem 0.75rem", 
-                    background: "var(--bg3)", 
-                    borderRadius: 6,
-                    fontSize: 12,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem"
-                  }}>
-                    <span style={{ fontWeight: 700, color: "var(--primary)" }}>{comp.quantidade}x</span>
-                    <span>{comp.nome}</span>
-                    {comp.sku && <span style={{ marginLeft: "auto", color: "var(--text2)", fontSize: 11 }}>SKU: {comp.sku}</span>}
-                  </div>
-                ))}
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                  {modal.kit.componentes.map((comp, idx) => (
+                    <div key={idx} style={{ 
+                      padding: "0.75rem", 
+                      background: "var(--bg3)", 
+                      borderRadius: 8,
+                      border: "1px solid var(--border)",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.25rem"
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <span style={{ 
+                          fontWeight: 700, 
+                          color: "var(--primary)", 
+                          fontSize: 14,
+                          minWidth: "40px"
+                        }}>
+                          {comp.quantidade}x
+                        </span>
+                        <span style={{ fontSize: 13, fontWeight: 600, flex: 1 }}>{comp.nome}</span>
+                      </div>
+                      <div style={{ display: "flex", gap: "0.5rem", marginLeft: "48px", fontSize: 11, color: "var(--text2)" }}>
+                        {comp.sku ? (
+                          <>
+                            <span>📦 SKU:</span>
+                            <span style={{ fontFamily: "monospace", fontWeight: 600 }}>{comp.sku}</span>
+                          </>
+                        ) : (
+                          <span style={{ fontStyle: "italic" }}>Sem SKU cadastrado</span>
+                        )}
+                        {comp.produto_id && (
+                          <>
+                            <span style={{ marginLeft: "1rem" }}>🔖 ID:</span>
+                            <span style={{ fontFamily: "monospace" }}>{comp.produto_id}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Upload de Thumbnail */}
@@ -395,7 +422,7 @@ export default function AbaCatalogo() {
                   {modal.kit.tem_thumb ? "🔄 Alterar Thumbnail" : "➕ Adicionar Thumbnail"}
                 </button>
                 <p style={{ fontSize: 11, color: "var(--text2)", fontStyle: "italic", margin: 0 }}>
-                  💡 Para editar preço, descrição ou componentes, edite diretamente no banco de dados MySQL.
+                  💡 Para editar preço, descrição, SKUs ou componentes, edite diretamente no banco de dados MySQL.
                 </p>
               </div>
 
@@ -457,7 +484,7 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
       }}>
         {kit.tem_thumb && !imgErro ? (
           <img
-            src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(`KIT_${kit.sku}_${kit.nome.replace(/[<>:"/\\|?*]/g, '')}`)}/thumb.${kit.thumb_ext}`}
+            src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(kit.nome.replace(/[<>:"/\\|?*]/g, '').trim())}/thumb.${kit.thumb_ext}`}
             alt={kit.nome}
             onError={() => setImgErro(true)}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -469,9 +496,25 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
 
       {/* Info do card */}
       <div style={{ padding: "0.875rem 1rem", flex: 1, display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-        <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", lineHeight: 1.3, margin: 0 }}>
-          {kit.nome}
-        </h3>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.25rem" }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", lineHeight: 1.3, margin: 0, flex: 1 }}>
+            {kit.nome}
+          </h3>
+          {kit.sku && (
+            <span style={{ 
+              fontSize: 9, 
+              fontWeight: 700, 
+              color: "var(--text2)", 
+              background: "var(--bg3)", 
+              padding: "2px 6px", 
+              borderRadius: 4,
+              fontFamily: "monospace",
+              letterSpacing: "0.5px"
+            }}>
+              {kit.sku}
+            </span>
+          )}
+        </div>
 
         {kit.preco > 0 && (
           <span style={{ fontSize: 15, fontWeight: 700, color: "var(--primary)" }}>
@@ -494,6 +537,12 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
         {!kit.preco && !kit.descricao && (
           <span style={{ fontSize: 11, color: "var(--border)", fontStyle: "italic" }}>
             Clique para ver detalhes
+          </span>
+        )}
+
+        {kit.componentes.length > 0 && (
+          <span style={{ fontSize: 10, color: "var(--text2)", marginTop: "0.25rem" }}>
+            📦 {kit.componentes.length} {kit.componentes.length === 1 ? 'produto' : 'produtos'}
           </span>
         )}
       </div>

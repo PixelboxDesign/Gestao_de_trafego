@@ -172,13 +172,12 @@ pub async fn listar_kits_db(
             Vec::new()
         };
 
-        // Verificar se tem thumb (procurar pasta do kit)
-        let nome_pasta = format!("KIT_{}_{}", 
-            kit.codigo_sku.as_ref().unwrap_or(&"SEM_SKU".to_string()),
-            kit.nome.as_ref().unwrap_or(&"".to_string())
-                .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
-                .trim()
-        );
+        // Verificar se tem thumb (buscar pela pasta com o nome do produto)
+        let nome_pasta = kit.nome.as_ref()
+            .unwrap_or(&"".to_string())
+            .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
+            .trim()
+            .to_string();
         
         let (tem_thumb, thumb_ext) = verificar_thumb(&nome_pasta).await;
 
