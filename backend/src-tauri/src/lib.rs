@@ -26,12 +26,13 @@ fn spawn_oculto(programa: &str, args: &[&str], envs: &[(&str, &str)]) -> Option<
         cmd.env(k, v);
     }
     cmd.creation_flags(CREATE_NO_WINDOW);
+    cmd.stdin(std::process::Stdio::null());
     cmd.stdout(std::process::Stdio::piped());
     cmd.stderr(std::process::Stdio::piped());
 
     match cmd.spawn() {
         Ok(child) => {
-            info!("✅ {} iniciado (sem janela)", programa);
+            info!("✅ {} iniciado (sem janela, PID: {:?})", programa, child.id());
             Some(child)
         }
         Err(e) => {
@@ -137,6 +138,9 @@ fn extract_cloudflare_url(line: &str) -> Option<String> {
 
 /// Inicia o sidecar Node.js do WhatsApp em background sem janela
 fn iniciar_whatsapp_sidecar() {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x08000000;
+
     let exe_dir = std::env::current_exe()
         .ok()
         .and_then(|p| p.parent().map(|d| d.to_path_buf()))
@@ -160,20 +164,18 @@ fn iniciar_whatsapp_sidecar() {
             cmd.arg(path.to_str().unwrap_or(""));
             cmd.current_dir(working_dir);
             cmd.env("WHATSAPP_PORT", "3002");
-            
-            #[cfg(target_os = "windows")]
-            {
-                use std::os::windows::process::CommandExt;
-                const CREATE_NO_WINDOW: u32 = 0x08000000;
-                cmd.creation_flags(CREATE_NO_WINDOW);
-            }
-            
-            cmd.stdout(std::process::Stdio::piped());
-            cmd.stderr(std::process::Stdio::piped());
+            cmd.creation_flags(CREATE_NO_WINDOW);
+            cmd.stdin(std::process::Stdio::null());
+            cmd.stdout(std::process::Stdio::null());
+            cmd.stderr(std::process::Stdio::null());
             
             match cmd.spawn() {
-                Ok(_child) => {
-                    info!("✅ WhatsApp sidecar iniciado com sucesso");
+                Ok(mut child) => {
+                    info!("✅ WhatsApp sidecar iniciado (PID: {:?})", child.id());
+                    // Desacopla o processo filho para que não seja morto quando o pai terminar
+                    std::thread::spawn(move || {
+                        let _ = child.wait();
+                    });
                     return;
                 }
                 Err(e) => {
