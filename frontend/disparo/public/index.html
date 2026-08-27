@@ -1229,7 +1229,7 @@ async function uploadCarrossel() {
     }
 
     // Recarrega dados do kit
-    await carregarKits();
+    await carregarCatalogo();
     kitAtual = kitsData.find(k => k.nome === kitAtual.nome);
     renderCarrossel(kitAtual.imagens_carrossel || []);
     
@@ -1260,7 +1260,7 @@ async function deletarImagemCarrossel(arquivo) {
     }
 
     // Recarrega dados do kit
-    await carregarKits();
+    await carregarCatalogo();
     kitAtual = kitsData.find(k => k.nome === kitAtual.nome);
     renderCarrossel(kitAtual.imagens_carrossel || []);
 
@@ -1326,7 +1326,7 @@ async function salvarKit() {
     }
 
     // Recarrega os kits para pegar as atualizações
-    await carregarKits();
+    await carregarCatalogo();
     
     // Atualiza kitAtual com os novos dados
     kitAtual = kitsData.find(k => k.nome === (data.novo_nome || kitAtual.nome));
