@@ -1,4 +1,5 @@
 pub mod catalogo;
+pub mod catalogo_db;
 pub mod clientes;
 pub mod disparos;
 pub mod logs;
@@ -46,7 +47,7 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .route("/api/clientes/filtros/cidades", get(clientes::list_cidades))
         .route("/api/clientes/filtros/fontes", get(clientes::list_fontes))
         .route("/api/clientes/:id", get(clientes::get_by_id))
-        // Rotas de catálogo
+        // Rotas de catálogo (v1 - arquivos)
         .route("/api/catalogo/marcas", get(catalogo::listar_marcas))
         .route("/api/catalogo/kits/:marca", get(catalogo::listar_kits))
         .route("/api/catalogo/imagem/:marca/:kit/:nome", get(catalogo::servir_imagem))
@@ -56,6 +57,10 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .route("/api/catalogo/deletar-imagem/:marca/:kit/:arquivo", axum::routing::delete(catalogo::deletar_imagem))
         .route("/api/catalogo/reordenar-carrossel", axum::routing::post(catalogo::reordenar_carrossel))
         .route("/api/catalogo/files/*path", get(catalogo::serve_file))
+        // Rotas de catálogo (v2 - banco de dados)
+        .route("/api/catalogo/v2/produtos", get(catalogo_db::listar_produtos_db))
+        .route("/api/catalogo/v2/kits", get(catalogo_db::listar_kits_db))
+        .route("/api/catalogo/v2/produto/:sku", get(catalogo_db::buscar_produto_por_sku))
         // Rotas de WhatsApp
         .route("/api/whatsapp/status", get(whatsapp::status))
         .route("/api/whatsapp/qr", get(whatsapp::get_qr))
