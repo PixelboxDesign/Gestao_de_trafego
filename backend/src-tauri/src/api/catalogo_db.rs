@@ -4,7 +4,7 @@ use axum::{
     Json,
 };
 use serde::{Deserialize, Serialize};
-use sqlx::{MySqlPool, FromRow};
+use sqlx::FromRow;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -92,7 +92,7 @@ pub async fn listar_produtos_db(
 /// GET /api/catalogo/v2/produto/:sku — busca produto por SKU
 pub async fn buscar_produto_por_sku(
     State(state): State<Arc<Mutex<AppState>>>,
-    Path(sku): Path<String),
+    Path(sku): Path<String>,
 ) -> Result<Json<ProdutoDB>, (StatusCode, String)> {
     let state = state.lock().await;
     let pool = &state.db;
@@ -203,7 +203,6 @@ pub async fn listar_kits_db(
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 async fn verificar_thumb(nome_pasta: &str) -> (bool, Option<String>) {
-    use tokio::fs;
     use std::path::PathBuf;
 
     let base = PathBuf::from("f:\\luna_cosmeticos\\catalogos\\Alphahall");
