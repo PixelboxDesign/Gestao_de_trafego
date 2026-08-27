@@ -15,7 +15,7 @@
 
 | Versão | Data | Título | Commit original | Commit atual | Amends |
 |---|---|---|---|---|---|
-| [v12-edit-catalogo-drag-reorder](#checkpoint-v12-edit-catalogo-drag-reorder) | 26/08/2026 | Modal de Edição Funcional + Drag-and-Drop para Reordenar Carrossel | `7bb3b8a` | `7bb3b8a` | — |
+| [v12-edit-catalogo-drag-reorder](#checkpoint-v12-edit-catalogo-drag-reorder) | 26/08/2026 | Modal de Edição Funcional + Drag-and-Drop para Reordenar Carrossel | `7bb3b8a` | **`d1983a1`** ← usar este | [a1](#v12-amend-1-correção-função-carregarkits) |
 | [v11-deploy-automatico](#checkpoint-v11-deploy-automatico) | 26/08/2026 | Deploy Automático no Render + Restart Tunnel | `7115b7c` | `7115b7c` | — |
 | [v10-thumb-carrossel](#checkpoint-v10-thumb-carrossel) | 25/08/2026 | Sistema de Thumbnails Otimizadas + Carrossel de Imagens | `e9a40b1` | `e9a40b1` | — |
 
@@ -190,7 +190,7 @@ formData.append('imagem', arquivoThumb);
 
 **Reverter:**
 ```bash
-git checkout 7bb3b8a
+git checkout d1983a1
 git checkout -b rollback-v12-edit-catalogo-drag-reorder
 ```
 
@@ -204,6 +204,7 @@ git checkout -b rollback-v12-edit-catalogo-drag-reorder
 7. ✅ Numeração das imagens atualiza após reordenar
 8. ✅ Feedback visual durante o arraste (borda azul, opacidade)
 9. ✅ Todas as edições persistem (pasta, JSON, arquivos)
+10. ✅ **Botão "Salvar" funciona sem erros** (carregarCatalogo corrigido)
 
 **Funcionalidades garantidas (além das anteriores):**
 - ✅ Modal de edição funcional sem erros
@@ -211,6 +212,7 @@ git checkout -b rollback-v12-edit-catalogo-drag-reorder
 - ✅ Upload e gerenciamento de imagens (thumb + carrossel)
 - ✅ Drag-and-drop para reordenar carrossel intuitivamente
 - ✅ Persistência de todas as alterações no sistema de arquivos
+- ✅ Salvamento completo sem chamadas a funções inexistentes
 - ✅ Todos os checkpoints anteriores preservados
 
 **Arquivos modificados/criados:**
@@ -303,6 +305,51 @@ async function salvarOrdemCarrossel(imagens) {
   showToast('✓ Ordem atualizada', 'success');
 }
 ```
+
+---
+
+### v12 — Amend 1 — Correção: Função carregarKits()
+
+**Commit após amend:** `d1983a1` | **Data:** 26/08/2026
+
+**Problema identificado:**
+Após o checkpoint v12, ao clicar no botão **"Salvar"** no modal de edição, aparecia o erro `"Erro ao salvar: campotext is not defined"`. Na verdade, o erro real era que a função `carregarKits()` não existia no código.
+
+**Causa raiz:**
+Três funções estavam chamando `await carregarKits()` que não estava definida:
+1. `salvarKit()` — linha após salvar info.json
+2. `uploadCarrossel()` — linha após upload de imagem
+3. `deletarImagemCarrossel()` — linha após deletar imagem
+
+A função correta é `carregarCatalogo()` que já existia no código.
+
+**Solução aplicada:**
+Substituídas todas as 3 ocorrências de `carregarKits()` por `carregarCatalogo()`:
+
+```javascript
+// ANTES (causava erro):
+await carregarKits();
+
+// DEPOIS (correto):
+await carregarCatalogo();
+```
+
+**Arquivos alterados:**
+```
+frontend/disparo/public/index.html — 3 substituições de carregarKits() → carregarCatalogo()
+```
+
+**Commits incluídos:**
+```
+d1983a1 — fix: corrige chamadas carregarKits() para carregarCatalogo()
+a6ad09f — fix: corrige modal de edicao e adiciona drag-drop
+719a3f9 — docs: adiciona checkpoint v12-edit-catalogo-drag-reorder
+7bb3b8a — checkpoint v12-edit-catalogo-drag-reorder
+```
+
+**Commit final após amend:** `d1983a1`
+
+> **Nota sobre amends:** Este amend corrige um bug crítico que impedia o salvamento de edições. Para rollback, use sempre `d1983a1`.
 
 ---
 
