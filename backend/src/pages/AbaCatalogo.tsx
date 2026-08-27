@@ -4,17 +4,24 @@ const API = "http://localhost:3001";
 const MARCA_PADRAO = "Alphahall"; // Marca padrão
 
 interface Kit {
+  id: number;
+  produto_id: string;
+  sku: string;
   nome: string;
-  marca: string;
+  tipo: string;
+  preco: number;
+  descricao: string;
+  eh_kit: boolean;
   tem_thumb: boolean;
   thumb_ext: string | null;
-  imagens_carrossel: string[];
-  info: {
-    preco: string;
-    descricao: string;
-    sku_kit: string;
-    skus_itens: string[];
-  };
+  componentes: Componente[];
+}
+
+interface Componente {
+  produto_id: string;
+  sku: string | null;
+  nome: string;
+  quantidade: number;
 }
 
 interface ModalState {
@@ -22,8 +29,6 @@ interface ModalState {
   nomeEditavel: string;
   preco: string;
   descricao: string;
-  skuKit: string;
-  skusItens: string[];
   salvando: boolean;
   salvo: boolean;
 }
@@ -39,7 +44,7 @@ export default function AbaCatalogo() {
     setLoading(true);
     setErro(null);
     try {
-      const res = await fetch(`${API}/api/catalogo/kits/${encodeURIComponent(MARCA_PADRAO)}`);
+      const res = await fetch(`${API}/api/catalogo/v2/kits`);
       const data: Kit[] = await res.json();
       setKits(data);
     } catch {
@@ -55,10 +60,8 @@ export default function AbaCatalogo() {
     setModal({
       kit,
       nomeEditavel: kit.nome,
-      preco: kit.info.preco || "",
-      descricao: kit.info.descricao || "",
-      skuKit: kit.info.sku_kit || "",
-      skusItens: kit.info.skus_itens || [],
+      preco: kit.preco ? `R$ ${kit.preco.toFixed(2)}` : "",
+      descricao: kit.descricao || "",
       salvando: false,
       salvo: false,
     });
@@ -86,11 +89,14 @@ export default function AbaCatalogo() {
       return;
     }
 
+    // Monta o nome da pasta: KIT_SKU_NOME
+    const nomePasta = `KIT_${modal.kit.sku}_${modal.kit.nome.replace(/[<>:"/\\|?*]/g, '')}`.substring(0, 150);
+
     const formData = new FormData();
     formData.append('imagem', file);
 
     try {
-      const res = await fetch(`${API}/api/catalogo/upload-thumb/${encodeURIComponent(modal.kit.marca)}/${encodeURIComponent(modal.kit.nome)}`, {
+      const res = await fetch(`${API}/api/catalogo/upload-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}`, {
         method: 'POST',
         body: formData,
       });
@@ -164,54 +170,12 @@ export default function AbaCatalogo() {
 
   async function salvar() {
     if (!modal) return;
-    setModal(m => m ? { ...m, salvando: true, salvo: false } : m);
+    alert("Salvar informações diretamente no banco será implementado em breve. Por enquanto, use apenas o upload de thumb.");
+    return;
 
-    try {
-      const novoNome = modal.nomeEditavel.trim() !== modal.kit.nome ? modal.nomeEditavel.trim() : undefined;
-
-      const res = await fetch(`${API}/api/catalogo/salvar`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          marca: modal.kit.marca,
-          kit: modal.kit.nome,
-          novo_nome: novoNome,
-          preco: modal.preco,
-          descricao: modal.descricao,
-          sku_kit: modal.skuKit,
-          skus_itens: modal.skusItens,
-        }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        setModal(m => m ? { ...m, salvando: false, salvo: true } : m);
-        
-        // Atualiza o kit na lista local
-        setKits(prev => prev.map(k => {
-          if (k.nome === modal.kit.nome) {
-            return {
-              ...k,
-              nome: data.novo_nome || k.nome,
-              info: {
-                preco: modal.preco,
-                descricao: modal.descricao,
-                sku_kit: modal.skuKit,
-                skus_itens: modal.skusItens,
-              }
-            };
-          }
-          return k;
-        }));
-
-        setTimeout(() => setModal(m => m ? { ...m, salvo: false } : m), 2000);
-      } else {
-        alert("Erro ao salvar: " + (data.erro ?? "desconhecido"));
-        setModal(m => m ? { ...m, salvando: false } : m);
-      }
-    } catch {
-      alert("Erro de conexão ao salvar.");
-      setModal(m => m ? { ...m, salvando: false } : m);
-    }
+    // TODO: Implementar update no banco via API
+    // setModal(m => m ? { ...m, salvando: true, salvo: false } : m);
+    // const res = await fetch(`${API}/api/catalogo/v2/atualizar`, { ... });
   }
 
   const kitsFiltrados = kits.filter(k =>
@@ -322,7 +286,7 @@ export default function AbaCatalogo() {
             {modal.kit.tem_thumb && (
               <div style={{ background: "var(--bg3)", display: "flex", justifyContent: "center", padding: "1rem" }}>
                 <img
-                  src={`${API}/api/catalogo/imagem/${encodeURIComponent(modal.kit.marca)}/${encodeURIComponent(modal.kit.nome)}/thumb.${modal.kit.thumb_ext}?t=${Date.now()}`}
+                  src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(`KIT_${modal.kit.sku}_${modal.kit.nome.replace(/[<>:"/\\|?*]/g, '')}`)}/thumb.${modal.kit.thumb_ext}?t=${Date.now()}`}
                   alt={modal.kit.nome}
                   style={{
                     maxHeight: 200, maxWidth: "100%",
@@ -345,8 +309,20 @@ export default function AbaCatalogo() {
               </div>
             )}
 
-            {/* Campos editáveis */}
+            {/* Campos de informação (somente leitura) */}
             <div style={{ padding: "1.25rem 1.5rem", display: "flex", flexDirection: "column", gap: "1rem", maxHeight: "400px", overflowY: "auto" }}>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  SKU
+                </label>
+                <input
+                  className="input"
+                  value={modal.kit.sku}
+                  readOnly
+                  style={{ fontSize: 15, background: "var(--bg3)", cursor: "not-allowed" }}
+                />
+              </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
@@ -354,10 +330,9 @@ export default function AbaCatalogo() {
                 </label>
                 <input
                   className="input"
-                  value={modal.preco}
-                  onChange={e => setModal(m => m ? { ...m, preco: e.target.value } : m)}
-                  placeholder="Ex: R$ 89,90"
-                  style={{ fontSize: 15 }}
+                  value={modal.preco || "Não informado"}
+                  readOnly
+                  style={{ fontSize: 15, background: "var(--bg3)", cursor: "not-allowed" }}
                 />
               </div>
 
@@ -367,75 +342,35 @@ export default function AbaCatalogo() {
                 </label>
                 <textarea
                   className="input"
-                  value={modal.descricao}
-                  onChange={e => setModal(m => m ? { ...m, descricao: e.target.value } : m)}
-                  placeholder="Descrição do produto..."
+                  value={modal.descricao || "Nenhuma descrição disponível"}
+                  readOnly
                   rows={4}
-                  style={{ resize: "vertical", fontFamily: "inherit", fontSize: 13, lineHeight: 1.6 }}
+                  style={{ resize: "vertical", fontFamily: "inherit", fontSize: 13, lineHeight: 1.6, background: "var(--bg3)", cursor: "not-allowed" }}
                 />
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  SKU do Kit
+                  Componentes do Kit
                 </label>
-                <input
-                  className="input"
-                  value={modal.skuKit}
-                  onChange={e => setModal(m => m ? { ...m, skuKit: e.target.value } : m)}
-                  placeholder="SKU principal do kit"
-                  style={{ fontSize: 13 }}
-                />
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                    SKUs dos Itens
-                  </label>
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => setModal(m => m ? { ...m, skusItens: [...m.skusItens, ""] } : m)}
-                    style={{ padding: "0.25rem 0.5rem", fontSize: 12 }}
-                  >
-                    ➕ Adicionar SKU
-                  </button>
-                </div>
-                {modal.skusItens.length === 0 && (
+                {modal.kit.componentes.length === 0 && (
                   <p style={{ fontSize: 12, color: "var(--text2)", fontStyle: "italic" }}>
-                    Nenhum SKU de item adicionado. Clique em "Adicionar SKU" para incluir.
+                    Nenhum componente cadastrado no banco de dados.
                   </p>
                 )}
-                {modal.skusItens.map((sku, idx) => (
-                  <div key={idx} style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                    <input
-                      className="input"
-                      value={sku}
-                      onChange={e => {
-                        const novos = [...modal.skusItens];
-                        novos[idx] = e.target.value;
-                        setModal(m => m ? { ...m, skusItens: novos } : m);
-                      }}
-                      placeholder={`SKU do item ${idx + 1}`}
-                      style={{ fontSize: 13, flex: 1 }}
-                    />
-                    <button
-                      onClick={() => {
-                        const novos = modal.skusItens.filter((_, i) => i !== idx);
-                        setModal(m => m ? { ...m, skusItens: novos } : m);
-                      }}
-                      style={{
-                        background: "none",
-                        border: "1px solid var(--danger)",
-                        color: "var(--danger)",
-                        borderRadius: 4,
-                        padding: "0.25rem 0.5rem",
-                        cursor: "pointer",
-                        fontSize: 12,
-                      }}
-                    >
-                      🗑️
-                    </button>
+                {modal.kit.componentes.map((comp, idx) => (
+                  <div key={idx} style={{ 
+                    padding: "0.5rem 0.75rem", 
+                    background: "var(--bg3)", 
+                    borderRadius: 6,
+                    fontSize: 12,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem"
+                  }}>
+                    <span style={{ fontWeight: 700, color: "var(--primary)" }}>{comp.quantidade}x</span>
+                    <span>{comp.nome}</span>
+                    {comp.sku && <span style={{ marginLeft: "auto", color: "var(--text2)", fontSize: 11 }}>SKU: {comp.sku}</span>}
                   </div>
                 ))}
               </div>
@@ -459,62 +394,9 @@ export default function AbaCatalogo() {
                 >
                   {modal.kit.tem_thumb ? "🔄 Alterar Thumbnail" : "➕ Adicionar Thumbnail"}
                 </button>
-              </div>
-
-              {/* Upload de Imagens do Carrossel */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                    🖼️ Imagens do Carrossel
-                  </label>
-                  <input
-                    type="file"
-                    id="upload-carrossel"
-                    accept="image/jpeg,image/jpg,image/png,image/webp"
-                    style={{ display: "none" }}
-                    onChange={handleCarrosselUpload}
-                  />
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => document.getElementById('upload-carrossel')?.click()}
-                    style={{ padding: "0.25rem 0.5rem", fontSize: 12 }}
-                  >
-                    ➕ Adicionar Imagem
-                  </button>
-                </div>
-                {modal.kit.imagens_carrossel.length === 0 && (
-                  <p style={{ fontSize: 12, color: "var(--text2)", fontStyle: "italic" }}>
-                    Nenhuma imagem no carrossel. Clique em "Adicionar Imagem".
-                  </p>
-                )}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(80px, 1fr))", gap: "0.5rem" }}>
-                  {modal.kit.imagens_carrossel.map((img, idx) => (
-                    <div key={idx} style={{ position: "relative", aspectRatio: "1", borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)" }}>
-                      <img
-                        src={`${API}/api/catalogo/imagem/${encodeURIComponent(modal.kit.marca)}/${encodeURIComponent(modal.kit.nome)}/${img}`}
-                        alt={`Carrossel ${idx + 1}`}
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      />
-                      <button
-                        onClick={() => deletarImagemCarrossel(img)}
-                        style={{
-                          position: "absolute",
-                          top: 4,
-                          right: 4,
-                          background: "rgba(239,68,68,0.9)",
-                          color: "white",
-                          border: "none",
-                          borderRadius: 4,
-                          padding: "0.25rem 0.35rem",
-                          cursor: "pointer",
-                          fontSize: 10,
-                        }}
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                <p style={{ fontSize: 11, color: "var(--text2)", fontStyle: "italic", margin: 0 }}>
+                  💡 Para editar preço, descrição ou componentes, edite diretamente no banco de dados MySQL.
+                </p>
               </div>
 
             </div>
@@ -526,20 +408,8 @@ export default function AbaCatalogo() {
               display: "flex", justifyContent: "flex-end", gap: "0.75rem",
               alignItems: "center",
             }}>
-              {modal.salvo && (
-                <span style={{ fontSize: 13, color: "var(--success)", fontWeight: 600 }}>
-                  ✅ Salvo com sucesso!
-                </span>
-              )}
-              <button className="btn btn-secondary" onClick={fecharModal}>
-                Cancelar
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={salvar}
-                disabled={modal.salvando}
-              >
-                {modal.salvando ? "Salvando..." : "💾 Salvar"}
+              <button className="btn btn-primary" onClick={fecharModal}>
+                ✅ Fechar
               </button>
             </div>
           </div>
@@ -587,7 +457,7 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
       }}>
         {kit.tem_thumb && !imgErro ? (
           <img
-            src={`${API}/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}`}
+            src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(`KIT_${kit.sku}_${kit.nome.replace(/[<>:"/\\|?*]/g, '')}`)}/thumb.${kit.thumb_ext}`}
             alt={kit.nome}
             onError={() => setImgErro(true)}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -603,13 +473,13 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
           {kit.nome}
         </h3>
 
-        {kit.info.preco && (
+        {kit.preco > 0 && (
           <span style={{ fontSize: 15, fontWeight: 700, color: "var(--primary)" }}>
-            {kit.info.preco}
+            R$ {kit.preco.toFixed(2)}
           </span>
         )}
 
-        {kit.info.descricao && (
+        {kit.descricao && (
           <p style={{
             fontSize: 11, color: "var(--text2)", lineHeight: 1.5,
             margin: 0, overflow: "hidden",
@@ -617,13 +487,13 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
           } as React.CSSProperties}>
-            {kit.info.descricao}
+            {kit.descricao}
           </p>
         )}
 
-        {!kit.info.preco && !kit.info.descricao && (
+        {!kit.preco && !kit.descricao && (
           <span style={{ fontSize: 11, color: "var(--border)", fontStyle: "italic" }}>
-            Clique para editar
+            Clique para ver detalhes
           </span>
         )}
       </div>
