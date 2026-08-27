@@ -18,9 +18,19 @@ let estado = {
 let client = null;
 
 function criarCliente() {
+  // Garante que a pasta de sessão existe
+  const fs = require('fs');
+  const path = require('path');
+  const sessaoDir = path.join(__dirname, 'sessao-whatsapp');
+  
+  if (!fs.existsSync(sessaoDir)) {
+    fs.mkdirSync(sessaoDir, { recursive: true });
+    console.log('[WhatsApp] Pasta de sessão criada:', sessaoDir);
+  }
+
   client = new Client({
     authStrategy: new LocalAuth({
-      dataPath: './sessao-whatsapp'
+      dataPath: sessaoDir
     }),
     puppeteer: {
       headless: true,

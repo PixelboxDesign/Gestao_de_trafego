@@ -43,7 +43,8 @@
       "../dist/*",
       "../whatsapp-sidecar/server.js",
       "../whatsapp-sidecar/node_modules",
-      "../whatsapp-sidecar/package.json"
+      "../whatsapp-sidecar/package.json",
+      "../whatsapp-sidecar/sessao-whatsapp"
     ]
   }
 }

@@ -142,18 +142,48 @@ fn iniciar_whatsapp_sidecar() {
         .and_then(|p| p.parent().map(|d| d.to_path_buf()))
         .unwrap_or_else(|| std::path::PathBuf::from("."));
 
+    // Caminho relativo ao executável (produção) e caminho absoluto (dev)
     let sidecar_paths = vec![
         exe_dir.join("whatsapp-sidecar").join("server.js"),
+        exe_dir.parent().and_then(|p| p.parent()).map(|p| p.join("whatsapp-sidecar").join("server.js")).unwrap_or_default(),
         std::path::PathBuf::from("f:\\luna_cosmeticos\\backend\\whatsapp-sidecar\\server.js"),
     ];
 
-    match sidecar_paths.into_iter().find(|p| p.exists()) {
-        Some(path) => {
+    for path in &sidecar_paths {
+        if path.exists() {
             info!("🟢 Iniciando WhatsApp sidecar: {}", path.display());
-            spawn_oculto("node", &[path.to_str().unwrap_or("")], &[("WHATSAPP_PORT", "3002")]);
+            
+            // Define working directory como a pasta do sidecar para sessão persistir
+            let working_dir = path.parent().unwrap_or(path.as_path());
+            
+            let mut cmd = std::process::Command::new("node");
+            cmd.arg(path.to_str().unwrap_or(""));
+            cmd.current_dir(working_dir);
+            cmd.env("WHATSAPP_PORT", "3002");
+            
+            #[cfg(target_os = "windows")]
+            {
+                use std::os::windows::process::CommandExt;
+                const CREATE_NO_WINDOW: u32 = 0x08000000;
+                cmd.creation_flags(CREATE_NO_WINDOW);
+            }
+            
+            cmd.stdout(std::process::Stdio::piped());
+            cmd.stderr(std::process::Stdio::piped());
+            
+            match cmd.spawn() {
+                Ok(_child) => {
+                    info!("✅ WhatsApp sidecar iniciado com sucesso");
+                    return;
+                }
+                Err(e) => {
+                    tracing::warn!("⚠️ Falha ao iniciar sidecar: {}", e);
+                }
+            }
         }
-        None => tracing::warn!("⚠️ WhatsApp sidecar não encontrado"),
     }
+    
+    tracing::warn!("⚠️ WhatsApp sidecar não encontrado em nenhum caminho");
 }
 
 /// Inicia o Tunnel Keep-Alive (Ngrok/Cloudflare) em background sem janela
