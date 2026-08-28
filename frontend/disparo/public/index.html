@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Luna — Disparo v9</title>
-  <!-- Build: 2026-08-10T22:10 DEBUG-EXTREMO -->
+  <!-- Build: 2026-08-10T22:30 FIX-MARCA-VAZIA -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 23;
+    const CURRENT_VERSION = 24;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -1291,16 +1291,17 @@ function renderKits(lista) {
 
   grid.innerHTML = lista.map(kit => {
     const temThumb = kit.caminho_thumb_bd || kit.tem_thumb;
+    const marca = kit.marca || 'Alphahall'; // Fallback para Alphahall se marca estiver vazia
     const thumbUrl = kit.caminho_thumb_bd 
       ? `/api/catalogo/files/${encodeURIComponent(kit.caminho_thumb_bd)}` 
       : kit.tem_thumb 
-        ? `/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}` 
+        ? `/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}` 
         : null;
     
-    console.log('[DEBUG] Renderizando kit:', kit.nome, '- data-kit-nome:', escAttr(kit.nome));
+    console.log('[DEBUG] Renderizando kit:', kit.nome, '- marca:', marca, '- data-kit-marca:', escAttr(marca));
     
     return `
-    <div class="kit-card" data-kit-nome="${escAttr(kit.nome)}" data-kit-marca="${escAttr(kit.marca)}">
+    <div class="kit-card" data-kit-nome="${escAttr(kit.nome)}" data-kit-marca="${escAttr(marca)}">
       <div class="kit-img-area">
         ${temThumb
           ? `<img 
@@ -1878,16 +1879,17 @@ function renderProdutos(lista) {
 
   grid.innerHTML = lista.map(produto => {
     const temThumb = produto.caminho_thumb_bd || produto.tem_thumb;
+    const marca = produto.marca || 'Alphahall'; // Fallback para Alphahall se marca estiver vazia
     const thumbUrl = produto.caminho_thumb_bd 
       ? `/api/catalogo/files/${encodeURIComponent(produto.caminho_thumb_bd)}` 
       : produto.tem_thumb 
-        ? `/api/catalogo/imagem/${encodeURIComponent(produto.marca)}/${encodeURIComponent(produto.nome)}/thumb.${produto.thumb_ext}?tipo=produto` 
+        ? `/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(produto.nome)}/thumb.${produto.thumb_ext}?tipo=produto` 
         : null;
     
-    console.log('[DEBUG] Renderizando produto:', produto.nome, '- data-produto-nome:', escAttr(produto.nome));
+    console.log('[DEBUG] Renderizando produto:', produto.nome, '- marca:', marca, '- data-produto-marca:', escAttr(marca));
     
     return `
-    <div class="kit-card" data-produto-nome="${escAttr(produto.nome)}" data-produto-marca="${escAttr(produto.marca)}">
+    <div class="kit-card" data-produto-nome="${escAttr(produto.nome)}" data-produto-marca="${escAttr(marca)}">
       <div class="kit-img-area">
         ${temThumb
           ? `<img 
