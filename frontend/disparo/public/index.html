@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Luna — Disparo v9</title>
-  <!-- Build: 2026-08-10T23:15 ADD-COMPONENTES-KIT -->
+  <!-- Build: 2026-08-10T23:30 FIX-SALVAR-KIT-API-V2 -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 26;
+    const CURRENT_VERSION = 27;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -1793,33 +1793,26 @@ async function salvarKit() {
   const preco = document.getElementById('modal-kit-preco').value.trim();
   const descricao = document.getElementById('modal-kit-descricao').value.trim();
   const skuKit = document.getElementById('modal-kit-sku').value.trim();
-  
-  // Coleta os SKUs dos itens
-  const inputs = document.querySelectorAll('.sku-item-input');
-  const skusItens = Array.from(inputs).map(inp => inp.value.trim()).filter(s => s);
 
   btn.disabled = true;
   btn.textContent = 'Salvando...';
 
   try {
-    // 1. Salvar info.json
-    const res = await fetch('/api/catalogo/salvar', {
-      method: 'POST',
+    // 1. Atualizar dados do kit via API v2
+    const marca = kitAtual.marca || 'Alphahall';
+    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        marca: kitAtual.marca,
-        kit: kitAtual.nome,
-        novo_nome: novoNome !== kitAtual.nome ? novoNome : undefined,
-        preco,
-        descricao,
-        sku_kit: skuKit,
-        skus_itens: skusItens
+        preco: preco.replace('R$ ', '').replace(',', '.'),
+        codigo_sku: skuKit,
+        descricao: descricao
       })
     });
 
-    const data = await res.json();
-    if (!data.ok) {
-      throw new Error(data.erro || 'Erro ao salvar');
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Erro ao salvar');
     }
 
     // 2. Upload de thumbnail (se selecionou)
@@ -1827,8 +1820,7 @@ async function salvarKit() {
       const formData = new FormData();
       formData.append('imagem', arquivoThumb);
 
-      const nomeParaUpload = data.novo_nome || kitAtual.nome;
-      const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(nomeParaUpload)}`, {
+      const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}?tipo=kit`, {
         method: 'POST',
         body: formData
       });
@@ -1839,11 +1831,10 @@ async function salvarKit() {
       }
     }
 
-    // Recarrega os kits para pegar as atualizações
-    await carregarCatalogo();
-    
-    // Atualiza kitAtual com os novos dados
-    kitAtual = kitsData.find(k => k.nome === (data.novo_nome || kitAtual.nome));
+    // Atualiza dados locais
+    kitAtual.preco = preco.replace('R$ ', '').replace(',', '.');
+    kitAtual.codigo_sku = skuKit;
+    kitAtual.descricao = descricao;
 
     // Mostra sucesso
     showToast('✓ Kit salvo com sucesso', 'success');
@@ -1857,11 +1848,11 @@ async function salvarKit() {
     document.getElementById('file-name-thumb').textContent = '';
     document.getElementById('modal-kit-file-thumb').value = '';
 
-    // Atualiza grid
-    const busca = document.getElementById('catalogo-busca').value;
-    filtrarKits(busca);
+    // Recarrega catálogo
+    await carregarCatalogo();
 
   } catch (e) {
+    console.error('Erro ao salvar kit:', e);
     alert('Erro ao salvar: ' + e.message);
   } finally {
     btn.disabled = false;
