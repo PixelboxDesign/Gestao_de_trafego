@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Luna — Disparo v9</title>
-  <!-- Build: 2026-08-10T23:30 FIX-SALVAR-KIT-API-V2 -->
+  <!-- Build: 2026-08-10T23:45 FIX-PRECO-NUMERO -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 27;
+    const CURRENT_VERSION = 28;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -1800,11 +1800,16 @@ async function salvarKit() {
   try {
     // 1. Atualizar dados do kit via API v2
     const marca = kitAtual.marca || 'Alphahall';
+    
+    // Converte preço para número
+    const precoLimpo = preco.replace('R$ ', '').replace(',', '.');
+    const precoNumero = parseFloat(precoLimpo) || 0;
+    
     const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        preco: preco.replace('R$ ', '').replace(',', '.'),
+        preco: precoNumero,  // Envia como número, não string
         codigo_sku: skuKit,
         descricao: descricao
       })
@@ -2080,6 +2085,8 @@ async function salvarCampoProduto(campo) {
   
   try {
     const payload = {};
+    const marca = produtoAtual.marca || 'Alphahall';
+    
     // Mapeia os nomes dos campos para os campos do banco
     const campoMap = {
       'sku': 'codigo_sku',
@@ -2090,9 +2097,16 @@ async function salvarCampoProduto(campo) {
       'composicao': 'descricao_composicao'
     };
     
-    payload[campoMap[campo]] = novoValor;
+    // Se for preço, converte para número
+    if (campo === 'preco') {
+      const precoLimpo = novoValor.replace('R$ ', '').replace(',', '.');
+      const precoNumero = parseFloat(precoLimpo) || 0;
+      payload[campoMap[campo]] = precoNumero;
+    } else {
+      payload[campoMap[campo]] = novoValor;
+    }
     
-    const res = await fetch(`/api/catalogo/v2/produto/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}`, {
+    const res = await fetch(`/api/catalogo/v2/produto/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -2105,8 +2119,8 @@ async function salvarCampoProduto(campo) {
 
     // Atualiza o produto atual
     switch(campo) {
-      case 'sku': produtoAtual.codigo_sku = novoValor.replace('R$ ', ''); break;
-      case 'preco': produtoAtual.preco = novoValor.replace('R$ ', ''); break;
+      case 'sku': produtoAtual.codigo_sku = novoValor; break;
+      case 'preco': produtoAtual.preco = novoValor.replace('R$ ', '').replace(',', '.'); break;
       case 'descricao': produtoAtual.descricao = novoValor; break;
       case 'peso': produtoAtual.descricao_peso = novoValor; break;
       case 'tamanho': produtoAtual.descricao_tamanho = novoValor; break;
@@ -2338,10 +2352,15 @@ async function salvarPreco() {
   const novoPreco = input.value.trim();
   
   try {
-    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+    // Converte preço para número
+    const marca = kitAtual.marca || 'Alphahall';
+    const precoLimpo = novoPreco.replace('R$ ', '').replace(',', '.');
+    const precoNumero = parseFloat(precoLimpo) || 0;
+    
+    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ preco: novoPreco })
+      body: JSON.stringify({ preco: precoNumero })  // Envia como número
     });
 
     if (!res.ok) {
@@ -2350,7 +2369,7 @@ async function salvarPreco() {
     }
 
     // Atualiza o kit atual
-    kitAtual.preco = novoPreco.replace('R$ ', '');
+    kitAtual.preco = precoLimpo;
     precoOriginal = novoPreco;
     
     // Desabilita o campo
