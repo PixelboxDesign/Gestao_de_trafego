@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Luna — Disparo v9</title>
-  <!-- Build: 2026-08-10T21:45 PRODUTOS-EDICAO-INLINE -->
+  <!-- Build: 2026-08-10T21:45 BANCO-DE-DADOS-INTEGRATION -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 13;
+    const CURRENT_VERSION = 14;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -1253,8 +1253,8 @@ function showToast(message, type = 'info') {
 
 async function carregarCatalogo() {
   try {
-    const data = await api(`/api/catalogo/kits/${encodeURIComponent(MARCA_PADRAO)}`);
-    kitsData = data;
+    const data = await api(`/api/catalogo/v2/kits`);
+    kitsData = data || [];
     renderKits(kitsData);
   } catch (e) {
     console.error('[Catálogo] Erro ao carregar:', e);
@@ -1278,20 +1278,25 @@ function renderKits(lista) {
       <div class="empty-state" style="grid-column:1/-1">
         <span>📦</span>
         <p>Nenhum kit no catálogo</p>
-        <p style="font-size:11px;color:var(--text2)">
-          Crie subpastas em <code style="background:var(--bg3);padding:2px 6px;border-radius:4px">F:\\luna_cosmeticos\\catalogos\\</code>
-        </p>
       </div>`;
     return;
   }
 
-  grid.innerHTML = lista.map(kit => `
-    <div class="kit-card" onclick="abrirModalKit('${esc(kit.nome)}')">
+  grid.innerHTML = lista.map(kit => {
+    const temThumb = kit.caminho_thumb_bd || kit.tem_thumb;
+    const thumbUrl = kit.caminho_thumb_bd 
+      ? `/api/catalogo/files/${encodeURIComponent(kit.caminho_thumb_bd)}` 
+      : kit.tem_thumb 
+        ? `/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}` 
+        : null;
+    
+    return `
+    <div class="kit-card" onclick="abrirModalKit('${esc(kit.nome)}', '${esc(kit.marca)}')">
       <div class="kit-img-area">
-        ${kit.tem_thumb 
+        ${temThumb
           ? `<img 
               loading="lazy" 
-              data-src="/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}" 
+              data-src="${thumbUrl}" 
               alt="${esc(kit.nome)}" 
               class="lazy-img"
               style="background:var(--bg3)"
@@ -1301,10 +1306,10 @@ function renderKits(lista) {
       </div>
       <div class="kit-info">
         <h3 class="kit-nome">${esc(kit.nome)}</h3>
-        ${kit.info.preco ? `<span class="kit-preco">${esc(kit.info.preco)}</span>` : ''}
-        ${kit.info.descricao 
-          ? `<p class="kit-mensagem">${esc(kit.info.descricao)}</p>` 
-          : !kit.info.preco 
+        ${kit.preco ? `<span class="kit-preco">R$ ${parseFloat(kit.preco).toFixed(2)}</span>` : ''}
+        ${kit.descricao 
+          ? `<p class="kit-mensagem">${esc(kit.descricao)}</p>` 
+          : !kit.preco 
             ? '<span style="font-size:11px;color:var(--border);font-style:italic">Clique para editar</span>' 
             : ''
         }
@@ -1313,7 +1318,8 @@ function renderKits(lista) {
         ✏️ Editar
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   // Inicializa lazy loading
   initLazyLoad();
@@ -1327,8 +1333,8 @@ function filtrarKits(busca) {
   renderKits(filtrados);
 }
 
-function abrirModalKit(nomeKit) {
-  kitAtual = kitsData.find(k => k.nome === nomeKit);
+function abrirModalKit(nomeKit, marca) {
+  kitAtual = kitsData.find(k => k.nome === nomeKit && k.marca === marca);
   if (!kitAtual) return;
 
   arquivoThumb = null;
@@ -1342,18 +1348,18 @@ function abrirModalKit(nomeKit) {
   
   // Preço - desabilitado por padrão
   const inputPreco = document.getElementById('modal-kit-preco');
-  inputPreco.value = kitAtual.info.preco || '';
+  inputPreco.value = kitAtual.preco ? `R$ ${parseFloat(kitAtual.preco).toFixed(2)}` : '';
   inputPreco.disabled = true;
   precoOriginal = inputPreco.value;
   document.getElementById('btn-editar-preco').style.display = 'block';
   document.getElementById('btn-salvar-preco').style.display = 'none';
   document.getElementById('btn-cancelar-preco').style.display = 'none';
   
-  document.getElementById('modal-kit-descricao').value = kitAtual.info.descricao || '';
+  document.getElementById('modal-kit-descricao').value = kitAtual.descricao || '';
   
   // SKU - desabilitado por padrão
   const inputSku = document.getElementById('modal-kit-sku');
-  inputSku.value = kitAtual.info.sku_kit || '';
+  inputSku.value = kitAtual.codigo_sku || '';
   inputSku.disabled = true;
   skuOriginal = inputSku.value;
   document.getElementById('btn-editar-sku').style.display = 'block';
@@ -1361,8 +1367,9 @@ function abrirModalKit(nomeKit) {
   document.getElementById('btn-cancelar-sku').style.display = 'none';
   
   // Atualiza texto do botão thumb e mostra botão deletar se existir
+  const temThumb = kitAtual.caminho_thumb_bd || kitAtual.tem_thumb;
   const btnDeletarThumb = document.getElementById('btn-deletar-thumb');
-  if (kitAtual.tem_thumb) {
+  if (temThumb) {
     document.getElementById('thumb-btn-text').textContent = '🔄 Alterar Thumbnail';
     btnDeletarThumb.style.display = 'block';
   } else {
@@ -1370,17 +1377,21 @@ function abrirModalKit(nomeKit) {
     btnDeletarThumb.style.display = 'none';
   }
   
-  // Renderiza SKUs dos itens
-  renderSkusItens(kitAtual.info.skus_itens || []);
+  // Renderiza SKUs dos itens (vazio por enquanto - dados do banco não tem essa estrutura)
+  renderSkusItens([]);
   
-  // Renderiza carrossel
-  renderCarrossel(kitAtual.imagens_carrossel || []);
+  // Renderiza carrossel (vazio por enquanto - dados do banco não tem essa estrutura)
+  renderCarrossel([]);
 
   const imgWrap = document.getElementById('modal-kit-img-wrap');
-  if (kitAtual.tem_thumb) {
+  if (temThumb) {
+    const thumbUrl = kitAtual.caminho_thumb_bd 
+      ? `/api/catalogo/files/${encodeURIComponent(kitAtual.caminho_thumb_bd)}` 
+      : `/api/catalogo/imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}/thumb.${kitAtual.thumb_ext}`;
+    
     imgWrap.innerHTML = `
       <div class="modal-img-preview">
-        <img src="/api/catalogo/imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}/thumb.${kitAtual.thumb_ext}" alt="${esc(kitAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
+        <img src="${thumbUrl}" alt="${esc(kitAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
       </div>`;
   } else {
     imgWrap.innerHTML = `
@@ -1799,8 +1810,8 @@ trocarAba = function(id, btn) {
 
 async function carregarProdutos() {
   try {
-    const data = await api(`/api/catalogo/produtos/${encodeURIComponent(MARCA_PADRAO)}`);
-    produtosData = data;
+    const data = await api(`/api/catalogo/v2/produtos-individuais`);
+    produtosData = data || [];
     renderProdutos(produtosData);
   } catch (e) {
     console.error('[Produtos] Erro ao carregar:', e);
@@ -1824,20 +1835,25 @@ function renderProdutos(lista) {
       <div class="empty-state" style="grid-column:1/-1">
         <span>🧴</span>
         <p>Nenhum produto no catálogo</p>
-        <p style="font-size:11px;color:var(--text2)">
-          Crie subpastas em <code style="background:var(--bg3);padding:2px 6px;border-radius:4px">F:\\luna_cosmeticos\\catalogos\\produtos\\</code>
-        </p>
       </div>`;
     return;
   }
 
-  grid.innerHTML = lista.map(produto => `
-    <div class="kit-card" onclick="abrirModalProduto('${esc(produto.nome)}')">
+  grid.innerHTML = lista.map(produto => {
+    const temThumb = produto.caminho_thumb_bd || produto.tem_thumb;
+    const thumbUrl = produto.caminho_thumb_bd 
+      ? `/api/catalogo/files/${encodeURIComponent(produto.caminho_thumb_bd)}` 
+      : produto.tem_thumb 
+        ? `/api/catalogo/imagem/${encodeURIComponent(produto.marca)}/${encodeURIComponent(produto.nome)}/thumb.${produto.thumb_ext}?tipo=produto` 
+        : null;
+    
+    return `
+    <div class="kit-card" onclick="abrirModalProduto('${esc(produto.nome)}', '${esc(produto.marca)}')">
       <div class="kit-img-area">
-        ${produto.tem_thumb 
+        ${temThumb
           ? `<img 
               loading="lazy" 
-              data-src="/api/catalogo/imagem/${encodeURIComponent(produto.marca)}/${encodeURIComponent(produto.nome)}/thumb.${produto.thumb_ext}?tipo=produto" 
+              data-src="${thumbUrl}" 
               alt="${esc(produto.nome)}" 
               class="lazy-img"
               style="background:var(--bg3)"
@@ -1847,10 +1863,10 @@ function renderProdutos(lista) {
       </div>
       <div class="kit-info">
         <h3 class="kit-nome">${esc(produto.nome)}</h3>
-        ${produto.info.preco ? `<span class="kit-preco">${esc(produto.info.preco)}</span>` : ''}
-        ${produto.info.descricao 
-          ? `<p class="kit-mensagem">${esc(produto.info.descricao)}</p>` 
-          : !produto.info.preco 
+        ${produto.preco ? `<span class="kit-preco">R$ ${parseFloat(produto.preco).toFixed(2)}</span>` : ''}
+        ${produto.descricao 
+          ? `<p class="kit-mensagem">${esc(produto.descricao)}</p>` 
+          : !produto.preco 
             ? '<span style="font-size:11px;color:var(--border);font-style:italic">Clique para editar</span>' 
             : ''
         }
@@ -1859,7 +1875,8 @@ function renderProdutos(lista) {
         ✏️ Editar
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   // Inicializa lazy loading
   initLazyLoad();
@@ -1873,8 +1890,8 @@ function filtrarProdutos(busca) {
   renderProdutos(filtrados);
 }
 
-function abrirModalProduto(nomeProduto) {
-  produtoAtual = produtosData.find(p => p.nome === nomeProduto);
+function abrirModalProduto(nomeProduto, marca) {
+  produtoAtual = produtosData.find(p => p.nome === nomeProduto && p.marca === marca);
   if (!produtoAtual) return;
 
   arquivoProdutoThumb = null;
@@ -1888,7 +1905,18 @@ function abrirModalProduto(nomeProduto) {
   const campos = ['sku', 'preco', 'descricao', 'peso', 'tamanho', 'composicao'];
   campos.forEach(campo => {
     const input = document.getElementById(`modal-produto-${campo}`);
-    const valor = produtoAtual.info[campo] || '';
+    let valor = '';
+    
+    // Mapeia os campos do banco para os campos do formulário
+    switch(campo) {
+      case 'sku': valor = produtoAtual.codigo_sku || ''; break;
+      case 'preco': valor = produtoAtual.preco ? `R$ ${parseFloat(produtoAtual.preco).toFixed(2)}` : ''; break;
+      case 'descricao': valor = produtoAtual.descricao || ''; break;
+      case 'peso': valor = produtoAtual.descricao_peso || ''; break;
+      case 'tamanho': valor = produtoAtual.descricao_tamanho || ''; break;
+      case 'composicao': valor = produtoAtual.descricao_composicao || ''; break;
+    }
+    
     input.value = valor;
     input.disabled = true;
     camposOriginais[campo] = valor;
@@ -1899,8 +1927,9 @@ function abrirModalProduto(nomeProduto) {
   });
   
   // Botão deletar thumb
+  const temThumb = produtoAtual.caminho_thumb_bd || produtoAtual.tem_thumb;
   const btnDeletarThumb = document.getElementById('btn-deletar-produto-thumb');
-  if (produtoAtual.tem_thumb) {
+  if (temThumb) {
     document.getElementById('produto-thumb-btn-text').textContent = '🔄 Alterar Thumbnail';
     btnDeletarThumb.style.display = 'block';
   } else {
@@ -1909,10 +1938,14 @@ function abrirModalProduto(nomeProduto) {
   }
 
   const imgWrap = document.getElementById('modal-produto-img-wrap');
-  if (produtoAtual.tem_thumb) {
+  if (temThumb) {
+    const thumbUrl = produtoAtual.caminho_thumb_bd 
+      ? `/api/catalogo/files/${encodeURIComponent(produtoAtual.caminho_thumb_bd)}` 
+      : `/api/catalogo/imagem/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}/thumb.${produtoAtual.thumb_ext}?tipo=produto`;
+    
     imgWrap.innerHTML = `
       <div class="modal-img-preview">
-        <img src="/api/catalogo/imagem/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}/thumb.${produtoAtual.thumb_ext}?tipo=produto" alt="${esc(produtoAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
+        <img src="${thumbUrl}" alt="${esc(produtoAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
       </div>`;
   } else {
     imgWrap.innerHTML = `
