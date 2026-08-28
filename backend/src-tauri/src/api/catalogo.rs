@@ -1,12 +1,12 @@
 use axum::{
     body::Body,
-    extract::{Path, State, Multipart},
+    extract::{Path, State, Multipart, Query},
     http::{header, StatusCode},
     response::Response,
     Json,
 };
 use serde::{Deserialize, Serialize};
-use std::{path::PathBuf, sync::Arc};
+use std::{collections::HashMap, path::PathBuf, sync::Arc};
 use tokio::{fs, sync::Mutex};
 
 use crate::AppState;
@@ -210,21 +210,26 @@ pub async fn listar_kits(
     Json(kits)
 }
 
-/// GET /api/catalogo/imagem/:marca/:kit/:nome — serve imagem específica do kit
+/// GET /api/catalogo/imagem/:marca/:kit/:nome?tipo=produto — serve imagem específica do kit/produto
 pub async fn servir_imagem(
     State(_state): State<Arc<Mutex<AppState>>>,
     Path((marca_nome, kit_nome, img_nome)): Path<(String, String, String)>,
+    Query(params): Query<HashMap<String, String>>,
 ) -> Result<Response<Body>, (StatusCode, String)> {
     let base = catalogo_path();
     let marca_path = base.join(&marca_nome);
-    let kit_path = marca_path.join(&kit_nome);
+    
+    // Determina o tipo (kits ou produtos)
+    let tipo = params.get("tipo").map(|s| s.as_str()).unwrap_or("kit");
+    let subfolder = if tipo == "produto" { "produtos" } else { "kits" };
+    let kit_path = marca_path.join(subfolder).join(&kit_nome);
 
     // Segurança: garante que está dentro do catálogo
     let canonical_base = base.canonicalize().map_err(|_| {
         (StatusCode::INTERNAL_SERVER_ERROR, "Catálogo não encontrado".to_string())
     })?;
     let canonical_kit = kit_path.canonicalize().map_err(|_| {
-        (StatusCode::NOT_FOUND, format!("Kit '{}/{}' não encontrado", marca_nome, kit_nome))
+        (StatusCode::NOT_FOUND, format!("{} '{}/{}' não encontrado", if tipo == "produto" { "Produto" } else { "Kit" }, marca_nome, kit_nome))
     })?;
     if !canonical_kit.starts_with(&canonical_base) {
         return Err((StatusCode::FORBIDDEN, "Acesso negado".to_string()));
@@ -392,15 +397,20 @@ pub async fn serve_file(
         .unwrap())
 }
 
-/// POST /api/catalogo/upload-thumb/:marca/:kit — faz upload da thumbnail
+/// POST /api/catalogo/upload-thumb/:marca/:kit?tipo=produto — faz upload da thumbnail
 pub async fn upload_thumb(
     State(_state): State<Arc<Mutex<AppState>>>,
     Path((marca_nome, kit_nome)): Path<(String, String)>,
+    Query(params): Query<HashMap<String, String>>,
     mut multipart: Multipart,
 ) -> Json<serde_json::Value> {
     let base = catalogo_path();
     let marca_path = base.join(&marca_nome);
-    let kit_path = marca_path.join(&kit_nome);
+    
+    // Determina o tipo (kits ou produtos)
+    let tipo = params.get("tipo").map(|s| s.as_str()).unwrap_or("kit");
+    let subfolder = if tipo == "produto" { "produtos" } else { "kits" };
+    let kit_path = marca_path.join(subfolder).join(&kit_nome);
 
     // Segurança
     let canonical_base = match base.canonicalize() {
@@ -409,7 +419,7 @@ pub async fn upload_thumb(
     };
     let canonical_kit = match kit_path.canonicalize() {
         Ok(p) => p,
-        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Kit não encontrado" })),
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": format!("{} não encontrado", if tipo == "produto" { "Produto" } else { "Kit" }) })),
     };
     if !canonical_kit.starts_with(&canonical_base) {
         return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
@@ -461,15 +471,20 @@ pub async fn upload_thumb(
     Json(serde_json::json!({ "ok": false, "erro": "Nenhum arquivo recebido" }))
 }
 
-/// POST /api/catalogo/upload-carrossel/:marca/:kit — adiciona imagem ao carrossel
+/// POST /api/catalogo/upload-carrossel/:marca/:kit?tipo=produto — adiciona imagem ao carrossel
 pub async fn upload_carrossel(
     State(_state): State<Arc<Mutex<AppState>>>,
     Path((marca_nome, kit_nome)): Path<(String, String)>,
+    Query(params): Query<HashMap<String, String>>,
     mut multipart: Multipart,
 ) -> Json<serde_json::Value> {
     let base = catalogo_path();
     let marca_path = base.join(&marca_nome);
-    let kit_path = marca_path.join(&kit_nome);
+    
+    // Determina o tipo (kits ou produtos)
+    let tipo = params.get("tipo").map(|s| s.as_str()).unwrap_or("kit");
+    let subfolder = if tipo == "produto" { "produtos" } else { "kits" };
+    let kit_path = marca_path.join(subfolder).join(&kit_nome);
 
     // Segurança
     let canonical_base = match base.canonicalize() {
@@ -478,7 +493,7 @@ pub async fn upload_carrossel(
     };
     let canonical_kit = match kit_path.canonicalize() {
         Ok(p) => p,
-        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Kit não encontrado" })),
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": format!("{} não encontrado", if tipo == "produto" { "Produto" } else { "Kit" }) })),
     };
     if !canonical_kit.starts_with(&canonical_base) {
         return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
@@ -537,14 +552,19 @@ pub async fn upload_carrossel(
     Json(serde_json::json!({ "ok": false, "erro": "Nenhum arquivo recebido" }))
 }
 
-/// DELETE /api/catalogo/deletar-imagem/:marca/:kit/:arquivo — deleta imagem do carrossel
+/// DELETE /api/catalogo/deletar-imagem/:marca/:kit/:arquivo?tipo=produto — deleta imagem do carrossel
 pub async fn deletar_imagem(
     State(_state): State<Arc<Mutex<AppState>>>,
     Path((marca_nome, kit_nome, arquivo)): Path<(String, String, String)>,
+    Query(params): Query<HashMap<String, String>>,
 ) -> Json<serde_json::Value> {
     let base = catalogo_path();
     let marca_path = base.join(&marca_nome);
-    let kit_path = marca_path.join(&kit_nome);
+    
+    // Determina o tipo (kits ou produtos)
+    let tipo = params.get("tipo").map(|s| s.as_str()).unwrap_or("kit");
+    let subfolder = if tipo == "produto" { "produtos" } else { "kits" };
+    let kit_path = marca_path.join(subfolder).join(&kit_nome);
 
     // Segurança: não permite deletar thumb
     if arquivo.to_lowercase().starts_with("thumb") {
@@ -557,7 +577,7 @@ pub async fn deletar_imagem(
     };
     let canonical_kit = match kit_path.canonicalize() {
         Ok(p) => p,
-        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Kit não encontrado" })),
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": format!("{} não encontrado", if tipo == "produto" { "Produto" } else { "Kit" }) })),
     };
     if !canonical_kit.starts_with(&canonical_base) {
         return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
@@ -639,4 +659,61 @@ pub async fn reordenar_carrossel(
     }
 
     Json(serde_json::json!({ "ok": true }))
+}
+
+
+/// DELETE /api/catalogo/deletar-thumb/:marca/:nome?tipo=produto — deleta thumbnail
+pub async fn deletar_thumb(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Path((marca_nome, nome)): Path<(String, String)>,
+    Query(params): Query<HashMap<String, String>>,
+) -> Json<serde_json::Value> {
+    let base = catalogo_path();
+    let marca_path = base.join(&marca_nome);
+    
+    // Determina o tipo (kits ou produtos)
+    let tipo = params.get("tipo").map(|s| s.as_str()).unwrap_or("kit");
+    let subfolder = if tipo == "produto" { "produtos" } else { "kits" };
+    let item_path = marca_path.join(subfolder).join(&nome);
+
+    // Segurança
+    let canonical_base = match base.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Catálogo não encontrado" })),
+    };
+    let canonical_item = match item_path.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": format!("{} não encontrado", if tipo == "produto" { "Produto" } else { "Kit" }) })),
+    };
+    if !canonical_item.starts_with(&canonical_base) {
+        return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
+    }
+
+    // Procura e deleta thumb.*
+    let extensoes = vec!["jpg", "jpeg", "png", "webp"];
+    let mut deletado = false;
+
+    for ext in extensoes {
+        let thumb_path = canonical_item.join(format!("thumb.{}", ext));
+        if thumb_path.exists() {
+            match fs::remove_file(&thumb_path).await {
+                Ok(_) => {
+                    deletado = true;
+                    break;
+                }
+                Err(e) => {
+                    return Json(serde_json::json!({ 
+                        "ok": false, 
+                        "erro": format!("Erro ao deletar thumbnail: {}", e) 
+                    }));
+                }
+            }
+        }
+    }
+
+    if deletado {
+        Json(serde_json::json!({ "ok": true, "mensagem": "Thumbnail deletada com sucesso" }))
+    } else {
+        Json(serde_json::json!({ "ok": false, "erro": "Nenhuma thumbnail encontrada" }))
+    }
 }

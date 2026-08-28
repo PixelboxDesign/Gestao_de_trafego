@@ -60,7 +60,11 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         // Rotas de catálogo (v2 - banco de dados)
         .route("/api/catalogo/v2/produtos", get(catalogo_db::listar_produtos_db))
         .route("/api/catalogo/v2/kits", get(catalogo_db::listar_kits_db))
-        .route("/api/catalogo/v2/produto/:sku", get(catalogo_db::buscar_produto_por_sku))
+        .route("/api/catalogo/v2/produtos-individuais", get(catalogo_db::listar_produtos_individuais_db))
+        .route("/api/catalogo/v2/produto/sku/:sku", get(catalogo_db::buscar_produto_por_sku))
+        .route("/api/catalogo/v2/produto/:marca/:nome", axum::routing::put(catalogo_db::atualizar_produto))
+        .route("/api/catalogo/v2/kit/:marca/:nome", axum::routing::put(catalogo_db::atualizar_kit))
+        .route("/api/catalogo/deletar-thumb/:marca/:nome", axum::routing::delete(catalogo::deletar_thumb))
         // Rotas de WhatsApp
         .route("/api/whatsapp/status", get(whatsapp::status))
         .route("/api/whatsapp/qr", get(whatsapp::get_qr))
