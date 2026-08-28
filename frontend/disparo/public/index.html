@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Luna — Disparo v9</title>
-  <!-- Build: 2026-08-10T21:45 BANCO-DE-DADOS-INTEGRATION -->
+  <!-- Build: 2026-08-10T21:45 CLICK-HANDLERS-FIX -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 14;
+    const CURRENT_VERSION = 15;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -1291,7 +1291,7 @@ function renderKits(lista) {
         : null;
     
     return `
-    <div class="kit-card" onclick="abrirModalKit('${esc(kit.nome)}', '${esc(kit.marca)}')">
+    <div class="kit-card" data-kit-nome="${esc(kit.nome)}" data-kit-marca="${esc(kit.marca)}">
       <div class="kit-img-area">
         ${temThumb
           ? `<img 
@@ -1320,6 +1320,15 @@ function renderKits(lista) {
     </div>
   `;
   }).join('');
+
+  // Adiciona event listeners aos cards
+  document.querySelectorAll('.kit-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const nome = card.getAttribute('data-kit-nome');
+      const marca = card.getAttribute('data-kit-marca');
+      abrirModalKit(nome, marca);
+    });
+  });
 
   // Inicializa lazy loading
   initLazyLoad();
@@ -1848,7 +1857,7 @@ function renderProdutos(lista) {
         : null;
     
     return `
-    <div class="kit-card" onclick="abrirModalProduto('${esc(produto.nome)}', '${esc(produto.marca)}')">
+    <div class="kit-card" data-produto-nome="${esc(produto.nome)}" data-produto-marca="${esc(produto.marca)}">
       <div class="kit-img-area">
         ${temThumb
           ? `<img 
@@ -1877,6 +1886,15 @@ function renderProdutos(lista) {
     </div>
   `;
   }).join('');
+
+  // Adiciona event listeners aos cards de produtos
+  document.querySelectorAll('[data-produto-nome]').forEach(card => {
+    card.addEventListener('click', () => {
+      const nome = card.getAttribute('data-produto-nome');
+      const marca = card.getAttribute('data-produto-marca');
+      abrirModalProduto(nome, marca);
+    });
+  });
 
   // Inicializa lazy loading
   initLazyLoad();
