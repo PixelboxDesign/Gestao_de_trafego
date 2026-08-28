@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Luna — Disparo v9</title>
-  <!-- Build: 2026-08-10T23:00 FIX-BUSCA-SEM-MARCA -->
+  <!-- Build: 2026-08-10T23:15 ADD-COMPONENTES-KIT -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 25;
+    const CURRENT_VERSION = 26;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -668,10 +668,7 @@
 
       <div class="form-group">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-          <label class="form-label" style="margin:0">SKUs dos Itens</label>
-          <button class="btn btn-secondary" onclick="adicionarSkuItem()" style="padding:.25rem .5rem;font-size:12px">
-            ➕ Adicionar SKU
-          </button>
+          <label class="form-label" style="margin:0" id="componentes-label">Produtos que compõem este kit</label>
         </div>
         <div id="skus-itens-container" style="display:flex;flex-direction:column;gap:.5rem"></div>
       </div>
@@ -1413,8 +1410,9 @@ function abrirModalKit(nomeKit, marca) {
     btnDeletarThumb.style.display = 'none';
   }
   
-  // Renderiza SKUs dos itens (vazio por enquanto - dados do banco não tem essa estrutura)
-  renderSkusItens([]);
+  // Renderiza componentes do kit
+  const componentes = kitAtual.componentes || [];
+  renderComponentesKit(componentes);
   
   // Renderiza carrossel (vazio por enquanto - dados do banco não tem essa estrutura)
   renderCarrossel([]);
@@ -1602,6 +1600,38 @@ function renderSkusItens(skus) {
   `).join('');
 }
 
+function renderComponentesKit(componentes) {
+  const container = document.getElementById('skus-itens-container');
+  
+  if (componentes.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic">Nenhum componente cadastrado.</p>';
+    return;
+  }
+  
+  container.innerHTML = componentes.map((comp, idx) => `
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.75rem;display:flex;align-items:center;gap:.75rem">
+      <div style="background:var(--primary);color:white;border-radius:6px;padding:.35rem .6rem;font-size:13px;font-weight:700;min-width:40px;text-align:center">
+        ${comp.quantidade}x
+      </div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:.25rem">
+          ${esc(comp.nome)}
+        </div>
+        ${comp.sku ? `<div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:.35rem">
+          <span style="background:var(--bg);padding:.15rem .4rem;border-radius:4px;font-family:monospace">${esc(comp.sku)}</span>
+        </div>` : ''}
+      </div>
+      <button
+        onclick="verDetalhesComponente('${escAttr(comp.sku || '')}')"
+        style="background:var(--info);color:white;border:none;border-radius:6px;padding:.4rem .7rem;cursor:pointer;font-size:11px;font-weight:600"
+        title="Ver detalhes"
+      >
+        👁️ Ver
+      </button>
+    </div>
+  `).join('');
+}
+
 function adicionarSkuItem() {
   const inputs = document.querySelectorAll('.sku-item-input');
   const skusAtuais = Array.from(inputs).map(inp => inp.value);
@@ -1614,6 +1644,15 @@ function removerSkuItem(idx) {
   const skusAtuais = Array.from(inputs).map(inp => inp.value);
   skusAtuais.splice(idx, 1);
   renderSkusItens(skusAtuais);
+}
+
+function verDetalhesComponente(sku) {
+  if (!sku) {
+    alert('SKU não disponível para este componente.');
+    return;
+  }
+  // TODO: Implementar visualização de detalhes do componente
+  alert(`Detalhes do componente com SKU: ${sku}`);
 }
 
 function fecharModalKit() {
