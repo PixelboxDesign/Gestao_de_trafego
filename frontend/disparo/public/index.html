@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Luna — Disparo v9</title>
-  <!-- Build: 2026-08-10T21:45 SETTIMEOUT-FIX -->
+  <!-- Build: 2026-08-10T21:45 DEBUG-MODAL-OPEN -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 18;
+    const CURRENT_VERSION = 19;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -1351,8 +1351,18 @@ function filtrarKits(busca) {
 }
 
 function abrirModalKit(nomeKit, marca) {
+  console.log('[DEBUG] abrirModalKit chamado com:', nomeKit, marca);
+  console.log('[DEBUG] kitsData tem', kitsData.length, 'kits');
+  
   kitAtual = kitsData.find(k => k.nome === nomeKit && k.marca === marca);
-  if (!kitAtual) return;
+  
+  console.log('[DEBUG] kitAtual encontrado?', kitAtual ? 'SIM' : 'NÃO');
+  
+  if (!kitAtual) {
+    console.error('[DEBUG] Kit não encontrado! Buscando:', { nome: nomeKit, marca: marca });
+    console.error('[DEBUG] Primeiro kit no array:', kitsData[0]);
+    return;
+  }
 
   arquivoThumb = null;
   arquivoCarrossel = null;
