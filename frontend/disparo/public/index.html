@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Luna — Disparo v9</title>
-  <!-- Build: 2026-08-10T21:45 CAMPOS-COMPLETOS -->
+  <!-- Build: 2026-08-10T21:45 PRODUTOS-EDICAO-INLINE -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 11;
+    const CURRENT_VERSION = 13;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -466,7 +466,8 @@
 <!-- Tabs -->
 <nav class="tabs">
   <button class="tab active" onclick="trocarAba('whatsapp', this)">💬 WhatsApp</button>
-  <button class="tab" onclick="trocarAba('catalogo', this)">💰 Precificação</button>
+  <button class="tab" onclick="trocarAba('catalogo', this)">📦 Kits</button>
+  <button class="tab" onclick="trocarAba('produtos', this)">🧴 Produtos</button>
 </nav>
 
 <!-- Content -->
@@ -531,6 +532,30 @@
 
   </div><!-- /page-catalogo -->
 
+  <!-- Aba Produtos -->
+  <div id="page-produtos" class="page">
+    
+    <!-- Toolbar -->
+    <div class="catalogo-toolbar">
+      <input
+        type="text"
+        id="produtos-busca"
+        placeholder="Buscar produto..."
+        onkeyup="filtrarProdutos(this.value)"
+      />
+      <button class="btn btn-secondary" onclick="carregarProdutos()">
+        🔄 Atualizar
+      </button>
+      <span style="margin-left:auto;font-size:12px;color:var(--text2)" id="produtos-count">
+        Carregando...
+      </span>
+    </div>
+
+    <!-- Grid de produtos -->
+    <div id="produtos-grid" class="catalogo-grid"></div>
+
+  </div><!-- /page-produtos -->
+
 </main>
 
 <!-- Modal de edição de kit -->
@@ -557,12 +582,40 @@
       
       <div class="form-group">
         <label class="form-label">Preço</label>
-        <input
-          type="text"
-          id="modal-kit-preco"
-          class="form-input"
-          placeholder="Ex: R$ 89,90"
-        />
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <input
+            type="text"
+            id="modal-kit-preco"
+            class="form-input"
+            placeholder="Ex: R$ 89,90"
+            style="flex:1"
+            disabled
+          />
+          <button 
+            id="btn-editar-preco"
+            onclick="toggleEditarPreco()" 
+            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Editar preço"
+          >
+            ✏️
+          </button>
+          <button 
+            id="btn-salvar-preco"
+            onclick="salvarPreco()" 
+            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Salvar"
+          >
+            ✅
+          </button>
+          <button 
+            id="btn-cancelar-preco"
+            onclick="cancelarEditarPreco()" 
+            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Cancelar"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <div class="form-group">
@@ -577,12 +630,40 @@
 
       <div class="form-group">
         <label class="form-label">SKU do Kit</label>
-        <input
-          type="text"
-          id="modal-kit-sku"
-          class="form-input"
-          placeholder="SKU principal do kit"
-        />
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <input
+            type="text"
+            id="modal-kit-sku"
+            class="form-input"
+            placeholder="SKU principal do kit"
+            style="flex:1"
+            disabled
+          />
+          <button 
+            id="btn-editar-sku"
+            onclick="toggleEditarSku()" 
+            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Editar SKU"
+          >
+            ✏️
+          </button>
+          <button 
+            id="btn-salvar-sku"
+            onclick="salvarSku()" 
+            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Salvar"
+          >
+            ✅
+          </button>
+          <button 
+            id="btn-cancelar-sku"
+            onclick="cancelarEditarSku()" 
+            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Cancelar"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <div class="form-group">
@@ -604,9 +685,19 @@
           accept="image/jpeg,image/jpg,image/png,image/webp"
           onchange="handleThumbSelect(this)"
         />
-        <button class="btn btn-secondary" onclick="document.getElementById('modal-kit-file-thumb').click()" style="width:100%">
-          <span id="thumb-btn-text">🔄 Alterar Thumbnail</span>
-        </button>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-secondary" onclick="document.getElementById('modal-kit-file-thumb').click()" style="flex:1">
+            <span id="thumb-btn-text">🔄 Alterar Thumbnail</span>
+          </button>
+          <button 
+            id="btn-deletar-thumb" 
+            class="btn btn-danger" 
+            onclick="deletarThumb()" 
+            style="display:none"
+          >
+            🗑️ Deletar
+          </button>
+        </div>
         <span id="file-name-thumb" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
       </div>
 
@@ -639,6 +730,300 @@
       </button>
       <button class="btn btn-primary" id="modal-save-btn" onclick="salvarKit()">
         💾 Salvar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal de edição de produto -->
+<div id="modal-produto" class="modal-overlay" style="display:none" onclick="if(event.target===this) fecharModalProduto()">
+  <div class="modal-box">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <input
+        type="text"
+        id="modal-produto-nome-edit"
+        class="form-input"
+        placeholder="Nome do produto"
+        style="font-size:16px;font-weight:700;flex:1;margin-right:1rem"
+      />
+      <button class="modal-close" onclick="fecharModalProduto()">✕</button>
+    </div>
+
+    <!-- Imagem preview -->
+    <div id="modal-produto-img-wrap"></div>
+
+    <!-- Body -->
+    <div class="modal-body" style="max-height:400px;overflow-y:auto">
+      
+      <div class="form-group">
+        <label class="form-label">SKU</label>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <input
+            type="text"
+            id="modal-produto-sku"
+            class="form-input"
+            placeholder="SKU do produto"
+            style="flex:1"
+            disabled
+          />
+          <button 
+            id="btn-editar-produto-sku"
+            onclick="toggleEditarCampo('sku')" 
+            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Editar SKU"
+          >
+            ✏️
+          </button>
+          <button 
+            id="btn-salvar-produto-sku"
+            onclick="salvarCampoProduto('sku')" 
+            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Salvar"
+          >
+            ✅
+          </button>
+          <button 
+            id="btn-cancelar-produto-sku"
+            onclick="cancelarEditarCampo('sku')" 
+            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Cancelar"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Preço</label>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <input
+            type="text"
+            id="modal-produto-preco"
+            class="form-input"
+            placeholder="Ex: R$ 89,90"
+            style="flex:1"
+            disabled
+          />
+          <button 
+            id="btn-editar-produto-preco"
+            onclick="toggleEditarCampo('preco')" 
+            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Editar preço"
+          >
+            ✏️
+          </button>
+          <button 
+            id="btn-salvar-produto-preco"
+            onclick="salvarCampoProduto('preco')" 
+            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Salvar"
+          >
+            ✅
+          </button>
+          <button 
+            id="btn-cancelar-produto-preco"
+            onclick="cancelarEditarCampo('preco')" 
+            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Cancelar"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Descrição (Contra Rótulo)</label>
+        <div style="display:flex;gap:.5rem;align-items:flex-start">
+          <textarea
+            id="modal-produto-descricao"
+            class="form-textarea"
+            placeholder="Descrição do contra rótulo..."
+            rows="3"
+            style="flex:1"
+            disabled
+          ></textarea>
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <button 
+              id="btn-editar-produto-descricao"
+              onclick="toggleEditarCampo('descricao')" 
+              style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              title="Editar descrição"
+            >
+              ✏️
+            </button>
+            <button 
+              id="btn-salvar-produto-descricao"
+              onclick="salvarCampoProduto('descricao')" 
+              style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              title="Salvar"
+            >
+              ✅
+            </button>
+            <button 
+              id="btn-cancelar-produto-descricao"
+              onclick="cancelarEditarCampo('descricao')" 
+              style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              title="Cancelar"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Peso</label>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <input
+            type="text"
+            id="modal-produto-peso"
+            class="form-input"
+            placeholder="Ex: 100g, 250ml"
+            style="flex:1"
+            disabled
+          />
+          <button 
+            id="btn-editar-produto-peso"
+            onclick="toggleEditarCampo('peso')" 
+            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Editar peso"
+          >
+            ✏️
+          </button>
+          <button 
+            id="btn-salvar-produto-peso"
+            onclick="salvarCampoProduto('peso')" 
+            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Salvar"
+          >
+            ✅
+          </button>
+          <button 
+            id="btn-cancelar-produto-peso"
+            onclick="cancelarEditarCampo('peso')" 
+            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Cancelar"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tamanho</label>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <input
+            type="text"
+            id="modal-produto-tamanho"
+            class="form-input"
+            placeholder="Ex: Pequeno, Médio, Grande"
+            style="flex:1"
+            disabled
+          />
+          <button 
+            id="btn-editar-produto-tamanho"
+            onclick="toggleEditarCampo('tamanho')" 
+            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Editar tamanho"
+          >
+            ✏️
+          </button>
+          <button 
+            id="btn-salvar-produto-tamanho"
+            onclick="salvarCampoProduto('tamanho')" 
+            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Salvar"
+          >
+            ✅
+          </button>
+          <button 
+            id="btn-cancelar-produto-tamanho"
+            onclick="cancelarEditarCampo('tamanho')" 
+            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            title="Cancelar"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Composição</label>
+        <div style="display:flex;gap:.5rem;align-items:flex-start">
+          <textarea
+            id="modal-produto-composicao"
+            class="form-textarea"
+            placeholder="Composição do produto..."
+            rows="3"
+            style="flex:1"
+            disabled
+          ></textarea>
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <button 
+              id="btn-editar-produto-composicao"
+              onclick="toggleEditarCampo('composicao')" 
+              style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              title="Editar composição"
+            >
+              ✏️
+            </button>
+            <button 
+              id="btn-salvar-produto-composicao"
+              onclick="salvarCampoProduto('composicao')" 
+              style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              title="Salvar"
+            >
+              ✅
+            </button>
+            <button 
+              id="btn-cancelar-produto-composicao"
+              onclick="cancelarEditarCampo('composicao')" 
+              style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              title="Cancelar"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="border-top:1px solid var(--border);padding-top:1rem">
+        <label class="form-label">📸 Imagem Thumbnail (Capa)</label>
+        <input
+          type="file"
+          id="modal-produto-file-thumb"
+          class="form-file"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
+          onchange="handleProdutoThumbSelect(this)"
+        />
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-secondary" onclick="document.getElementById('modal-produto-file-thumb').click()" style="flex:1">
+            <span id="produto-thumb-btn-text">🔄 Alterar Thumbnail</span>
+          </button>
+          <button 
+            id="btn-deletar-produto-thumb" 
+            class="btn btn-danger" 
+            onclick="deletarProdutoThumb()" 
+            style="display:none"
+          >
+            🗑️ Deletar
+          </button>
+        </div>
+        <span id="file-name-produto-thumb" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <span id="modal-produto-save-success" class="save-success" style="display:none">
+        ✅ Salvo com sucesso!
+      </span>
+      <button class="btn btn-secondary" onclick="fecharModalProduto()">
+        Fechar
       </button>
     </div>
 
@@ -842,6 +1227,25 @@ let arquivoThumb = null;
 let arquivoCarrossel = null;
 const MARCA_PADRAO = 'Alphahall'; // Marca padrão por enquanto
 
+// Estados de edição inline (Kits)
+let skuOriginal = '';
+let precoOriginal = '';
+
+// Produtos
+let produtosData = [];
+let produtoAtual = null;
+let arquivoProdutoThumb = null;
+
+// Estados de edição inline (Produtos)
+let camposOriginais = {
+  sku: '',
+  preco: '',
+  descricao: '',
+  peso: '',
+  tamanho: '',
+  composicao: ''
+};
+
 function showToast(message, type = 'info') {
   // Simples alert por enquanto, pode ser melhorado com um toast bonito
   console.log(`[${type.toUpperCase()}] ${message}`);
@@ -935,12 +1339,36 @@ function abrirModalKit(nomeKit) {
   document.getElementById('modal-save-success').style.display = 'none';
 
   document.getElementById('modal-kit-nome-edit').value = kitAtual.nome;
-  document.getElementById('modal-kit-preco').value = kitAtual.info.preco || '';
-  document.getElementById('modal-kit-descricao').value = kitAtual.info.descricao || '';
-  document.getElementById('modal-kit-sku').value = kitAtual.info.sku_kit || '';
   
-  // Atualiza texto do botão thumb
-  document.getElementById('thumb-btn-text').textContent = kitAtual.tem_thumb ? '🔄 Alterar Thumbnail' : '➕ Adicionar Thumbnail';
+  // Preço - desabilitado por padrão
+  const inputPreco = document.getElementById('modal-kit-preco');
+  inputPreco.value = kitAtual.info.preco || '';
+  inputPreco.disabled = true;
+  precoOriginal = inputPreco.value;
+  document.getElementById('btn-editar-preco').style.display = 'block';
+  document.getElementById('btn-salvar-preco').style.display = 'none';
+  document.getElementById('btn-cancelar-preco').style.display = 'none';
+  
+  document.getElementById('modal-kit-descricao').value = kitAtual.info.descricao || '';
+  
+  // SKU - desabilitado por padrão
+  const inputSku = document.getElementById('modal-kit-sku');
+  inputSku.value = kitAtual.info.sku_kit || '';
+  inputSku.disabled = true;
+  skuOriginal = inputSku.value;
+  document.getElementById('btn-editar-sku').style.display = 'block';
+  document.getElementById('btn-salvar-sku').style.display = 'none';
+  document.getElementById('btn-cancelar-sku').style.display = 'none';
+  
+  // Atualiza texto do botão thumb e mostra botão deletar se existir
+  const btnDeletarThumb = document.getElementById('btn-deletar-thumb');
+  if (kitAtual.tem_thumb) {
+    document.getElementById('thumb-btn-text').textContent = '🔄 Alterar Thumbnail';
+    btnDeletarThumb.style.display = 'block';
+  } else {
+    document.getElementById('thumb-btn-text').textContent = '➕ Adicionar Thumbnail';
+    btnDeletarThumb.style.display = 'none';
+  }
   
   // Renderiza SKUs dos itens
   renderSkusItens(kitAtual.info.skus_itens || []);
@@ -1362,10 +1790,494 @@ trocarAba = function(id, btn) {
   if (id === 'catalogo' && kitsData.length === 0) {
     carregarCatalogo();
   }
+  if (id === 'produtos' && produtosData.length === 0) {
+    carregarProdutos();
+  }
 };
+
+// ── Produtos ─────────────────────────────────────────────────────────────────
+
+async function carregarProdutos() {
+  try {
+    const data = await api(`/api/catalogo/produtos/${encodeURIComponent(MARCA_PADRAO)}`);
+    produtosData = data;
+    renderProdutos(produtosData);
+  } catch (e) {
+    console.error('[Produtos] Erro ao carregar:', e);
+    document.getElementById('produtos-grid').innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <span>⚠️</span>
+        <p>Erro ao carregar produtos</p>
+        <p style="font-size:11px;color:var(--text2)">Verifique se o servidor está rodando</p>
+      </div>`;
+  }
+}
+
+function renderProdutos(lista) {
+  const grid = document.getElementById('produtos-grid');
+  const count = document.getElementById('produtos-count');
+  
+  count.textContent = `${lista.length} produto${lista.length !== 1 ? 's' : ''}`;
+
+  if (lista.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <span>🧴</span>
+        <p>Nenhum produto no catálogo</p>
+        <p style="font-size:11px;color:var(--text2)">
+          Crie subpastas em <code style="background:var(--bg3);padding:2px 6px;border-radius:4px">F:\\luna_cosmeticos\\catalogos\\produtos\\</code>
+        </p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = lista.map(produto => `
+    <div class="kit-card" onclick="abrirModalProduto('${esc(produto.nome)}')">
+      <div class="kit-img-area">
+        ${produto.tem_thumb 
+          ? `<img 
+              loading="lazy" 
+              data-src="/api/catalogo/imagem/${encodeURIComponent(produto.marca)}/${encodeURIComponent(produto.nome)}/thumb.${produto.thumb_ext}?tipo=produto" 
+              alt="${esc(produto.nome)}" 
+              class="lazy-img"
+              style="background:var(--bg3)"
+            />`
+          : `<span class="kit-img-placeholder">🧴</span>`
+        }
+      </div>
+      <div class="kit-info">
+        <h3 class="kit-nome">${esc(produto.nome)}</h3>
+        ${produto.info.preco ? `<span class="kit-preco">${esc(produto.info.preco)}</span>` : ''}
+        ${produto.info.descricao 
+          ? `<p class="kit-mensagem">${esc(produto.info.descricao)}</p>` 
+          : !produto.info.preco 
+            ? '<span style="font-size:11px;color:var(--border);font-style:italic">Clique para editar</span>' 
+            : ''
+        }
+      </div>
+      <div class="kit-footer">
+        ✏️ Editar
+      </div>
+    </div>
+  `).join('');
+
+  // Inicializa lazy loading
+  initLazyLoad();
+}
+
+function filtrarProdutos(busca) {
+  const termo = busca.toLowerCase().trim();
+  const filtrados = termo
+    ? produtosData.filter(p => p.nome.toLowerCase().includes(termo))
+    : produtosData;
+  renderProdutos(filtrados);
+}
+
+function abrirModalProduto(nomeProduto) {
+  produtoAtual = produtosData.find(p => p.nome === nomeProduto);
+  if (!produtoAtual) return;
+
+  arquivoProdutoThumb = null;
+  document.getElementById('file-name-produto-thumb').textContent = '';
+  document.getElementById('modal-produto-file-thumb').value = '';
+  document.getElementById('modal-produto-save-success').style.display = 'none';
+
+  document.getElementById('modal-produto-nome-edit').value = produtoAtual.nome;
+  
+  // Inicializa todos os campos desabilitados
+  const campos = ['sku', 'preco', 'descricao', 'peso', 'tamanho', 'composicao'];
+  campos.forEach(campo => {
+    const input = document.getElementById(`modal-produto-${campo}`);
+    const valor = produtoAtual.info[campo] || '';
+    input.value = valor;
+    input.disabled = true;
+    camposOriginais[campo] = valor;
+    
+    document.getElementById(`btn-editar-produto-${campo}`).style.display = 'block';
+    document.getElementById(`btn-salvar-produto-${campo}`).style.display = 'none';
+    document.getElementById(`btn-cancelar-produto-${campo}`).style.display = 'none';
+  });
+  
+  // Botão deletar thumb
+  const btnDeletarThumb = document.getElementById('btn-deletar-produto-thumb');
+  if (produtoAtual.tem_thumb) {
+    document.getElementById('produto-thumb-btn-text').textContent = '🔄 Alterar Thumbnail';
+    btnDeletarThumb.style.display = 'block';
+  } else {
+    document.getElementById('produto-thumb-btn-text').textContent = '➕ Adicionar Thumbnail';
+    btnDeletarThumb.style.display = 'none';
+  }
+
+  const imgWrap = document.getElementById('modal-produto-img-wrap');
+  if (produtoAtual.tem_thumb) {
+    imgWrap.innerHTML = `
+      <div class="modal-img-preview">
+        <img src="/api/catalogo/imagem/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}/thumb.${produtoAtual.thumb_ext}?tipo=produto" alt="${esc(produtoAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
+      </div>`;
+  } else {
+    imgWrap.innerHTML = `
+      <div class="modal-no-img">
+        <span style="font-size:32px">🖼️</span>
+        <span>Escolha uma thumb abaixo</span>
+      </div>`;
+  }
+
+  document.getElementById('modal-produto').style.display = 'flex';
+}
+
+function fecharModalProduto() {
+  document.getElementById('modal-produto').style.display = 'none';
+  produtoAtual = null;
+  arquivoProdutoThumb = null;
+}
+
+// Funções de edição inline para produtos
+function toggleEditarCampo(campo) {
+  const input = document.getElementById(`modal-produto-${campo}`);
+  camposOriginais[campo] = input.value;
+  input.disabled = false;
+  input.focus();
+  document.getElementById(`btn-editar-produto-${campo}`).style.display = 'none';
+  document.getElementById(`btn-salvar-produto-${campo}`).style.display = 'block';
+  document.getElementById(`btn-cancelar-produto-${campo}`).style.display = 'block';
+}
+
+function cancelarEditarCampo(campo) {
+  const input = document.getElementById(`modal-produto-${campo}`);
+  input.value = camposOriginais[campo];
+  input.disabled = true;
+  document.getElementById(`btn-editar-produto-${campo}`).style.display = 'block';
+  document.getElementById(`btn-salvar-produto-${campo}`).style.display = 'none';
+  document.getElementById(`btn-cancelar-produto-${campo}`).style.display = 'none';
+}
+
+async function salvarCampoProduto(campo) {
+  if (!produtoAtual) return;
+  
+  const input = document.getElementById(`modal-produto-${campo}`);
+  const novoValor = input.value.trim();
+  
+  try {
+    const payload = {};
+    // Mapeia os nomes dos campos para os campos do banco
+    const campoMap = {
+      'sku': 'codigo_sku',
+      'preco': 'preco',
+      'descricao': 'descricao',
+      'peso': 'descricao_peso',
+      'tamanho': 'descricao_tamanho',
+      'composicao': 'descricao_composicao'
+    };
+    
+    payload[campoMap[campo]] = novoValor;
+    
+    const res = await fetch(`/api/catalogo/v2/produto/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Atualiza o produto atual
+    produtoAtual.info[campo] = novoValor;
+    camposOriginais[campo] = novoValor;
+    
+    // Desabilita o campo
+    input.disabled = true;
+    document.getElementById(`btn-editar-produto-${campo}`).style.display = 'block';
+    document.getElementById(`btn-salvar-produto-${campo}`).style.display = 'none';
+    document.getElementById(`btn-cancelar-produto-${campo}`).style.display = 'none';
+    
+    showToast(`✓ ${campo.charAt(0).toUpperCase() + campo.slice(1)} atualizado`, 'success');
+    
+    // Recarrega catálogo
+    await carregarProdutos();
+  } catch (err) {
+    console.error(`Erro ao salvar ${campo}:`, err);
+    alert(`❌ Erro ao salvar ${campo}: ` + err.message);
+    cancelarEditarCampo(campo);
+  }
+}
+
+function handleProdutoThumbSelect(input) {
+  const file = input.files?.[0];
+  if (!file) {
+    arquivoProdutoThumb = null;
+    document.getElementById('file-name-produto-thumb').textContent = '';
+    return;
+  }
+
+  // Validação de tipo
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
+    input.value = '';
+    arquivoProdutoThumb = null;
+    document.getElementById('file-name-produto-thumb').textContent = '';
+    return;
+  }
+
+  // Validação de tamanho (5MB)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
+    input.value = '';
+    arquivoProdutoThumb = null;
+    document.getElementById('file-name-produto-thumb').textContent = '';
+    return;
+  }
+
+  arquivoProdutoThumb = file;
+  document.getElementById('file-name-produto-thumb').textContent = `✓ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  
+  // Upload automático
+  uploadProdutoThumb();
+}
+
+async function uploadProdutoThumb() {
+  if (!arquivoProdutoThumb || !produtoAtual) return;
+
+  const formData = new FormData();
+  formData.append('imagem', arquivoProdutoThumb);
+
+  try {
+    const res = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}?tipo=produto`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Atualiza visualmente
+    produtoAtual.tem_thumb = true;
+    const ext = arquivoProdutoThumb.name.split('.').pop();
+    produtoAtual.thumb_ext = ext;
+    
+    document.getElementById('modal-produto-img-wrap').innerHTML = `
+      <div class="modal-img-preview">
+        <img src="/api/catalogo/imagem/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}/thumb.${ext}?tipo=produto&t=${Date.now()}" alt="${esc(produtoAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
+      </div>`;
+    
+    document.getElementById('produto-thumb-btn-text').textContent = '🔄 Alterar Thumbnail';
+    document.getElementById('btn-deletar-produto-thumb').style.display = 'block';
+    
+    // Limpa input
+    document.getElementById('modal-produto-file-thumb').value = '';
+    document.getElementById('file-name-produto-thumb').textContent = '';
+    arquivoProdutoThumb = null;
+
+    showToast('✓ Thumbnail atualizada', 'success');
+    
+    // Recarrega catálogo
+    await carregarProdutos();
+  } catch (err) {
+    console.error('Erro ao upload thumbnail:', err);
+    alert('❌ Erro ao atualizar thumbnail: ' + err.message);
+  }
+}
+
+async function deletarProdutoThumb() {
+  if (!produtoAtual) return;
+  
+  if (!confirm(`Deletar thumbnail do produto "${produtoAtual.nome}"?`)) return;
+
+  try {
+    const res = await fetch(`/api/catalogo/deletar-thumb/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}?tipo=produto`, {
+      method: 'DELETE'
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Atualiza visualmente
+    produtoAtual.tem_thumb = false;
+    document.getElementById('modal-produto-img-wrap').innerHTML = `
+      <div class="modal-no-img">
+        <span style="font-size:32px">🖼️</span>
+        <span>Escolha uma thumb abaixo</span>
+      </div>`;
+    
+    document.getElementById('produto-thumb-btn-text').textContent = '➕ Adicionar Thumbnail';
+    document.getElementById('btn-deletar-produto-thumb').style.display = 'none';
+
+    showToast('✓ Thumbnail deletada', 'success');
+    
+    // Recarrega catálogo
+    await carregarProdutos();
+  } catch (err) {
+    console.error('Erro ao deletar thumbnail:', err);
+    alert('❌ Erro ao deletar: ' + err.message);
+  }
+}
 
 // ── Lazy loading de imagens ──────────────────────────────────────────────────
 let lazyLoadObserver = null;
+
+// ── Funções de edição inline ─────────────────────────────────────────────────
+
+// Edição de SKU
+function toggleEditarSku() {
+  const input = document.getElementById('modal-kit-sku');
+  skuOriginal = input.value;
+  input.disabled = false;
+  input.focus();
+  document.getElementById('btn-editar-sku').style.display = 'none';
+  document.getElementById('btn-salvar-sku').style.display = 'block';
+  document.getElementById('btn-cancelar-sku').style.display = 'block';
+}
+
+function cancelarEditarSku() {
+  const input = document.getElementById('modal-kit-sku');
+  input.value = skuOriginal;
+  input.disabled = true;
+  document.getElementById('btn-editar-sku').style.display = 'block';
+  document.getElementById('btn-salvar-sku').style.display = 'none';
+  document.getElementById('btn-cancelar-sku').style.display = 'none';
+}
+
+async function salvarSku() {
+  if (!kitAtual) return;
+  
+  const input = document.getElementById('modal-kit-sku');
+  const novoSku = input.value.trim();
+  
+  try {
+    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigo_sku: novoSku })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Atualiza o kit atual
+    kitAtual.info.sku_kit = novoSku;
+    skuOriginal = novoSku;
+    
+    // Desabilita o campo
+    input.disabled = true;
+    document.getElementById('btn-editar-sku').style.display = 'block';
+    document.getElementById('btn-salvar-sku').style.display = 'none';
+    document.getElementById('btn-cancelar-sku').style.display = 'none';
+    
+    showToast('✓ SKU atualizado', 'success');
+    
+    // Recarrega catálogo
+    await carregarCatalogo();
+  } catch (err) {
+    console.error('Erro ao salvar SKU:', err);
+    alert('❌ Erro ao salvar SKU: ' + err.message);
+    cancelarEditarSku();
+  }
+}
+
+// Edição de Preço
+function toggleEditarPreco() {
+  const input = document.getElementById('modal-kit-preco');
+  precoOriginal = input.value;
+  input.disabled = false;
+  input.focus();
+  document.getElementById('btn-editar-preco').style.display = 'none';
+  document.getElementById('btn-salvar-preco').style.display = 'block';
+  document.getElementById('btn-cancelar-preco').style.display = 'block';
+}
+
+function cancelarEditarPreco() {
+  const input = document.getElementById('modal-kit-preco');
+  input.value = precoOriginal;
+  input.disabled = true;
+  document.getElementById('btn-editar-preco').style.display = 'block';
+  document.getElementById('btn-salvar-preco').style.display = 'none';
+  document.getElementById('btn-cancelar-preco').style.display = 'none';
+}
+
+async function salvarPreco() {
+  if (!kitAtual) return;
+  
+  const input = document.getElementById('modal-kit-preco');
+  const novoPreco = input.value.trim();
+  
+  try {
+    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ preco: novoPreco })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Atualiza o kit atual
+    kitAtual.info.preco = novoPreco;
+    precoOriginal = novoPreco;
+    
+    // Desabilita o campo
+    input.disabled = true;
+    document.getElementById('btn-editar-preco').style.display = 'block';
+    document.getElementById('btn-salvar-preco').style.display = 'none';
+    document.getElementById('btn-cancelar-preco').style.display = 'none';
+    
+    showToast('✓ Preço atualizado', 'success');
+    
+    // Recarrega catálogo
+    await carregarCatalogo();
+  } catch (err) {
+    console.error('Erro ao salvar preço:', err);
+    alert('❌ Erro ao salvar preço: ' + err.message);
+    cancelarEditarPreco();
+  }
+}
+
+// Deletar thumbnail
+async function deletarThumb() {
+  if (!kitAtual) return;
+  
+  if (!confirm(`Deletar thumbnail do kit "${kitAtual.nome}"?`)) return;
+
+  try {
+    const res = await fetch(`/api/catalogo/deletar-thumb/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}?tipo=kit`, {
+      method: 'DELETE'
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Atualiza visualmente
+    kitAtual.tem_thumb = false;
+    document.getElementById('modal-kit-img-wrap').innerHTML = `
+      <div class="modal-no-img">
+        <span style="font-size:32px">🖼️</span>
+        <span>Escolha uma thumb abaixo</span>
+      </div>`;
+    
+    document.getElementById('thumb-btn-text').textContent = '➕ Adicionar Thumbnail';
+    document.getElementById('btn-deletar-thumb').style.display = 'none';
+
+    showToast('✓ Thumbnail deletada', 'success');
+    
+    // Recarrega catálogo
+    await carregarCatalogo();
+  } catch (err) {
+    console.error('Erro ao deletar thumbnail:', err);
+    alert('❌ Erro ao deletar: ' + err.message);
+  }
+}
 
 function initLazyLoad() {
   if (lazyLoadObserver) {
