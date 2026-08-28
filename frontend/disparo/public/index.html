@@ -4,13 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Luna — Disparo v9</title>
-  <!-- Build: 2026-08-10T22:00 FIX-FINAL-MODAL-FORCE-REBUILD -->
+  <!-- Build: 2026-08-10T22:10 DEBUG-EXTREMO -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 22;
+    const CURRENT_VERSION = 23;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
@@ -1259,6 +1259,7 @@ async function carregarCatalogo() {
   try {
     const data = await api(`/api/catalogo/v2/kits`);
     kitsData = data || [];
+    console.log('[DEBUG] Kits carregados:', kitsData.length, '- Exemplo:', kitsData[0]);
     renderKits(kitsData);
   } catch (e) {
     console.error('[Catálogo] Erro ao carregar:', e);
@@ -1277,6 +1278,8 @@ function renderKits(lista) {
   
   count.textContent = `${lista.length} kit${lista.length !== 1 ? 's' : ''}`;
 
+  console.log('[DEBUG] renderKits - total:', lista.length);
+
   if (lista.length === 0) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
@@ -1293,6 +1296,8 @@ function renderKits(lista) {
       : kit.tem_thumb 
         ? `/api/catalogo/imagem/${encodeURIComponent(kit.marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}` 
         : null;
+    
+    console.log('[DEBUG] Renderizando kit:', kit.nome, '- data-kit-nome:', escAttr(kit.nome));
     
     return `
     <div class="kit-card" data-kit-nome="${escAttr(kit.nome)}" data-kit-marca="${escAttr(kit.marca)}">
@@ -1327,7 +1332,9 @@ function renderKits(lista) {
 
   // Adiciona event listeners aos cards
   setTimeout(() => {
-    document.querySelectorAll('.kit-card[data-kit-nome]').forEach(card => {
+    const cards = document.querySelectorAll('.kit-card[data-kit-nome]');
+    console.log('[DEBUG] Cards encontrados:', cards.length);
+    cards.forEach(card => {
       console.log('[DEBUG] Adicionando listener ao kit:', card.getAttribute('data-kit-nome'));
       card.addEventListener('click', () => {
         const nome = card.getAttribute('data-kit-nome').trim();
@@ -1839,6 +1846,7 @@ async function carregarProdutos() {
   try {
     const data = await api(`/api/catalogo/v2/produtos-individuais`);
     produtosData = data || [];
+    console.log('[DEBUG] Produtos carregados:', produtosData.length, '- Exemplo:', produtosData[0]);
     renderProdutos(produtosData);
   } catch (e) {
     console.error('[Produtos] Erro ao carregar:', e);
@@ -1857,6 +1865,8 @@ function renderProdutos(lista) {
   
   count.textContent = `${lista.length} produto${lista.length !== 1 ? 's' : ''}`;
 
+  console.log('[DEBUG] renderProdutos - total:', lista.length);
+
   if (lista.length === 0) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
@@ -1873,6 +1883,8 @@ function renderProdutos(lista) {
       : produto.tem_thumb 
         ? `/api/catalogo/imagem/${encodeURIComponent(produto.marca)}/${encodeURIComponent(produto.nome)}/thumb.${produto.thumb_ext}?tipo=produto` 
         : null;
+    
+    console.log('[DEBUG] Renderizando produto:', produto.nome, '- data-produto-nome:', escAttr(produto.nome));
     
     return `
     <div class="kit-card" data-produto-nome="${escAttr(produto.nome)}" data-produto-marca="${escAttr(produto.marca)}">
@@ -1907,7 +1919,9 @@ function renderProdutos(lista) {
 
   // Adiciona event listeners aos cards de produtos
   setTimeout(() => {
-    document.querySelectorAll('.kit-card[data-produto-nome]').forEach(card => {
+    const cards = document.querySelectorAll('.kit-card[data-produto-nome]');
+    console.log('[DEBUG] Cards de produtos encontrados:', cards.length);
+    cards.forEach(card => {
       console.log('[DEBUG] Adicionando listener ao produto:', card.getAttribute('data-produto-nome'));
       card.addEventListener('click', () => {
         const nome = card.getAttribute('data-produto-nome').trim();
