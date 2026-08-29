@@ -698,23 +698,6 @@
         <span id="file-name-thumb" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
       </div>
 
-      <div class="form-group">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-          <label class="form-label" style="margin:0">🖼️ Imagens do Carrossel</label>
-          <input
-            type="file"
-            id="modal-kit-file-carrossel"
-            class="form-file"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
-            onchange="handleCarrosselSelect(this)"
-          />
-          <button class="btn btn-secondary" onclick="document.getElementById('modal-kit-file-carrossel').click()" style="padding:.25rem .5rem;font-size:12px">
-            ➕ Adicionar Imagem
-          </button>
-        </div>
-        <div id="carrossel-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem"></div>
-      </div>
-
     </div>
 
     <!-- Footer -->
@@ -1012,6 +995,23 @@
         <span id="file-name-produto-thumb" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
       </div>
 
+      <div class="form-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+          <label class="form-label" style="margin:0">🖼️ Imagens do Carrossel</label>
+          <input
+            type="file"
+            id="modal-produto-file-carrossel"
+            class="form-file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            onchange="handleProdutoCarrosselSelect(this)"
+          />
+          <button class="btn btn-secondary" onclick="document.getElementById('modal-produto-file-carrossel').click()" style="padding:.25rem .5rem;font-size:12px">
+            ➕ Adicionar Imagem
+          </button>
+        </div>
+        <div id="produto-carrossel-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem"></div>
+      </div>
+
     </div>
 
     <!-- Footer -->
@@ -1020,7 +1020,10 @@
         ✅ Salvo com sucesso!
       </span>
       <button class="btn btn-secondary" onclick="fecharModalProduto()">
-        Fechar
+        Cancelar
+      </button>
+      <button class="btn btn-primary" id="modal-produto-save-btn" onclick="salvarProduto()">
+        💾 Salvar
       </button>
     </div>
 
@@ -2048,6 +2051,9 @@ function abrirModalProduto(nomeProduto, marca) {
       </div>`;
   }
 
+  // Renderiza carrossel do produto
+  renderProdutoCarrossel(produtoAtual.imagens_carrossel || []);
+
   document.getElementById('modal-produto').style.display = 'flex';
 }
 
@@ -2467,6 +2473,274 @@ function initLazyLoad() {
     });
   }
 }
+
+// ── Funções de Produtos - Salvar e Carrossel ────────────────────────────────
+
+let arquivoProdutoCarrossel = null;
+
+async function salvarProduto() {
+  if (!produtoAtual) return;
+
+  const btn = document.getElementById('modal-produto-save-btn');
+  const descricao = document.getElementById('modal-produto-descricao').value.trim();
+
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  try {
+    const marca = produtoAtual.marca || 'Alphahall';
+    
+    // Atualiza descrição
+    const res = await fetch(`/api/catalogo/v2/produto/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ descricao: descricao })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Erro ao salvar');
+    }
+
+    // Atualiza dados locais
+    produtoAtual.descricao = descricao;
+
+    // Mostra sucesso
+    showToast('✓ Produto salvo com sucesso', 'success');
+    document.getElementById('modal-produto-save-success').style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('modal-produto-save-success').style.display = 'none';
+    }, 2000);
+
+    // Recarrega catálogo
+    await carregarProdutos();
+
+  } catch (e) {
+    console.error('Erro ao salvar produto:', e);
+    alert('Erro ao salvar: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 Salvar';
+  }
+}
+
+function handleProdutoCarrosselSelect(input) {
+  const file = input.files?.[0];
+  if (!file) {
+    arquivoProdutoCarrossel = null;
+    return;
+  }
+
+  // Validação de tipo
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
+    input.value = '';
+    arquivoProdutoCarrossel = null;
+    return;
+  }
+
+  // Validação de tamanho (5MB)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
+    input.value = '';
+    arquivoProdutoCarrossel = null;
+    return;
+  }
+
+  arquivoProdutoCarrossel = file;
+  // Upload automático após seleção
+  uploadProdutoCarrossel();
+}
+
+async function uploadProdutoCarrossel() {
+  if (!arquivoProdutoCarrossel || !produtoAtual) return;
+
+  const formData = new FormData();
+  formData.append('imagem', arquivoProdutoCarrossel);
+
+  try {
+    const marca = produtoAtual.marca || 'Alphahall';
+    const res = await fetch(`/api/catalogo/upload-carrossel/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}?tipo=produto`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Recarrega dados do produto
+    await carregarProdutos();
+    produtoAtual = produtosData.find(p => p.nome === produtoAtual.nome);
+    renderProdutoCarrossel(produtoAtual.imagens_carrossel || []);
+    
+    // Limpa input
+    document.getElementById('modal-produto-file-carrossel').value = '';
+    arquivoProdutoCarrossel = null;
+
+    showToast('✓ Imagem adicionada ao carrossel', 'success');
+  } catch (err) {
+    console.error('Erro ao upload carrossel:', err);
+    alert('❌ Erro ao adicionar imagem: ' + err.message);
+  }
+}
+
+function renderProdutoCarrossel(imagens) {
+  const container = document.getElementById('produto-carrossel-container');
+  if (!imagens || imagens.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic;grid-column:1/-1">Nenhuma imagem. Clique em "Adicionar Imagem".</p>';
+    return;
+  }
+  
+  const marca = produtoAtual.marca || 'Alphahall';
+  container.innerHTML = imagens.map((img, idx) => `
+    <div 
+      draggable="true"
+      data-index="${idx}"
+      data-filename="${esc(img)}"
+      class="produto-carrossel-item"
+      style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);cursor:move"
+      ondragstart="handleProdutoDragStart(event)"
+      ondragover="handleProdutoDragOver(event)"
+      ondrop="handleProdutoDrop(event)"
+      ondragend="handleProdutoDragEnd(event)"
+    >
+      <img
+        src="/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}/${encodeURIComponent(img)}?tipo=produto"
+        alt="Carrossel"
+        style="width:100%;height:100%;object-fit:cover;pointer-events:none"
+      />
+      <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.6);color:white;border-radius:4px;padding:.15rem .35rem;font-size:10px;font-weight:700">
+        ${idx + 1}
+      </div>
+      <button
+        onclick="deletarProdutoImagemCarrossel('${esc(img)}')"
+        style="position:absolute;top:4px;right:4px;background:rgba(239,68,68,0.9);color:white;border:none;border-radius:4px;padding:.25rem .35rem;cursor:pointer;font-size:10px"
+      >
+        🗑️
+      </button>
+    </div>
+  `).join('');
+}
+
+// Drag and Drop para Carrossel de Produtos
+let draggedProdutoElement = null;
+
+function handleProdutoDragStart(e) {
+  draggedProdutoElement = e.target;
+  e.target.style.opacity = '0.4';
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleProdutoDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault();
+  }
+  e.dataTransfer.dropEffect = 'move';
+  
+  const target = e.target.closest('.produto-carrossel-item');
+  if (target && target !== draggedProdutoElement) {
+    target.style.borderColor = '#3b82f6';
+    target.style.borderWidth = '2px';
+  }
+  
+  return false;
+}
+
+function handleProdutoDrop(e) {
+  if (e.stopPropagation) {
+    e.stopPropagation();
+  }
+  
+  const target = e.target.closest('.produto-carrossel-item');
+  if (!target || !draggedProdutoElement || target === draggedProdutoElement) {
+    return false;
+  }
+  
+  target.style.borderColor = '';
+  target.style.borderWidth = '';
+  
+  const fromIndex = parseInt(draggedProdutoElement.getAttribute('data-index'));
+  const toIndex = parseInt(target.getAttribute('data-index'));
+  
+  const imagens = [...(produtoAtual.imagens_carrossel || [])];
+  const [movedImage] = imagens.splice(fromIndex, 1);
+  imagens.splice(toIndex, 0, movedImage);
+  
+  produtoAtual.imagens_carrossel = imagens;
+  renderProdutoCarrossel(imagens);
+  salvarOrdemProdutoCarrossel(imagens);
+  
+  return false;
+}
+
+function handleProdutoDragEnd(e) {
+  e.target.style.opacity = '1';
+  document.querySelectorAll('.produto-carrossel-item').forEach(item => {
+    item.style.borderColor = '';
+    item.style.borderWidth = '';
+  });
+  draggedProdutoElement = null;
+}
+
+async function salvarOrdemProdutoCarrossel(imagens) {
+  if (!produtoAtual) return;
+  
+  try {
+    const marca = produtoAtual.marca || 'Alphahall';
+    const res = await fetch('/api/catalogo/reordenar-carrossel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        marca: marca,
+        produto: produtoAtual.nome,
+        ordem: imagens,
+        tipo: 'produto'
+      })
+    });
+    
+    const data = await res.json();
+    if (!data.ok) {
+      throw new Error(data.erro || 'Erro ao salvar ordem');
+    }
+    
+    showToast('✓ Ordem atualizada', 'success');
+  } catch (err) {
+    console.error('Erro ao salvar ordem:', err);
+    showToast('❌ Erro ao salvar ordem', 'error');
+  }
+}
+
+async function deletarProdutoImagemCarrossel(arquivo) {
+  if (!produtoAtual) return;
+  
+  if (!confirm(`Deletar imagem "${arquivo}"?`)) return;
+
+  try {
+    const marca = produtoAtual.marca || 'Alphahall';
+    const res = await fetch(`/api/catalogo/deletar-imagem/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}/${encodeURIComponent(arquivo)}?tipo=produto`, {
+      method: 'DELETE'
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    await carregarProdutos();
+    produtoAtual = produtosData.find(p => p.nome === produtoAtual.nome);
+    renderProdutoCarrossel(produtoAtual.imagens_carrossel || []);
+
+    showToast('✓ Imagem deletada', 'success');
+  } catch (err) {
+    console.error('Erro ao deletar imagem:', err);
+    alert('❌ Erro ao deletar: ' + err.message);
+  }
+}
+
 </script>
 </body>
 </html>
