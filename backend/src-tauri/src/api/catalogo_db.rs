@@ -391,7 +391,7 @@ pub struct AtualizarProdutoRequest {
 /// PUT /api/catalogo/produto/:id — atualiza campos do produto
 pub async fn atualizar_produto(
     State(state): State<Arc<Mutex<AppState>>>,
-    Path((marca, nome)): Path<(String, String)>,
+    Path((_marca, nome)): Path<(String, String)>,
     Json(payload): Json<AtualizarProdutoRequest>,
 ) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
     let state = state.lock().await;
@@ -431,7 +431,7 @@ pub async fn atualizar_produto(
     }
 
     let query_str = format!(
-        "UPDATE relacao_produtos_kits_disparo_luna SET {} WHERE marca = ? AND nome = ?",
+        "UPDATE relacao_produtos_kits_disparo_luna SET {} WHERE nome = ?",
         updates.join(", ")
     );
 
@@ -441,7 +441,6 @@ pub async fn atualizar_produto(
     for value in values {
         query = query.bind(value);
     }
-    query = query.bind(&marca);
     query = query.bind(&nome);
 
     query.execute(pool)
@@ -453,7 +452,7 @@ pub async fn atualizar_produto(
 
 pub async fn atualizar_kit(
     State(state): State<Arc<Mutex<AppState>>>,
-    Path((marca, nome)): Path<(String, String)>,
+    Path((_marca, nome)): Path<(String, String)>,
     Json(payload): Json<AtualizarProdutoRequest>,
 ) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
     let state = state.lock().await;
@@ -471,13 +470,17 @@ pub async fn atualizar_kit(
         updates.push("preco = ?");
         values.push(preco.to_string());
     }
+    if let Some(desc) = &payload.descricao {
+        updates.push("descricao = ?");
+        values.push(desc.clone());
+    }
 
     if updates.is_empty() {
         return Err((StatusCode::BAD_REQUEST, "Nenhum campo para atualizar".to_string()));
     }
 
     let query_str = format!(
-        "UPDATE relacao_produtos_kits_disparo_luna SET {} WHERE marca = ? AND nome = ? AND tipo = 'kit'",
+        "UPDATE relacao_produtos_kits_disparo_luna SET {} WHERE nome = ? AND tipo = 'kit_composto'",
         updates.join(", ")
     );
 
@@ -487,7 +490,6 @@ pub async fn atualizar_kit(
     for value in values {
         query = query.bind(value);
     }
-    query = query.bind(&marca);
     query = query.bind(&nome);
 
     query.execute(pool)
