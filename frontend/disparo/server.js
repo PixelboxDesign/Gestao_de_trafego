@@ -6,8 +6,10 @@ const path    = require('path');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// URL do Luna Server local (via Tailscale)
-const LUNA_API = process.env.LUNA_API_URL || 'https://antarctica-reached-pmc-conventions.trycloudflare.com';
+// URL do Luna Server local (via Cloudflare Tunnel)
+// ⚠️ AVISO: Atualizar esta URL quando o tunnel mudar!
+// URL atual do Tauri: victoria-break-betting-congressional
+const LUNA_API = process.env.LUNA_API_URL || 'https://victoria-break-betting-congressional.trycloudflare.com';
 
 app.use(express.json());
 
