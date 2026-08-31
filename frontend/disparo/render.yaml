@@ -7,4 +7,4 @@ services:
     startCommand: npm start
     envVars:
       - key: LUNA_API_URL
-        value: https://eclipse-bursa-evolution-declare.trycloudflare.com
+        value: https://adipex-korea-evolution-declare.trycloudflare.com
