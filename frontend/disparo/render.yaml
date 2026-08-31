@@ -2,6 +2,7 @@ services:
   - type: web
     name: luna-disparo
     runtime: node
+    rootDirectory: frontend/disparo
     buildCommand: npm install
     startCommand: npm start
     envVars:
