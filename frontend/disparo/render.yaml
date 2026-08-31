@@ -6,4 +6,4 @@ services:
     startCommand: npm start
     envVars:
       - key: LUNA_API_URL
-        value: https://antarctica-reached-pmc-conventions.trycloudflare.com
+        value: https://eclipse-bursa-evolution-declare.trycloudflare.com
