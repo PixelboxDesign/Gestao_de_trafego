@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { API_BASE_URL } from "../config";
 
 interface Cliente {
   nome: string;
@@ -16,10 +17,16 @@ interface ClientesResponse {
   limit: number;
 }
 
-const API = "http://localhost:3001";
+const API = API_BASE_URL;
 
 // Detecta a porta correta tentando 3001, 3002, 3003...
 async function detectarPorta(): Promise<string> {
+  // Em produção, sempre usa a API_BASE_URL configurada
+  if (API_BASE_URL !== 'http://localhost:3001') {
+    return API_BASE_URL;
+  }
+  
+  // Em desenvolvimento local, detecta a porta
   for (const port of [3001, 3002, 3003, 3004]) {
     try {
       const res = await fetch(`http://localhost:${port}/health`, { signal: AbortSignal.timeout(500) });

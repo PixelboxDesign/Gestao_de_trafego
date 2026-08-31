@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
+import { API_BASE_URL } from "../config";
 
-const API = "http://localhost:3001";
+const API = API_BASE_URL;
 
 type Status = "disconnected" | "qr" | "connecting" | "connected" | "error";
 
