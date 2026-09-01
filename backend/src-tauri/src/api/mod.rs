@@ -138,6 +138,7 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .route("/api/catalogo/v2/produtos", get(catalogo_db::listar_produtos_db))
         .route("/api/catalogo/v2/kits", get(catalogo_db::listar_kits_db))
         .route("/api/catalogo/v2/produtos-individuais", get(catalogo_db::listar_produtos_individuais_db))
+        .route("/api/catalogo/v2/kits-e-produtos", get(catalogo_db::listar_kits_e_produtos_disparo))
         .route("/api/catalogo/v2/produto/sku/:sku", get(catalogo_db::buscar_produto_por_sku))
         .route("/api/catalogo/v2/produto/:marca/:nome", axum::routing::put(catalogo_db::atualizar_produto))
         .route("/api/catalogo/v2/kit/:marca/:nome", axum::routing::put(catalogo_db::atualizar_kit))
@@ -153,11 +154,12 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         // Rotas de disparos
         .route("/api/disparos", get(disparos::list))
         .route("/api/disparos", axum::routing::post(disparos::criar))
+        .route("/api/disparos/iniciar", axum::routing::post(disparos::iniciar_disparo))
         .layer(middleware::from_fn_with_state(state.clone(), log_middleware))
         .layer(cors)
         .with_state(state);
     
-    info!("✅ [HTTP] {} rotas registradas", 30);
+    info!("✅ [HTTP] {} rotas registradas", 32);
 
     info!("🔌 [HTTP] Vinculando à porta...");
     let (listener, port) = bind_available_port(3001).await;

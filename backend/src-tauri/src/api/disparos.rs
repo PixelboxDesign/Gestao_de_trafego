@@ -117,3 +117,125 @@ pub async fn criar(
         Err(e) => Json(serde_json::json!({ "ok": false, "erro": e.to_string() })),
     }
 }
+
+// ─── Endpoint para iniciar disparo ───────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct IniciarDisparoRequest {
+    pub mensagem: String,
+    pub item_id: i32,
+    pub item_tipo: String, // "kit" ou "produto"
+    pub quantidade: u32,
+    pub intervalo_horas: f64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct IniciarDisparoResponse {
+    pub ok: bool,
+    pub disparo_id: Option<u64>,
+    pub erro: Option<String>,
+    pub intervalo_segundos: Option<u32>,
+}
+
+/// POST /api/disparos/iniciar — inicia um disparo WhatsApp configurado
+pub async fn iniciar_disparo(
+    State(state): State<Arc<Mutex<AppState>>>,
+    Json(body): Json<IniciarDisparoRequest>,
+) -> Json<IniciarDisparoResponse> {
+    let state_lock = state.lock().await;
+    
+    // Validações
+    if body.mensagem.trim().is_empty() {
+        return Json(IniciarDisparoResponse {
+            ok: false,
+            disparo_id: None,
+            erro: Some("Mensagem não pode estar vazia".to_string()),
+            intervalo_segundos: None,
+        });
+    }
+
+    if body.quantidade == 0 {
+        return Json(IniciarDisparoResponse {
+            ok: false,
+            disparo_id: None,
+            erro: Some("Quantidade deve ser maior que zero".to_string()),
+            intervalo_segundos: None,
+        });
+    }
+
+    if body.intervalo_horas <= 0.0 {
+        return Json(IniciarDisparoResponse {
+            ok: false,
+            disparo_id: None,
+            erro: Some("Intervalo deve ser maior que zero".to_string()),
+            intervalo_segundos: None,
+        });
+    }
+
+    // Busca o item (kit ou produto) no banco
+    let item_query = format!(
+        r#"SELECT id, nome, tipo, codigo_sku FROM relacao_produtos_kits_disparo_luna 
+           WHERE id = ? AND tipo = ? LIMIT 1"#
+    );
+
+    let tipo_db = if body.item_tipo == "kit" {
+        "kit_composto"
+    } else {
+        "produto_individual"
+    };
+
+    let item: Option<(i32, Option<String>, String, Option<String>)> = 
+        sqlx::query_as(&item_query)
+            .bind(body.item_id)
+            .bind(tipo_db)
+            .fetch_optional(&state_lock.db)
+            .await
+            .unwrap_or(None);
+
+    let item_nome = match item {
+        Some((_, nome_opt, _, _)) => nome_opt.unwrap_or_else(|| "Sem nome".to_string()),
+        None => {
+            return Json(IniciarDisparoResponse {
+                ok: false,
+                disparo_id: None,
+                erro: Some(format!("{} não encontrado", if body.item_tipo == "kit" { "Kit" } else { "Produto" })),
+                intervalo_segundos: None,
+            });
+        }
+    };
+
+    // Calcula intervalo em segundos entre cada mensagem
+    let intervalo_segundos = ((body.intervalo_horas * 3600.0) / body.quantidade as f64).floor() as u32;
+
+    // TODO: Aqui seria iniciado o processo de disparo em background
+    // Por enquanto, apenas registra o disparo no banco
+    
+    // Registra o disparo inicial no histórico
+    let result = sqlx::query(
+        r#"INSERT INTO app_disparos (numero, nome, mensagem, kit_nome, campanha_id, status)
+           VALUES (?, ?, ?, ?, ?, ?)"#
+    )
+    .bind("") // número será preenchido no envio
+    .bind(Option::<String>::None) // nome do cliente
+    .bind(&body.mensagem)
+    .bind(&item_nome)
+    .bind(Option::<u32>::None) // campanha_id
+    .bind("agendado") // status
+    .execute(&state_lock.db)
+    .await;
+
+    match result {
+        Ok(r) => Json(IniciarDisparoResponse {
+            ok: true,
+            disparo_id: Some(r.last_insert_id()),
+            erro: None,
+            intervalo_segundos: Some(intervalo_segundos),
+        }),
+        Err(e) => Json(IniciarDisparoResponse {
+            ok: false,
+            disparo_id: None,
+            erro: Some(format!("Erro ao registrar disparo: {}", e)),
+            intervalo_segundos: None,
+        }),
+    }
+}

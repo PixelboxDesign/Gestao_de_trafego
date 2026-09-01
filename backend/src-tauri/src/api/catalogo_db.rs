@@ -376,6 +376,107 @@ async fn listar_imagens_carrossel_produto(nome_pasta: &str) -> Vec<String> {
     imagens
 }
 
+// ─── Endpoint para dropdown de disparo ──────────────────────────────────────
+
+#[derive(Debug, Serialize)]
+pub struct ItemDisparo {
+    pub id: i32,
+    pub nome: String,
+    pub tipo: String, // "kit" ou "produto"
+    pub thumb_url: Option<String>,
+    pub caminho_thumb_bd: Option<String>,
+}
+
+/// GET /api/catalogo/v2/kits-e-produtos — lista kits e produtos para dropdown de disparo
+pub async fn listar_kits_e_produtos_disparo(
+    State(state): State<Arc<Mutex<AppState>>>,
+) -> Result<Json<Vec<ItemDisparo>>, (StatusCode, String)> {
+    let state = state.lock().await;
+    let pool = &state.db;
+
+    // Busca kits e produtos do banco
+    let items_raw = sqlx::query_as::<_, ProdutoDB>(
+        r#"
+        SELECT 
+            id,
+            produto_id,
+            codigo_sku,
+            nome,
+            tipo,
+            CAST(preco AS DOUBLE) as preco,
+            CAST(preco_custo AS DOUBLE) as preco_custo,
+            descricao,
+            descricao_peso,
+            descricao_tamanho,
+            descricao_composicao,
+            imagem_url,
+            CAST(estoque_virtual AS DOUBLE) as estoque_virtual,
+            situacao,
+            eh_kit,
+            componentes
+        FROM relacao_produtos_kits_disparo_luna
+        WHERE (tipo = 'kit_composto' OR tipo = 'produto_individual') AND nome IS NOT NULL
+        ORDER BY tipo DESC, nome ASC
+        "#
+    )
+    .fetch_all(pool)
+    .await
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao buscar itens: {}", e)))?;
+
+    let mut items = Vec::new();
+    
+    for item in items_raw {
+        let nome = item.nome.as_ref()
+            .unwrap_or(&"".to_string())
+            .clone();
+        
+        let nome_pasta = nome
+            .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
+            .trim()
+            .to_string();
+        
+        // Determina se é kit ou produto
+        let tipo_item = if item.tipo == "kit_composto" { "kit" } else { "produto" };
+        let subfolder = if tipo_item == "kit" { "kits" } else { "produtos" };
+        
+        // Verificar se tem thumb
+        let (tem_thumb, thumb_ext) = if tipo_item == "kit" {
+            verificar_thumb_kit(&nome_pasta).await
+        } else {
+            verificar_thumb_produto(&nome_pasta).await
+        };
+        
+        let thumb_url = if tem_thumb && thumb_ext.is_some() {
+            let ext = thumb_ext.as_ref().unwrap();
+            Some(format!(
+                "/api/catalogo/imagem/Alphahall/{}/thumb.{}?tipo={}",
+                nome_pasta, ext, tipo_item
+            ))
+        } else {
+            None
+        };
+
+        let caminho_thumb_bd = if tem_thumb && thumb_ext.is_some() {
+            Some(format!(
+                "Alphahall/{}/{}/thumb.{}",
+                subfolder, nome_pasta, thumb_ext.as_ref().unwrap()
+            ))
+        } else {
+            None
+        };
+
+        items.push(ItemDisparo {
+            id: item.id,
+            nome,
+            tipo: tipo_item.to_string(),
+            thumb_url,
+            caminho_thumb_bd,
+        });
+    }
+
+    Ok(Json(items))
+}
+
 // ─── Struct para atualização ─────────────────────────────────────────────────
 
 #[derive(Debug, Deserialize)]
