@@ -1885,6 +1885,9 @@ async function enviarTeste() {
     // Adiciona DDI +55 se não tiver
     const numeroCompleto = numero.startsWith('55') ? numero : '55' + numero;
     
+    console.log('[Teste] Enviando para:', numeroCompleto);
+    console.log('[Teste] Mensagem:', mensagem.substring(0, 50) + '...');
+    
     // Envia via WhatsApp sidecar diretamente
     const res = await fetch('/api/whatsapp/enviar', {
       method: 'POST',
@@ -1895,24 +1898,49 @@ async function enviarTeste() {
       })
     });
     
-    if (!res.ok) {
-      const erro = await res.json().catch(() => ({ erro: 'Erro desconhecido' }));
-      throw new Error(erro.erro || 'Erro ao enviar');
+    console.log('[Teste] Status da resposta:', res.status);
+    
+    // Tenta ler o corpo da resposta
+    let responseText = '';
+    try {
+      responseText = await res.text();
+      console.log('[Teste] Resposta do servidor:', responseText);
+    } catch (readError) {
+      console.error('[Teste] Erro ao ler resposta:', readError);
+      throw new Error('Erro ao ler resposta do servidor');
     }
     
-    const data = await res.json();
-    if (!data.ok) {
-      throw new Error(data.erro || 'Erro ao enviar');
+    // Tenta parsear como JSON
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('[Teste] Erro ao parsear JSON:', parseError);
+      console.error('[Teste] Resposta raw:', responseText);
+      throw new Error('Resposta inválida do servidor: ' + responseText.substring(0, 100));
+    }
+    
+    console.log('[Teste] Dados parseados:', data);
+    
+    if (!res.ok) {
+      throw new Error(data.erro || data.error || `Erro HTTP ${res.status}`);
+    }
+    
+    if (!data.ok && data.ok !== undefined) {
+      throw new Error(data.erro || data.error || 'Erro ao enviar mensagem');
     }
     
     alert('✓ Mensagem de teste enviada com sucesso!');
     fecharModalTeste();
     
     // Adiciona ao histórico local
-    adicionarLog('success', `✓ Teste enviado para ${formatarTel(numeroCompleto)}`);
+    if (typeof adicionarLog === 'function') {
+      adicionarLog('success', `✓ Teste enviado para ${formatarTel(numeroCompleto)}`);
+    }
     
   } catch (err) {
     console.error('[Teste] Erro completo:', err);
+    console.error('[Teste] Stack:', err.stack);
     let mensagemErro = err.message;
     
     // Melhora mensagens de erro comuns
