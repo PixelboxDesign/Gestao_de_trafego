@@ -227,7 +227,7 @@ export default function AbaWhatsApp() {
       )}
 
       {/* SUB-ABAS: Gerenciamento e Histórico */}
-      {wa.status === "connected" && (
+      {(wa.status === "connected" || wa.status === "qr" || wa.status === "connecting") && (
         <div style={{ width: "100%", maxWidth: 900 }}>
           {/* Navegação das sub-abas */}
           <div style={{ display: "flex", gap: "0.5rem", borderBottom: "2px solid var(--border)", marginBottom: "1.5rem" }}>
