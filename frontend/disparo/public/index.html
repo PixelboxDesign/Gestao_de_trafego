@@ -105,8 +105,33 @@
     #page-whatsapp {
       padding: 1.5rem;
       gap: 1.5rem;
-      align-items: flex-start;
+      display: flex;
+      flex-direction: column;
     }
+    
+    /* ── Sub-tabs ── */
+    .sub-tabs {
+      display: flex;
+      gap: .5rem;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    .sub-tab {
+      padding: .75rem 1.25rem;
+      background: transparent;
+      color: var(--text2);
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .15s;
+    }
+    .sub-tab:hover { color: var(--text); }
+    .sub-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    
+    .sub-page { display: none; flex-direction: column; gap: 1.5rem; }
+    .sub-page.active { display: flex; }
 
     .wa-status-card {
       background: var(--bg2);
@@ -500,11 +525,43 @@
       <p style="font-size:11px;color:var(--text2)">O QR Code atualiza automaticamente</p>
     </div>
 
-    <!-- Separador histórico -->
-    <p class="historico-titulo">Histórico de disparos</p>
+    <!-- Sub-tabs (aparecem quando conectado) -->
+    <div id="wa-sub-tabs-container" style="display:none;flex-direction:column;width:100%">
+      <nav class="sub-tabs">
+        <button class="sub-tab active" onclick="trocarSubAba('gerenciamento', this)">📤 Gerenciamento</button>
+        <button class="sub-tab" onclick="trocarSubAba('historico', this)">📊 Histórico</button>
+      </nav>
 
-    <!-- Grid de cards -->
-    <div id="historico-grid" class="cards-grid"></div>
+      <!-- Sub-página: Gerenciamento -->
+      <div id="sub-page-gerenciamento" class="sub-page active">
+        <h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0">
+          Configurar Disparo de Mensagens
+        </h3>
+        
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;display:flex;flex-direction:column;gap:1rem">
+          <p style="font-size:14px;color:var(--text2);line-height:1.6">
+            🚧 Em desenvolvimento
+          </p>
+          <p style="font-size:13px;color:var(--text2);line-height:1.6">
+            Em breve você poderá configurar e iniciar disparos de mensagens diretamente por aqui.
+          </p>
+        </div>
+      </div>
+
+      <!-- Sub-página: Histórico -->
+      <div id="sub-page-historico" class="sub-page">
+        <p class="historico-titulo" style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">Histórico de disparos</p>
+        <div id="historico-grid" class="cards-grid"></div>
+      </div>
+    </div>
+
+    <!-- Mensagem quando desconectado -->
+    <div id="wa-desconectado-msg" style="display:none;flex-direction:column;gap:.5rem;align-items:center;text-align:center;color:var(--text2)">
+      <div style="font-size:40px">📵</div>
+      <p style="font-size:14px;max-width:420px">
+        Conecte o WhatsApp para acessar o gerenciamento de disparos
+      </p>
+    </div>
 
   </div><!-- /page-whatsapp -->
 
@@ -1046,6 +1103,14 @@ function trocarAba(id, btn) {
   btn.classList.add('active');
 }
 
+// ── Troca de sub-aba (WhatsApp) ──────────────────────────────────────────────
+function trocarSubAba(id, btn) {
+  document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sub-page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
 // ── API helper ───────────────────────────────────────────────────────────────
 async function api(path, opts) {
   const r = await fetch(path, opts);
@@ -1149,6 +1214,18 @@ async function atualizarWhatsApp() {
       qrArea.style.display = 'flex';
     } else {
       qrArea.style.display = 'none';
+    }
+    
+    // Sub-tabs e mensagem desconectado
+    const subTabsContainer = document.getElementById('wa-sub-tabs-container');
+    const desconectadoMsg = document.getElementById('wa-desconectado-msg');
+    
+    if (d.status === 'connected' || d.status === 'qr' || d.status === 'connecting') {
+      subTabsContainer.style.display = 'flex';
+      desconectadoMsg.style.display = 'none';
+    } else {
+      subTabsContainer.style.display = 'none';
+      desconectadoMsg.style.display = 'flex';
     }
 
   } catch {
