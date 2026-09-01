@@ -224,6 +224,26 @@ fn iniciar_tunnel_keepalive() {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Carrega variáveis de ambiente do .env do diretório do executável
+    let exe_dir = std::env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(|d| d.to_path_buf()))
+        .unwrap_or_else(|| std::path::PathBuf::from("."));
+    
+    let env_path = exe_dir.join(".env");
+    if env_path.exists() {
+        match dotenv::from_path(&env_path) {
+            Ok(_) => eprintln!("✅ Variáveis de ambiente carregadas de: {:?}", env_path),
+            Err(e) => eprintln!("⚠️ Erro ao carregar {:?}: {}", env_path, e),
+        }
+    } else {
+        eprintln!("⚠️ Arquivo .env não encontrado em: {:?}", env_path);
+        eprintln!("   Tentando .env no diretório atual...");
+        if let Err(e) = dotenv::dotenv() {
+            eprintln!("⚠️ .env não encontrado: {}", e);
+        }
+    }
+
     // Inicializar logs ULTRA VERBOSOS (sem captura para AppState ainda - será feito depois do setup)
     tracing_subscriber::fmt()
         .with_env_filter("luna_server=info,axum=info,sqlx=warn,tower_http=info,tauri=info")

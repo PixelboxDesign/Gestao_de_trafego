@@ -54,11 +54,14 @@ pub async fn deploy_com_url_nova(
 
     info!("📡 URL do Cloudflare: {}", tunnel_url);
 
-    // 2. Configuração do Render (hardcoded por enquanto - depois pode vir do .env)
+    // 2. Configuração do Render (lê do .env ou usa fallback)
     let render_api_key = std::env::var("RENDER_API_KEY")
-        .unwrap_or_else(|_| "rnd_bsQpbKjHzxS7RcLg4WpuBOCAajIf".to_string());
-    let service_id = "srv-d9roha7avr4c739pjlu0";
+        .unwrap_or_else(|_| "rnd_cyHZHxdwg0Aah04WKhrTYwzXSIuT".to_string());
+    let service_id = "srv-d9roha7avr4c739pliu0";
     let env_var_name = "VITE_API_BASE_URL";
+    
+    info!("🔑 Token sendo usado: {}...", &render_api_key[..15]);
+    info!("🎯 Service ID: {}", service_id);
 
     // 3. Criar cliente HTTP
     let client = reqwest::Client::new();
