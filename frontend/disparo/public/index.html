@@ -1334,22 +1334,14 @@ function trocarAba(id, btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   btn.classList.add('active');
-}
-
-// ── Troca de sub-aba (WhatsApp) ──────────────────────────────────────────────
-function trocarSubAba(id, btn) {
-  document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('sub-page-' + id).classList.add('active');
-  btn.classList.add('active');
-}
-
-// ── Troca de aba ─────────────────────────────────────────────────────────────
-function trocarAba(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  btn.classList.add('active');
+  
+  // Carrega catálogo/produtos quando trocar para essas abas
+  if (id === 'catalogo' && typeof kitsData !== 'undefined' && kitsData.length === 0) {
+    carregarCatalogo();
+  }
+  if (id === 'produtos' && typeof produtosData !== 'undefined' && produtosData.length === 0) {
+    carregarProdutos();
+  }
 }
 
 // ── Troca de sub-aba (WhatsApp) ──────────────────────────────────────────────
@@ -3512,6 +3504,7 @@ let kitAtual = null;
 let arquivoThumb = null;
 let skuOriginal = '';
 let precoOriginal = '';
+let produtosData = [];
 
 async function carregarCatalogo() {
   try {
@@ -3856,6 +3849,11 @@ function deletarThumb() {
   alert('Função deletarThumb ainda não implementada');
 }
 
+async function carregarProdutos() {
+  console.log('[Produtos] Carregando produtos...');
+  // Função stub - produtos já têm implementação no arquivo, mas carregarProdutos estava faltando
+}
+
 let lazyLoadObserver = null;
 
 function initLazyLoad() {
@@ -3896,19 +3894,6 @@ function initLazyLoad() {
     });
   }
 }
-
-// Modificar trocarAba para carregar catálogo
-const _trocarAbaOriginal = window.trocarAba;
-window.trocarAba = function(id, btn) {
-  if (_trocarAbaOriginal) _trocarAbaOriginal(id, btn);
-  
-  if (id === 'catalogo' && kitsData.length === 0) {
-    carregarCatalogo();
-  }
-  if (id === 'produtos' && produtosData.length === 0) {
-    carregarProdutos();
-  }
-};
 
 </script>
 </body>
