@@ -1046,18 +1046,9 @@ function trocarAba(id, btn) {
   btn.classList.add('active');
 }
 
-// ── Configuração do Backend ─────────────────────────────────────────────────
-// Detecta se está em produção (Render) e usa localhost, senão usa caminho relativo
-const API_BASE_URL = window.location.hostname === 'luna-disparo.onrender.com' 
-  ? 'http://localhost:3000'  // Render: usa localhost (servidor interno)
-  : '';  // Desenvolvimento: usa caminho relativo
-
-console.log('[Luna] API Base URL configurada:', API_BASE_URL || 'relativo');
-
 // ── API helper ───────────────────────────────────────────────────────────────
 async function api(path, opts) {
-  const fullUrl = API_BASE_URL + path;
-  const r = await fetch(fullUrl, opts);
+  const r = await fetch(path, opts);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
 }
@@ -1068,7 +1059,7 @@ async function verificarServidor() {
   console.log(`[Luna ${buildVersion}] verificando servidor via /health`);
   try {
     // Adiciona timestamp para evitar cache
-    const url = `${API_BASE_URL}/health?_=${Date.now()}`;
+    const url = `/health?_=${Date.now()}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
     
