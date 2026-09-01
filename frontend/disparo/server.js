@@ -7,9 +7,9 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 // URL do Luna Server local (via Cloudflare Tunnel)
-// ⚠️ AVISO: Atualizar esta URL quando o tunnel mudar!
-// URL atual: shield-required-enjoy-trained
-const LUNA_API = process.env.LUNA_API_URL || 'https://shield-required-enjoy-trained.trycloudflare.com';
+// ⚠️ Atualizada automaticamente via API do Render quando o tunnel muda
+// Variável de ambiente: VITE_API_BASE_URL (configurada no Render.com)
+const LUNA_API = process.env.VITE_API_BASE_URL || process.env.LUNA_API_URL || 'https://hundred-typical-physically-alpine.trycloudflare.com';
 
 app.use(express.json());
 
@@ -35,7 +35,9 @@ app.use(express.static(path.join(__dirname, 'public'), {
 app.get('/diagnostico', (req, res) => {
   res.json({
     luna_api: LUNA_API,
-    env_set: !!process.env.LUNA_API_URL,
+    vite_api_base_url: process.env.VITE_API_BASE_URL || 'não definido',
+    luna_api_url: process.env.LUNA_API_URL || 'não definido',
+    env_used: process.env.VITE_API_BASE_URL ? 'VITE_API_BASE_URL' : (process.env.LUNA_API_URL ? 'LUNA_API_URL' : 'fallback hardcoded'),
     node_env: process.env.NODE_ENV || 'development',
   });
 });
