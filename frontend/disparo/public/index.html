@@ -534,18 +534,92 @@
 
       <!-- Sub-página: Gerenciamento -->
       <div id="sub-page-gerenciamento" class="sub-page active">
-        <h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0">
+        <h3 style="font-size:18px;font-weight:700;color:var(--text);margin:0">
           Configurar Disparo de Mensagens
         </h3>
         
-        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;display:flex;flex-direction:column;gap:1rem">
-          <p style="font-size:14px;color:var(--text2);line-height:1.6">
-            🚧 Em desenvolvimento
-          </p>
-          <p style="font-size:13px;color:var(--text2);line-height:1.6">
-            Em breve você poderá configurar e iniciar disparos de mensagens diretamente por aqui.
-          </p>
+        <!-- Campo: Mensagem -->
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label style="font-size:14px;font-weight:600;color:var(--text)">
+            Mensagem
+          </label>
+          <textarea
+            id="disparo-mensagem"
+            placeholder="Digite a mensagem que será enviada..."
+            style="padding:.75rem;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);resize:vertical;min-height:120px;font-family:inherit"
+          ></textarea>
         </div>
+
+        <!-- Campo: Kit ou Produto -->
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          <label style="font-size:14px;font-weight:600;color:var(--text)">
+            Kit ou Produto (imagem do disparo)
+          </label>
+          <input
+            type="text"
+            id="disparo-busca-item"
+            placeholder="Digite o nome do kit ou produto..."
+            style="padding:.75rem;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text)"
+            oninput="filtrarItensDisparo(this.value)"
+          />
+
+          <!-- Dropdown de itens -->
+          <div id="disparo-dropdown" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:8px;max-height:300px;overflow-y:auto;margin-top:.25rem">
+          </div>
+
+          <!-- Item selecionado -->
+          <div id="disparo-item-selecionado" style="display:none;margin-top:.5rem;padding:1rem;background:var(--bg2);border:1px solid var(--success);border-radius:8px;align-items:center;gap:1rem">
+          </div>
+        </div>
+
+        <!-- Campos: Quantidade e Intervalo -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <label style="font-size:14px;font-weight:600;color:var(--text)">
+              Quantidade de Mensagens
+            </label>
+            <input
+              type="number"
+              id="disparo-quantidade"
+              value="10"
+              min="1"
+              style="padding:.75rem;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text)"
+              oninput="atualizarCalculoIntervalo()"
+            />
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:.5rem">
+            <label style="font-size:14px;font-weight:600;color:var(--text)">
+              Intervalo (horas)
+            </label>
+            <input
+              type="number"
+              id="disparo-intervalo-horas"
+              value="1"
+              min="0.1"
+              step="0.5"
+              style="padding:.75rem;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text)"
+              oninput="atualizarCalculoIntervalo()"
+            />
+          </div>
+        </div>
+
+        <!-- Cálculo do intervalo -->
+        <div id="disparo-calculo" style="padding:1rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2)">
+          ⏱️ Cada mensagem será enviada a cada <strong style="color:var(--primary)" id="intervalo-segundos">360</strong> segundos
+          <br />
+          (<span id="calc-detalhe">10 mensagens em 1h = intervalo de 360s entre cada envio</span>)
+        </div>
+
+        <!-- Botão: Iniciar Disparo -->
+        <button
+          id="btn-iniciar-disparo"
+          onclick="iniciarDisparo()"
+          disabled
+          style="padding:1rem;font-size:16px;font-weight:700;border-radius:8px;background:var(--primary);color:white;border:none;cursor:not-allowed;opacity:0.5"
+        >
+          🚀 Iniciar Disparo
+        </button>
       </div>
 
       <!-- Sub-página: Histórico -->
@@ -1296,7 +1370,182 @@ function formatarTel(n) {
   return n;
 }
 
+// ── Gerenciamento de Disparos ────────────────────────────────────────────────
+let itensDisponiveis = [];
+let itemSelecionado = null;
+
+async function carregarItensDisparo() {
+  try {
+    const data = await api('/api/catalogo/v2/kits-e-produtos');
+    itensDisponiveis = data || [];
+    console.log('[Disparo] Itens carregados:', itensDisponiveis.length);
+  } catch (err) {
+    console.error('[Disparo] Erro ao carregar itens:', err);
+  }
+}
+
+function filtrarItensDisparo(busca) {
+  const termo = busca.toLowerCase().trim();
+  const dropdown = document.getElementById('disparo-dropdown');
+  
+  if (!termo) {
+    dropdown.style.display = 'none';
+    return;
+  }
+  
+  const filtrados = itensDisponiveis.filter(item =>
+    item.nome.toLowerCase().includes(termo)
+  );
+  
+  if (filtrados.length === 0) {
+    dropdown.style.display = 'none';
+    return;
+  }
+  
+  dropdown.innerHTML = filtrados.map(item => `
+    <div
+      onclick="selecionarItemDisparo(${item.id}, '${esc(item.tipo)}')"
+      style="padding:.75rem;cursor:pointer;display:flex;align-items:center;gap:.75rem;border-bottom:1px solid var(--border);transition:background 0.2s"
+      onmouseenter="this.style.background='var(--bg3)'"
+      onmouseleave="this.style.background='transparent'"
+    >
+      ${item.thumb_url ? `<img src="${item.thumb_url}" alt="${esc(item.nome)}" style="width:40px;height:40px;border-radius:6px;object-fit:cover"/>` : ''}
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:600;color:var(--text)">${esc(item.nome)}</div>
+        <div style="font-size:12px;color:var(--text2)">${item.tipo === 'kit' ? 'Kit' : 'Produto'}</div>
+      </div>
+    </div>
+  `).join('');
+  
+  dropdown.style.display = 'block';
+}
+
+function selecionarItemDisparo(id, tipo) {
+  itemSelecionado = itensDisponiveis.find(i => i.id === id && i.tipo === tipo);
+  if (!itemSelecionado) return;
+  
+  // Atualiza campo de busca
+  document.getElementById('disparo-busca-item').value = itemSelecionado.nome;
+  
+  // Esconde dropdown
+  document.getElementById('disparo-dropdown').style.display = 'none';
+  
+  // Mostra item selecionado
+  const container = document.getElementById('disparo-item-selecionado');
+  container.style.display = 'flex';
+  container.innerHTML = `
+    ${itemSelecionado.thumb_url ? `<img src="${itemSelecionado.thumb_url}" alt="${esc(itemSelecionado.nome)}" style="width:60px;height:60px;border-radius:8px;object-fit:cover"/>` : ''}
+    <div style="flex:1">
+      <div style="font-size:15px;font-weight:700;color:var(--success)">✓ Selecionado</div>
+      <div style="font-size:14px;color:var(--text)">${esc(itemSelecionado.nome)}</div>
+      <div style="font-size:12px;color:var(--text2)">${itemSelecionado.tipo === 'kit' ? 'Kit' : 'Produto'}</div>
+    </div>
+  `;
+  
+  // Atualiza botão
+  atualizarBotaoDisparo();
+}
+
+function atualizarCalculoIntervalo() {
+  const quantidade = parseInt(document.getElementById('disparo-quantidade').value) || 1;
+  const intervaloHoras = parseFloat(document.getElementById('disparo-intervalo-horas').value) || 0.1;
+  
+  const intervaloSegundos = Math.floor((intervaloHoras * 3600) / quantidade);
+  
+  document.getElementById('intervalo-segundos').textContent = intervaloSegundos;
+  document.getElementById('calc-detalhe').textContent = 
+    `${quantidade} mensagens em ${intervaloHoras}h = intervalo de ${intervaloSegundos}s entre cada envio`;
+    
+  atualizarBotaoDisparo();
+}
+
+function atualizarBotaoDisparo() {
+  const mensagem = document.getElementById('disparo-mensagem').value.trim();
+  const btn = document.getElementById('btn-iniciar-disparo');
+  
+  const podeIniciar = mensagem && itemSelecionado;
+  
+  btn.disabled = !podeIniciar;
+  btn.style.opacity = podeIniciar ? '1' : '0.5';
+  btn.style.cursor = podeIniciar ? 'pointer' : 'not-allowed';
+}
+
+async function iniciarDisparo() {
+  const mensagem = document.getElementById('disparo-mensagem').value.trim();
+  const quantidade = parseInt(document.getElementById('disparo-quantidade').value) || 1;
+  const intervaloHoras = parseFloat(document.getElementById('disparo-intervalo-horas').value) || 0.1;
+  
+  if (!mensagem || !itemSelecionado) {
+    alert('Preencha a mensagem e selecione um kit/produto');
+    return;
+  }
+  
+  const btn = document.getElementById('btn-iniciar-disparo');
+  btn.disabled = true;
+  btn.textContent = 'Iniciando...';
+  
+  try {
+    const res = await fetch('/api/disparos/iniciar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mensagem: mensagem,
+        item_id: itemSelecionado.id,
+        item_tipo: itemSelecionado.tipo,
+        quantidade: quantidade,
+        intervalo_horas: intervaloHoras
+      })
+    });
+    
+    if (!res.ok) {
+      const erro = await res.text();
+      throw new Error(erro);
+    }
+    
+    alert('✅ Disparo iniciado com sucesso!');
+    
+    // Limpa formulário
+    document.getElementById('disparo-mensagem').value = '';
+    document.getElementById('disparo-busca-item').value = '';
+    document.getElementById('disparo-item-selecionado').style.display = 'none';
+    itemSelecionado = null;
+    
+    // Vai para aba de histórico
+    trocarSubAba('historico', document.querySelectorAll('.sub-tab')[1]);
+    
+  } catch (err) {
+    console.error('[Disparo] Erro:', err);
+    alert('❌ Erro ao iniciar disparo: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 Iniciar Disparo';
+    atualizarBotaoDisparo();
+  }
+}
+
+// Adicionar listeners de input
+document.addEventListener('DOMContentLoaded', () => {
+  const msgInput = document.getElementById('disparo-mensagem');
+  if (msgInput) {
+    msgInput.addEventListener('input', atualizarBotaoDisparo);
+  }
+});
+
 // ── Loop principal ───────────────────────────────────────────────────────────
+async function tick() {
+  const online = await verificarServidor();
+  if (online) {
+    await atualizarWhatsApp();
+    await carregarHistorico();
+  }
+}
+
+// Carrega itens para o gerenciamento de disparos
+carregarItensDisparo();
+
+tick();
+setInterval(tick, 4000); // atualiza a cada 4s
+
 async function tick() {
   const online = await verificarServidor();
   if (online) {
