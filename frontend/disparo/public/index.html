@@ -1550,11 +1550,69 @@ function formatarTel(n) {
 let itensDisponiveis = [];
 let itemSelecionado = null;
 
+// ━━ Persistência de dados do disparo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function salvarConfigDisparo() {
+  const config = {
+    mensagem: document.getElementById('disparo-mensagem')?.value || '',
+    quantidade: document.getElementById('disparo-quantidade')?.value || '10',
+    intervaloValor: document.getElementById('disparo-intervalo-valor')?.value || '1',
+    intervaloUnidade: document.getElementById('disparo-intervalo-unidade')?.value || 'horas',
+    itemSelecionado: itemSelecionado ? {
+      id: itemSelecionado.id,
+      tipo: itemSelecionado.tipo,
+      nome: itemSelecionado.nome,
+      thumb_url: itemSelecionado.thumb_url
+    } : null
+  };
+  localStorage.setItem('luna_disparo_config', JSON.stringify(config));
+  console.log('[Disparo] Configuração salva:', config);
+}
+
+function carregarConfigDisparo() {
+  try {
+    const saved = localStorage.getItem('luna_disparo_config');
+    if (!saved) return;
+    
+    const config = JSON.parse(saved);
+    console.log('[Disparo] Configuração carregada:', config);
+    
+    // Restaura campos
+    if (config.mensagem) {
+      document.getElementById('disparo-mensagem').value = config.mensagem;
+    }
+    if (config.quantidade) {
+      document.getElementById('disparo-quantidade').value = config.quantidade;
+    }
+    if (config.intervaloValor) {
+      document.getElementById('disparo-intervalo-valor').value = config.intervaloValor;
+    }
+    if (config.intervaloUnidade) {
+      document.getElementById('disparo-intervalo-unidade').value = config.intervaloUnidade;
+    }
+    
+    // Restaura item selecionado
+    if (config.itemSelecionado) {
+      itemSelecionado = config.itemSelecionado;
+      mostrarItemSelecionado();
+    }
+    
+    // Atualiza cálculo e botão
+    atualizarCalculoIntervalo();
+    atualizarBotaoDisparo();
+    
+  } catch (err) {
+    console.error('[Disparo] Erro ao carregar configuração:', err);
+  }
+}
+
 async function carregarItensDisparo() {
   try {
     const data = await api('/api/catalogo/v2/kits-e-produtos');
     itensDisponiveis = data || [];
     console.log('[Disparo] Itens carregados:', itensDisponiveis.length);
+    
+    // Carrega configuração salva após carregar itens
+    carregarConfigDisparo();
   } catch (err) {
     console.error('[Disparo] Erro ao carregar itens:', err);
   }
@@ -1607,6 +1665,18 @@ function selecionarItemDisparo(id, tipo) {
   document.getElementById('disparo-dropdown').style.display = 'none';
   
   // Mostra item selecionado
+  mostrarItemSelecionado();
+  
+  // Salva configuração
+  salvarConfigDisparo();
+  
+  // Atualiza botão
+  atualizarBotaoDisparo();
+}
+
+function mostrarItemSelecionado() {
+  if (!itemSelecionado) return;
+  
   const container = document.getElementById('disparo-item-selecionado');
   container.style.display = 'flex';
   container.innerHTML = `
@@ -1616,7 +1686,45 @@ function selecionarItemDisparo(id, tipo) {
       <div style="font-size:14px;color:var(--text)">${esc(itemSelecionado.nome)}</div>
       <div style="font-size:12px;color:var(--text2)">${itemSelecionado.tipo === 'kit' ? 'Kit' : 'Produto'}</div>
     </div>
+    <div style="display:flex;gap:.5rem">
+      <button 
+        onclick="alterarItemSelecionado()" 
+        style="padding:.5rem .75rem;background:var(--info);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600"
+        title="Alterar seleção"
+      >
+        🔄 Alterar
+      </button>
+      <button 
+        onclick="removerItemSelecionado()" 
+        style="padding:.5rem .75rem;background:var(--danger);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600"
+        title="Remover seleção"
+      >
+        ✕ Remover
+      </button>
+    </div>
   `;
+}
+
+function alterarItemSelecionado() {
+  // Limpa campo de busca para permitir nova seleção
+  document.getElementById('disparo-busca-item').value = '';
+  document.getElementById('disparo-busca-item').focus();
+  
+  // Esconde item selecionado mas mantém na memória até selecionar outro
+  document.getElementById('disparo-item-selecionado').style.display = 'none';
+}
+
+function removerItemSelecionado() {
+  itemSelecionado = null;
+  
+  // Limpa campo de busca
+  document.getElementById('disparo-busca-item').value = '';
+  
+  // Esconde item selecionado
+  document.getElementById('disparo-item-selecionado').style.display = 'none';
+  
+  // Salva configuração
+  salvarConfigDisparo();
   
   // Atualiza botão
   atualizarBotaoDisparo();
@@ -1640,6 +1748,9 @@ function atualizarCalculoIntervalo() {
   document.getElementById('calc-detalhe').textContent = 
     `${quantidade} mensagens em ${intervaloValor} ${unidadeTexto} = intervalo de ${intervaloSegundos}s entre cada envio`;
     
+  // Salva configuração
+  salvarConfigDisparo();
+  
   atualizarBotaoDisparo();
 }
 
@@ -2016,7 +2127,31 @@ async function iniciarDisparo() {
 document.addEventListener('DOMContentLoaded', () => {
   const msgInput = document.getElementById('disparo-mensagem');
   if (msgInput) {
-    msgInput.addEventListener('input', atualizarBotaoDisparo);
+    msgInput.addEventListener('input', () => {
+      salvarConfigDisparo();
+      atualizarBotaoDisparo();
+    });
+  }
+  
+  const qtdInput = document.getElementById('disparo-quantidade');
+  if (qtdInput) {
+    qtdInput.addEventListener('input', () => {
+      salvarConfigDisparo();
+    });
+  }
+  
+  const intervaloValorInput = document.getElementById('disparo-intervalo-valor');
+  if (intervaloValorInput) {
+    intervaloValorInput.addEventListener('input', () => {
+      salvarConfigDisparo();
+    });
+  }
+  
+  const intervaloUnidadeSelect = document.getElementById('disparo-intervalo-unidade');
+  if (intervaloUnidadeSelect) {
+    intervaloUnidadeSelect.addEventListener('change', () => {
+      salvarConfigDisparo();
+    });
   }
 });
 
