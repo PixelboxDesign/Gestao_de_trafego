@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teste Click</title>
+  <style>
+    .card { 
+      width: 200px; 
+      height: 100px; 
+      background: #333; 
+      margin: 10px; 
+      padding: 20px;
+      cursor: pointer;
+      color: white;
+    }
+    .card:hover { background: #555; }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  
+  <script>
+    const dados = [
+      { nome: 'Kit 1', marca: 'Alphahall' },
+      { nome: 'Kit 2', marca: 'Alphahall' }
+    ];
+    
+    function renderCards() {
+      const container = document.getElementById('container');
+      
+      container.innerHTML = dados.map(item => `
+        <div class="card" data-nome="${item.nome}" data-marca="${item.marca}">
+          ${item.nome}
+        </div>
+      `).join('');
+      
+      // Adiciona listeners
+      document.querySelectorAll('.card').forEach(card => {
+        console.log('Adicionando listener a:', card.getAttribute('data-nome'));
+        card.addEventListener('click', () => {
+          const nome = card.getAttribute('data-nome');
+          const marca = card.getAttribute('data-marca');
+          console.log('CLICOU:', nome, marca);
+          alert('Clicou em: ' + nome);
+        });
+      });
+    }
+    
+    renderCards();
+  </script>
+</body>
+</html>

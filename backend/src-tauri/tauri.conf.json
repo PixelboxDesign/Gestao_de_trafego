@@ -3,10 +3,9 @@
   "version": "0.1.0",
   "identifier": "com.luna.server",
   "build": {
-    "frontendDist": "../dist",
-    "devUrl": "http://localhost:1420",
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "devUrl": "http://localhost:3001",
+    "beforeDevCommand": "",
+    "beforeBuildCommand": ""
   },
   "app": {
     "windows": [
@@ -16,9 +15,10 @@
         "height": 750,
         "resizable": true,
         "fullscreen": false,
-        "visible": false,
+        "visible": true,
         "decorations": true,
-        "center": true
+        "center": true,
+        "devtools": true
       }
     ],
     "security": {
@@ -43,8 +43,7 @@
       "../dist/*",
       "../whatsapp-sidecar/server.js",
       "../whatsapp-sidecar/node_modules",
-      "../whatsapp-sidecar/package.json",
-      "../whatsapp-sidecar/sessao-whatsapp"
+      "../whatsapp-sidecar/package.json"
     ]
   }
 }

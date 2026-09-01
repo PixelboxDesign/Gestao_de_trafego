@@ -1,0 +1,3502 @@
+[
+  {
+    "timestamp": "17:39:48",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:48",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8629ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7394ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.6916ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2778ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.6997ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7161ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1932ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.9233ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2153ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7058ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.763ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:39:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7186ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:00",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:00",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7182ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:01",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:01",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.202ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7232ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1023ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8999ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:05",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:05",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2128ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7011ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7179ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7097ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2203ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2643ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7148ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (3.6394ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:13",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:13",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7216ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2454ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.9732ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:16",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:16",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.4402ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:17",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:17",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.0303ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7117ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2202ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8649ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7184ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1928ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7135ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:24",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:24",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2259ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:25",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:25",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7452ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2232ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2429ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:28",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:28",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7157ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:29",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:29",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7059ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.4358ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.6971ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:32",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:32",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7138ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:33",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:33",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.201ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2113ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7288ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:36",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:36",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7131ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:37",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:37",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8797ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7343ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7163ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:40",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:40",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (3.143ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:41",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:41",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7105ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.9722ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7233ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:44",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:44",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7137ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:45",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:45",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7131ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7067ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8238ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:48",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:48",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.9651ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7323ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7162ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7047ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8308ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.0528ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2774ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2878ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2909ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7408ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7234ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:40:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.714ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:00",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:00",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7154ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:01",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:01",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1214ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2231ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7116ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2219ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:05",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:05",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.4562ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2038ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.729ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7132ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7197ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8955ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.7137ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7823ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:13",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:13",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2437ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.9309ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7589ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:16",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:16",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.809ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:17",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:17",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7154ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7358ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2288ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.5339ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.342ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.744ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.8345ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:24",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:24",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7428ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:25",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:25",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7253ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.9131ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2035ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:28",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:28",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7101ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:29",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:29",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7532ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7267ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7188ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:32",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:32",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8588ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:33",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:33",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (3.017ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2123ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7223ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:36",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:36",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7389ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:37",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:37",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7441ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.37ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7126ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:40",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:40",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7327ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:41",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:41",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7177ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2171ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7088ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:44",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:44",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2301ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:45",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:45",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1149ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (3.7737ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2245ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:48",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:48",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (3.6842ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8473ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7321ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7075ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2257ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2162ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7105ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.3114ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7523ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1912ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.887ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:41:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.705ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:00",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:00",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.6711ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:01",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:01",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8083ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.721ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8564ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.035ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:05",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:05",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7572ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8398ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7208ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7047ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.6984ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2235ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.9207ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7085ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:13",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:13",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.705ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2087ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7148ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:16",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:16",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7106ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:17",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:17",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.9051ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7447ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7356ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8214ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7117ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7108ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7156ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:24",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:24",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2193ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:25",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:25",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.4038ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7127ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2264ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:28",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:28",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.042ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:29",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:29",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7366ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.787ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.9068ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:32",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:32",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7223ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:33",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:33",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7046ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.0505ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7336ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:36",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:36",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2066ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:37",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:37",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.696ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7518ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8394ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:40",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:40",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7846ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:41",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:41",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1188ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2668ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.3207ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:44",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:44",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.9139ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:45",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:45",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7171ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7271ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.94ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:48",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:48",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7091ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7768ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.3085ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.715ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7214ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2071ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1434ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8787ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1975ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.6999ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1997ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:42:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7136ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:00",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:00",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2011ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:01",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:01",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.3194ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2119ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1975ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2557ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:05",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:05",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7734ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7111ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.0884ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2132ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.696ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7168ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.206ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2247ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:13",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:13",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7051ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7169ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7063ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:16",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:16",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1975ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:17",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:17",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7066ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.3506ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7071ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7348ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7205ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.6976ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (3.7094ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:24",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:24",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.818ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:25",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:25",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7321ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.1932ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7107ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:28",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:28",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7592ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:29",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:29",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (3.1057ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2132ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.213ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:32",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:32",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7122ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:33",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:33",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7181ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7155ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.9211ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:36",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:36",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.215ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:37",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:37",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7299ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.707ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7154ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:40",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:40",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.6969ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:41",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:41",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8896ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7386ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7365ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:44",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:44",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2119ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:45",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:45",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7073ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7238ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7085ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:48",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:48",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.6987ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7312ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7115ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (2.2048ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.8545ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7284ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.6968ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7194ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7152ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/logs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "17:43:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/logs - 200 OK (1.7327ms)",
+    "source": "backend"
+  }
+]

@@ -34,7 +34,7 @@ tauri-plugin-notification = "2"
 # HTTP Server (API REST interna)
 axum = { version = "0.7", features = ["json", "ws", "multipart"] }
 tokio = { version = "1", features = ["full"] }
-tower-http = { version = "0.5", features = ["cors", "trace"] }
+tower-http = { version = "0.5", features = ["cors", "trace", "fs"] }
 tower = "0.4"
 
 # Banco de dados
@@ -62,7 +62,8 @@ regex = "1"
 
 [profile.release]
 panic = "abort"
-codegen-units = 1
-lto = true
-opt-level = "s"
+codegen-units = 16        # Aumentado de 1 para 16 (paraleliza build)
+lto = "thin"              # Mudado de true para "thin" (mais rápido)
+opt-level = "z"           # Otimiza para tamanho
 strip = true
+incremental = true        # Habilita compilação incremental

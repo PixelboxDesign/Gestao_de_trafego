@@ -80,10 +80,14 @@ pub fn iniciar_cloudflare_tunnel(app_handle: tauri::AppHandle) {
                             if let Some(url) = extract_cloudflare_url(&line) {
                                 info!("🌐 URL do Cloudflare detectada: {}", url);
                                 
+                                // Salva em arquivo
+                                save_tunnel_url_to_file(&url);
+                                
                                 // Atualiza estado global
                                 if let Some(state) = app_handle_stdout.try_state::<Arc<Mutex<AppState>>>() {
                                     if let Ok(mut state_guard) = state.try_lock() {
                                         state_guard.set_tunnel_url(url.clone());
+                                        state_guard.add_log(crate::state::LogLevel::Info, "Cloudflare", &format!("Nova URL detectada: {}", url));
                                     }
                                 }
                                 
@@ -111,10 +115,14 @@ pub fn iniciar_cloudflare_tunnel(app_handle: tauri::AppHandle) {
                             if let Some(url) = extract_cloudflare_url(&line) {
                                 info!("🌐 URL do Cloudflare detectada (stderr): {}", url);
                                 
+                                // Salva em arquivo
+                                save_tunnel_url_to_file(&url);
+                                
                                 // Atualiza estado global
                                 if let Some(state) = app_handle_stderr.try_state::<Arc<Mutex<AppState>>>() {
                                     if let Ok(mut state_guard) = state.try_lock() {
                                         state_guard.set_tunnel_url(url.clone());
+                                        state_guard.add_log(crate::state::LogLevel::Info, "Cloudflare", &format!("Nova URL detectada: {}", url));
                                     }
                                 }
                                 
@@ -134,6 +142,16 @@ fn extract_cloudflare_url(line: &str) -> Option<String> {
     use regex::Regex;
     let re = Regex::new(r"https://[a-z0-9-]+\.trycloudflare\.com").ok()?;
     re.find(line).map(|m| m.as_str().to_string())
+}
+
+/// Salva URL do tunnel em arquivo
+fn save_tunnel_url_to_file(url: &str) {
+    let path = std::path::PathBuf::from("tunnel-url.txt");
+    if let Err(e) = std::fs::write(&path, url) {
+        tracing::warn!("⚠️ Falha ao salvar tunnel-url.txt: {}", e);
+    } else {
+        info!("✅ URL salva em tunnel-url.txt: {}", url);
+    }
 }
 
 /// Inicia o sidecar Node.js do WhatsApp em background sem janela
@@ -206,12 +224,17 @@ fn iniciar_tunnel_keepalive() {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // Inicializar logs
+    // Inicializar logs ULTRA VERBOSOS (sem captura para AppState ainda - será feito depois do setup)
     tracing_subscriber::fmt()
-        .with_env_filter("luna_server=debug,axum=info,sqlx=warn")
+        .with_env_filter("luna_server=info,axum=info,sqlx=warn,tower_http=info,tauri=info")
+        .with_line_number(true)
+        .with_file(true)
+        .with_target(true)
         .init();
 
     info!("🌙 Luna Server iniciando...");
+    info!("📍 Diretório de execução: {:?}", std::env::current_dir().unwrap_or_default());
+    info!("📍 Executável: {:?}", std::env::current_exe().unwrap_or_default());
 
     // Carregar variáveis de ambiente
     dotenv::dotenv().ok();
@@ -231,49 +254,96 @@ pub fn run() {
             commands::restart_cloudflare_tunnel,
         ])
         .setup(|app| {
+            info!("🔧 [SETUP] Iniciando configuração do app...");
+            
             // Conectar ao banco e iniciar API em background
             let app_handle = app.handle().clone();
             let app_handle_tunnel = app_handle.clone();
             
+            // Usar Arc<AtomicBool> para sinalizar quando servidor estiver pronto
+            let server_pronto = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+            let server_pronto_clone = server_pronto.clone();
+            
             tauri::async_runtime::spawn(async move {
-                let pool = db::connect()
-                    .await
-                    .expect("Falha ao conectar no banco de dados");
-
-                info!("✅ Banco de dados conectado");
+                info!("🔌 [DB] Conectando ao banco de dados...");
+                let pool = match db::connect().await {
+                    Ok(p) => {
+                        info!("✅ [DB] Banco de dados conectado com sucesso");
+                        p
+                    }
+                    Err(e) => {
+                        tracing::error!("❌ [DB] ERRO ao conectar no banco: {:?}", e);
+                        panic!("Falha ao conectar no banco de dados: {:?}", e);
+                    }
+                };
 
                 let state = Arc::new(Mutex::new(AppState::new(pool)));
                 let state_clone = state.clone();
+                
+                // Adicionar log inicial
+                if let Ok(mut s) = state.try_lock() {
+                    s.add_log(crate::state::LogLevel::Info, "Sistema", "Luna Server iniciado com sucesso");
+                    s.add_log(crate::state::LogLevel::Info, "Database", "Conexão com MySQL estabelecida");
+                }
 
                 // Tentar carregar configuração do Render
+                info!("📁 [CONFIG] Carregando configuração do Render...");
                 if let Ok(config) = commands::load_render_config_from_file() {
                     if let Ok(mut s) = state.try_lock() {
                         s.render_config = Some(config);
-                        info!("✅ Configuração do Render carregada");
+                        info!("✅ [CONFIG] Configuração do Render carregada");
                     }
+                } else {
+                    info!("ℹ️ [CONFIG] Nenhuma configuração do Render encontrada");
                 }
 
                 // Guardar estado no app
                 app_handle.manage(state);
+                info!("✅ [STATE] Estado global registrado no Tauri");
 
                 // Iniciar servidor HTTP na porta 3001
+                info!("🌐 [HTTP] Iniciando servidor HTTP na porta 3001...");
+                let server_pronto_http = server_pronto_clone.clone();
                 tokio::spawn(async move {
+                    // Sinaliza que servidor está pronto ANTES de bloquear
+                    server_pronto_http.store(true, std::sync::atomic::Ordering::SeqCst);
+                    info!("✅ [HTTP] Servidor HTTP PRONTO - marcando flag");
+                    
                     api::start_server(state_clone).await;
                 });
 
-                info!("✅ API REST iniciada na porta 3001");
+                // AGUARDA até servidor estar pronto (max 5 segundos)
+                info!("⏳ [HTTP] Aguardando servidor HTTP ficar pronto...");
+                for i in 0..50 {
+                    if server_pronto_clone.load(std::sync::atomic::Ordering::SeqCst) {
+                        info!("✅ [HTTP] Servidor confirmado como pronto após {}ms", i * 100);
+                        break;
+                    }
+                    tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+                }
+
+                info!("✅ [API] API REST completamente inicializada");
             });
 
+            // Aguardar servidor ficar pronto antes de continuar setup
+            info!("⏳ [SETUP] Aguardando servidor HTTP (bloqueante)...");
+            std::thread::sleep(std::time::Duration::from_secs(3));
+            info!("✅ [SETUP] Timeout de espera concluído");
+
+            info!("🔥 [TUNNEL] Iniciando Cloudflare Tunnel...");
             // Iniciar Cloudflare Tunnel (expõe porta 3001 publicamente)
             iniciar_cloudflare_tunnel(app_handle_tunnel);
 
+            info!("💬 [WHATSAPP] Iniciando sidecar WhatsApp...");
             // Iniciar sidecar WhatsApp
             iniciar_whatsapp_sidecar();
 
+            info!("🔁 [KEEPALIVE] Iniciando Tunnel Keep-Alive...");
             // Iniciar Tunnel Keep-Alive (mantém tunnel ativo)
             iniciar_tunnel_keepalive();
 
             // Configurar system tray
+            info!("🖼️ [TRAY] Configurando system tray...");
             let quit = MenuItem::with_id(app, "quit", "Encerrar Luna Server", true, None::<&str>)?;
             let show = MenuItem::with_id(app, "show", "Abrir Painel", true, None::<&str>)?;
             let status = MenuItem::with_id(
@@ -292,10 +362,38 @@ pub fn run() {
                 .tooltip("🌙 Luna Server — Online")
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "quit" => {
-                        info!("Encerrando Luna Server...");
+                        info!("🛑 [TRAY] Encerrando Luna Server...");
+                        
+                        // Salvar logs antes de encerrar
+                        if let Some(state) = app.try_state::<Arc<Mutex<AppState>>>() {
+                            if let Ok(guard) = state.try_lock() {
+                                let logs_dir = std::path::PathBuf::from("logs");
+                                if let Err(e) = std::fs::create_dir_all(&logs_dir) {
+                                    tracing::warn!("⚠️ Falha ao criar diretório logs: {}", e);
+                                } else {
+                                    let timestamp = chrono::Local::now().format("%Y-%m-%d_%H-%M-%S");
+                                    let log_file = logs_dir.join(format!("logs_{}.json", timestamp));
+                                    
+                                    match serde_json::to_string_pretty(&guard.logs) {
+                                        Ok(json) => {
+                                            if let Err(e) = std::fs::write(&log_file, json) {
+                                                tracing::warn!("⚠️ Falha ao salvar logs: {}", e);
+                                            } else {
+                                                info!("✅ Logs salvos em: {:?}", log_file);
+                                            }
+                                        }
+                                        Err(e) => {
+                                            tracing::warn!("⚠️ Falha ao serializar logs: {}", e);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
                         app.exit(0);
                     }
                     "show" => {
+                        info!("👁️ [TRAY] Mostrando janela...");
                         if let Some(window) = app.get_webview_window("main") {
                             let _ = window.show();
                             let _ = window.set_focus();
@@ -310,6 +408,7 @@ pub fn run() {
                         ..
                     } = event
                     {
+                        info!("🖱️ [TRAY] Clique no ícone detectado");
                         let app = tray.app_handle();
                         if let Some(window) = app.get_webview_window("main") {
                             let _ = window.show();
@@ -318,22 +417,33 @@ pub fn run() {
                     }
                 })
                 .build(app)?;
+            
+            info!("✅ [TRAY] System tray configurado");
 
             // Janela começa visível na primeira abertura
+            info!("🪟 [WINDOW] Mostrando janela principal...");
             if let Some(window) = app.get_webview_window("main") {
+                info!("🪟 [WINDOW] Janela encontrada, tornando visível...");
                 let _ = window.show();
                 let _ = window.set_focus();
+                info!("✅ [WINDOW] Janela deve estar visível agora");
+            } else {
+                tracing::error!("❌ [WINDOW] ERRO: Janela 'main' não encontrada!");
             }
 
+            info!("✅ [SETUP] Setup completo!");
             Ok(())
         })
         .on_window_event(|window, event| {
             // Fechar janela volta para tray em vez de encerrar
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                info!("🚪 [WINDOW] Usuário tentou fechar - minimizando para tray");
                 api.prevent_close();
                 let _ = window.hide();
             }
         })
         .run(tauri::generate_context!())
         .expect("Erro ao iniciar Luna Server");
+    
+    info!("👋 [EXIT] Luna Server encerrado");
 }

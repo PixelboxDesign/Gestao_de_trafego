@@ -226,10 +226,19 @@ pub async fn list(
         )
     };
 
-    let mut clientes: Vec<Cliente> = sqlx::query_as(&sql)
+    let mut clientes: Vec<Cliente> = match sqlx::query_as(&sql)
         .fetch_all(&state.db)
         .await
-        .unwrap_or_default();
+    {
+        Ok(data) => {
+            tracing::info!("📊 [SQL] Query clientes executada com sucesso - {} registros retornados", data.len());
+            data
+        }
+        Err(e) => {
+            tracing::error!("❌ [SQL] Erro ao buscar clientes: {:?}", e);
+            vec![]
+        }
+    };
 
     // Aplica limpeza de nome em Rust após buscar do banco
     for c in &mut clientes {
@@ -244,9 +253,12 @@ pub async fn list(
         .fetch_one(&state.db)
         .await
     {
-        Ok(v) => v,
+        Ok(v) => {
+            tracing::info!("📊 [SQL] Count clientes: {} total", v);
+            v
+        }
         Err(e) => {
-            tracing::error!("Erro no COUNT: {:?}\nSQL: {}", e, &count_sql[..300.min(count_sql.len())]);
+            tracing::error!("❌ [SQL] Erro no COUNT: {:?}\nSQL: {}", e, &count_sql[..300.min(count_sql.len())]);
             0
         }
     };
@@ -283,6 +295,7 @@ pub async fn list_ufs(
     State(state): State<Arc<Mutex<AppState>>>,
 ) -> Json<Vec<String>> {
     let state = state.lock().await;
+    tracing::info!("📊 [SQL] Buscando lista de UFs distintas");
     let sql = r#"
         SELECT DISTINCT estado FROM (
             SELECT state as estado FROM clientes_tray_ecommerce WHERE state IS NOT NULL AND TRIM(state) != ''
@@ -295,6 +308,7 @@ pub async fn list_ufs(
         .fetch_all(&state.db)
         .await
         .unwrap_or_default();
+    tracing::info!("✅ [SQL] {} UFs encontradas", rows.len());
     Json(rows.into_iter().map(|(v,)| v).collect())
 }
 
@@ -303,6 +317,7 @@ pub async fn list_cidades(
     State(state): State<Arc<Mutex<AppState>>>,
 ) -> Json<Vec<String>> {
     let state = state.lock().await;
+    tracing::info!("📊 [SQL] Buscando lista de cidades");
     let sql = r#"
         SELECT cidade, COUNT(*) as total FROM (
             SELECT city as cidade FROM clientes_tray_ecommerce WHERE city IS NOT NULL AND TRIM(city) != ''
@@ -319,6 +334,7 @@ pub async fn list_cidades(
         .fetch_all(&state.db)
         .await
         .unwrap_or_default();
+    tracing::info!("✅ [SQL] {} cidades encontradas", rows.len());
     Json(rows.into_iter().map(|(v, _)| v).collect())
 }
 

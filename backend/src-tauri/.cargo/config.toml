@@ -1,0 +1,9 @@
+# Configuração para acelerar builds no Windows
+
+[target.x86_64-pc-windows-msvc]
+# Usa o linker LLD (muito mais rápido que link.exe do MSVC)
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+[build]
+# Número de jobs paralelos (ajuste conforme seus núcleos de CPU)
+jobs = 8

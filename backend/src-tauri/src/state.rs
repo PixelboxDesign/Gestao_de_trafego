@@ -25,15 +25,17 @@ pub enum WhatsAppStatus {
     Error(String),
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct LogEntry {
     pub timestamp: String,
     pub level: LogLevel,
     pub module: String,
     pub message: String,
+    pub source: String, // "frontend" ou "backend"
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "PascalCase")]
 pub enum LogLevel {
     Info,
     Warn,
@@ -62,10 +64,26 @@ impl AppState {
 
     pub fn add_log(&mut self, level: LogLevel, module: &str, message: &str) {
         let entry = LogEntry {
-            timestamp: chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
+            timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
             level,
             module: module.to_string(),
             message: message.to_string(),
+            source: "backend".to_string(),
+        };
+        self.logs.push(entry);
+        // Manter apenas os últimos 500 logs
+        if self.logs.len() > 500 {
+            self.logs.remove(0);
+        }
+    }
+    
+    pub fn add_frontend_log(&mut self, level: LogLevel, module: &str, message: &str) {
+        let entry = LogEntry {
+            timestamp: chrono::Local::now().format("%H:%M:%S").to_string(),
+            level,
+            module: module.to_string(),
+            message: message.to_string(),
+            source: "frontend".to_string(),
         };
         self.logs.push(entry);
         // Manter apenas os últimos 500 logs
