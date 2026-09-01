@@ -44,7 +44,7 @@
       flex-direction: column;
     }
 
-    /* ÔöÇÔöÇ Header ÔöÇÔöÇ */
+    /* —— Header ━━ */
     .header {
       background: var(--bg2);
       border-bottom: 1px solid var(--border);
@@ -58,7 +58,7 @@
     .header-title { font-size: 15px; font-weight: 700; }
     .header-right  { margin-left: auto; display: flex; align-items: center; gap: .5rem; font-size: 12px; color: var(--text2); }
 
-    /* ÔöÇÔöÇ Tabs ÔöÇÔöÇ */
+    /* ━━ Tabs ━━ */
     .tabs {
       background: var(--bg2);
       border-bottom: 1px solid var(--border);
@@ -77,12 +77,12 @@
     .tab:hover { color: var(--text); }
     .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-    /* ÔöÇÔöÇ Content ÔöÇÔöÇ */
+    /* ━━ Content ━━ */
     .content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
     .page    { display: none; flex: 1; flex-direction: column; overflow: auto; }
     .page.active { display: flex; }
 
-    /* ÔöÇÔöÇ Dot ÔöÇÔöÇ */
+    /* ━━ Dot ━━ */
     .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
     .dot-green  { background: var(--success); box-shadow: 0 0 6px var(--success); }
     .dot-yellow { background: var(--warning); animation: pulse 1.5s infinite; }
@@ -90,7 +90,7 @@
     .dot-gray   { background: var(--text2); }
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
-    /* ÔöÇÔöÇ Btn ÔöÇÔöÇ */
+    /* ━━ Btn ━━ */
     .btn {
       padding: .45rem 1rem; border: none; border-radius: 6px;
       font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity .15s;
@@ -101,7 +101,7 @@
     .btn-danger  { background: var(--danger); color: #fff; }
     .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
 
-    /* ÔöÇÔöÇ WhatsApp page ÔöÇÔöÇ */
+    /* ━━ WhatsApp page ━━ */
     #page-whatsapp {
       padding: 1.5rem;
       gap: 1.5rem;
@@ -110,7 +110,7 @@
       position: relative;
     }
     
-    /* ÔöÇÔöÇ Bot├úo de teste flutuante ÔöÇÔöÇ */
+    /* ━━ Bot├úo de teste flutuante ━━ */
     .btn-teste-flutuante {
       position: absolute;
       top: 1.5rem;
@@ -137,7 +137,7 @@
       box-shadow: none;
     }
     
-    /* ÔöÇÔöÇ Checkbox e Log ÔöÇÔöÇ */
+    /* ━━ Checkbox e Log ━━ */
     .disparo-massa-container {
       display: flex;
       gap: 1.5rem;
@@ -236,7 +236,7 @@
       font-size: 13px;
     }
     
-    /* ÔöÇÔöÇ Sub-tabs ÔöÇÔöÇ */
+    /* ━━ Sub-tabs ━━ */
     .sub-tabs {
       display: flex;
       gap: .5rem;
@@ -287,7 +287,7 @@
 
     .qr-hint { font-size: 12px; color: var(--text2); max-width: 320px; line-height: 1.6; }
 
-    /* ÔöÇÔöÇ Hist├│rico ÔöÇÔöÇ */
+    /* ━━ Hist├│rico ━━ */
     #page-whatsapp .historico-titulo {
       font-size: 13px; font-weight: 700; color: var(--text2);
       text-transform: uppercase; letter-spacing: .05em;
@@ -335,7 +335,7 @@
     }
     .empty-state span { font-size: 36px; }
 
-    /* ÔöÇÔöÇ Offline banner ÔöÇÔöÇ */
+    /* ━━ Offline banner ━━ */
     #offline-banner {
       display: none;
       background: rgba(239,68,68,.15);
@@ -352,7 +352,7 @@
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* ÔöÇÔöÇ Cat├ílogo page ÔöÇÔöÇ */
+    /* ━━ Cat├ílogo page ━━ */
     #page-catalogo {
       padding: 1.5rem;
       gap: 1.5rem;
@@ -464,7 +464,7 @@
       gap: .4rem;
     }
 
-    /* ÔöÇÔöÇ Modal ÔöÇÔöÇ */
+    /* ━━ Modal ━━ */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -1321,14 +1321,14 @@
 </div>
 
 <script>
-// ÔöÇÔöÇ Service Worker Killer ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Service Worker Killer ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(regs => {
     regs.forEach(reg => reg.unregister());
   });
 }
 
-// ÔöÇÔöÇ Troca de aba ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Troca de aba ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 function trocarAba(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1336,7 +1336,7 @@ function trocarAba(id, btn) {
   btn.classList.add('active');
 }
 
-// ÔöÇÔöÇ Troca de sub-aba (WhatsApp) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Troca de sub-aba (WhatsApp) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function trocarSubAba(id, btn) {
   document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
@@ -1344,7 +1344,7 @@ function trocarSubAba(id, btn) {
   btn.classList.add('active');
 }
 
-// ÔöÇÔöÇ Troca de aba ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Troca de aba ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 function trocarAba(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1352,7 +1352,7 @@ function trocarAba(id, btn) {
   btn.classList.add('active');
 }
 
-// ÔöÇÔöÇ Troca de sub-aba (WhatsApp) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Troca de sub-aba (WhatsApp) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function trocarSubAba(id, btn) {
   document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
@@ -1360,14 +1360,14 @@ function trocarSubAba(id, btn) {
   btn.classList.add('active');
 }
 
-// ÔöÇÔöÇ API helper ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ API helper ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 async function api(path, opts) {
   const r = await fetch(path, opts);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
 }
 
-// ÔöÇÔöÇ Status do servidor ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Status do servidor ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 async function verificarServidor() {
   const buildVersion = 'v10-thumb-carrossel';
   console.log(`[Luna ${buildVersion}] verificando servidor via /health`);
@@ -1402,7 +1402,7 @@ async function verificarServidor() {
   }
 }
 
-// ÔöÇÔöÇ WhatsApp status ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ WhatsApp status ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const STATUS_CFG = {
   disconnected: { cls: 'dot-red',    texto: 'Desconectado',         cor: 'var(--danger)'  },
   qr:           { cls: 'dot-yellow', texto: 'Aguardando QR Code',   cor: 'var(--warning)' },
@@ -1488,7 +1488,7 @@ async function desconectarWhatsApp() {
   } catch {}
 }
 
-// ÔöÇÔöÇ Hist├│rico de disparos ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Hist├│rico de disparos ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 async function carregarHistorico() {
   try {
     const d = await api('/api/disparos?limit=60');
@@ -1545,7 +1545,7 @@ function formatarTel(n) {
   return n;
 }
 
-// ÔöÇÔöÇ Gerenciamento de Disparos ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Gerenciamento de Disparos ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 let itensDisponiveis = [];
 let itemSelecionado = null;
 
@@ -1656,7 +1656,7 @@ function atualizarBotaoDisparo() {
   checkbox.disabled = !podeIniciar;
 }
 
-// ÔöÇÔöÇ Disparo em Massa com Log ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Disparo em Massa com Log ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 let disparoMassaAtivo = false;
 let disparoMassaConfig = null;
 
@@ -1824,7 +1824,7 @@ function adicionarLog(tipo, mensagem, scroll = true) {
   }
 }
 
-// ÔöÇÔöÇ Modal de Teste ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Modal de Teste ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 function abrirModalTeste() {
   const mensagem = document.getElementById('disparo-mensagem').value.trim();
   
@@ -1973,7 +1973,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// ÔöÇÔöÇ Loop principal ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Loop principal ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 async function tick() {
   const online = await verificarServidor();
   if (online) {
@@ -1999,7 +1999,7 @@ async function tick() {
 tick();
 setInterval(tick, 4000); // atualiza a cada 4s
 
-// ÔöÇÔöÇ Cat├ílogo ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Cat├ílogo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 let kitsData = [];
 let kitAtual = null;
 let arquivoThumb = null;
@@ -2242,7 +2242,7 @@ function renderCarrossel(imagens) {
   `).join('');
 }
 
-// ÔöÇÔöÇ Drag and Drop para Carrossel ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Drag and Drop para Carrossel ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 let draggedElement = null;
 
 function handleDragStart(e) {
@@ -2644,7 +2644,7 @@ trocarAba = function(id, btn) {
   }
 };
 
-// ÔöÇÔöÇ Produtos ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Produtos ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 
 async function carregarProdutos() {
   try {
@@ -3031,10 +3031,10 @@ async function deletarProdutoThumb() {
   }
 }
 
-// ÔöÇÔöÇ Lazy loading de imagens ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Lazy loading de imagens ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 let lazyLoadObserver = null;
 
-// ÔöÇÔöÇ Fun├º├Áes de edi├º├úo inline ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Fun├º├Áes de edi├º├úo inline ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 
 // Edi├º├úo de SKU
 function toggleEditarSku() {
@@ -3238,7 +3238,7 @@ function initLazyLoad() {
   }
 }
 
-// ÔöÇÔöÇ Fun├º├Áes de Produtos - Salvar e Carrossel ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// ━━ Fun├º├Áes de Produtos - Salvar e Carrossel ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 let arquivoProdutoCarrossel = null;
 
