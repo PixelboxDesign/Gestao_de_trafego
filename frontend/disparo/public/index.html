@@ -674,6 +674,19 @@
           (<span id="calc-detalhe">10 mensagens em 1 hora(s) = intervalo de 360s entre cada envio</span>)
         </div>
 
+        <!-- Botão Salvar Configuração -->
+        <div style="display:flex;justify-content:center;padding-top:1rem;border-top:1px solid var(--border)">
+          <button
+            id="btn-salvar-config-disparo"
+            onclick="salvarConfigDisparoManual()"
+            style="padding:1rem 2rem;background:var(--success);color:white;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(34,197,94,0.3);transition:all 0.2s"
+            onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(34,197,94,0.4)'"
+            onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(34,197,94,0.3)'"
+          >
+            💾 Salvar Configuração
+          </button>
+        </div>
+
         <!-- Checkbox de Disparo em Massa + Log -->
         <div class="disparo-massa-container">
           
@@ -1562,10 +1575,51 @@ function salvarConfigDisparo() {
       tipo: itemSelecionado.tipo,
       nome: itemSelecionado.nome,
       thumb_url: itemSelecionado.thumb_url
-    } : null
+    } : null,
+    dataHoraSalvo: new Date().toISOString()
   };
   localStorage.setItem('luna_disparo_config', JSON.stringify(config));
   console.log('[Disparo] Configuração salva:', config);
+}
+
+function salvarConfigDisparoManual() {
+  const mensagem = document.getElementById('disparo-mensagem')?.value?.trim();
+  
+  // Valida campos obrigatórios
+  if (!mensagem) {
+    alert('⚠️ Digite uma mensagem antes de salvar');
+    document.getElementById('disparo-mensagem').focus();
+    return;
+  }
+  
+  if (!itemSelecionado) {
+    alert('⚠️ Selecione um kit ou produto antes de salvar');
+    document.getElementById('disparo-busca-item').focus();
+    return;
+  }
+  
+  // Salva a configuração
+  salvarConfigDisparo();
+  
+  // Feedback visual no botão
+  const btn = document.getElementById('btn-salvar-config-disparo');
+  const textoOriginal = btn.innerHTML;
+  btn.innerHTML = '✓ Configuração Salva!';
+  btn.style.background = 'var(--success)';
+  btn.disabled = true;
+  
+  setTimeout(() => {
+    btn.innerHTML = textoOriginal;
+    btn.style.background = 'var(--success)';
+    btn.disabled = false;
+  }, 2000);
+  
+  console.log('[Disparo] ✓ Configuração salva manualmente pelo usuário');
+  
+  // Mostra toast de sucesso
+  if (typeof showToast === 'function') {
+    showToast('✓ Configuração salva com sucesso!', 'success');
+  }
 }
 
 function carregarConfigDisparo() {
@@ -1578,21 +1632,27 @@ function carregarConfigDisparo() {
     
     // Restaura campos
     if (config.mensagem) {
-      document.getElementById('disparo-mensagem').value = config.mensagem;
+      const msgInput = document.getElementById('disparo-mensagem');
+      if (msgInput) msgInput.value = config.mensagem;
     }
     if (config.quantidade) {
-      document.getElementById('disparo-quantidade').value = config.quantidade;
+      const qtdInput = document.getElementById('disparo-quantidade');
+      if (qtdInput) qtdInput.value = config.quantidade;
     }
     if (config.intervaloValor) {
-      document.getElementById('disparo-intervalo-valor').value = config.intervaloValor;
+      const intervaloInput = document.getElementById('disparo-intervalo-valor');
+      if (intervaloInput) intervaloInput.value = config.intervaloValor;
     }
     if (config.intervaloUnidade) {
-      document.getElementById('disparo-intervalo-unidade').value = config.intervaloUnidade;
+      const unidadeSelect = document.getElementById('disparo-intervalo-unidade');
+      if (unidadeSelect) unidadeSelect.value = config.intervaloUnidade;
     }
     
     // Restaura item selecionado
     if (config.itemSelecionado) {
       itemSelecionado = config.itemSelecionado;
+      const buscaInput = document.getElementById('disparo-busca-item');
+      if (buscaInput) buscaInput.value = itemSelecionado.nome;
       mostrarItemSelecionado();
     }
     
@@ -1667,36 +1727,40 @@ function selecionarItemDisparo(id, tipo) {
   // Mostra item selecionado
   mostrarItemSelecionado();
   
-  // Salva configuração
-  salvarConfigDisparo();
-  
   // Atualiza botão
   atualizarBotaoDisparo();
 }
 
 function mostrarItemSelecionado() {
-  if (!itemSelecionado) return;
+  if (!itemSelecionado) {
+    document.getElementById('disparo-item-selecionado').style.display = 'none';
+    return;
+  }
   
   const container = document.getElementById('disparo-item-selecionado');
   container.style.display = 'flex';
   container.innerHTML = `
-    ${itemSelecionado.thumb_url ? `<img src="${itemSelecionado.thumb_url}" alt="${esc(itemSelecionado.nome)}" style="width:60px;height:60px;border-radius:8px;object-fit:cover"/>` : ''}
+    ${itemSelecionado.thumb_url ? `<img src="${itemSelecionado.thumb_url}" alt="${esc(itemSelecionado.nome)}" style="width:60px;height:60px;border-radius:8px;object-fit:cover"/>` : '<div style="width:60px;height:60px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:24px">📦</div>'}
     <div style="flex:1">
       <div style="font-size:15px;font-weight:700;color:var(--success)">✔️ Selecionado</div>
-      <div style="font-size:14px;color:var(--text)">${esc(itemSelecionado.nome)}</div>
-      <div style="font-size:12px;color:var(--text2)">${itemSelecionado.tipo === 'kit' ? 'Kit' : 'Produto'}</div>
+      <div style="font-size:14px;color:var(--text);margin-top:.25rem">${esc(itemSelecionado.nome)}</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:.15rem">${itemSelecionado.tipo === 'kit' ? '📦 Kit' : '🧴 Produto'}</div>
     </div>
-    <div style="display:flex;gap:.5rem">
+    <div style="display:flex;flex-direction:column;gap:.5rem">
       <button 
         onclick="alterarItemSelecionado()" 
-        style="padding:.5rem .75rem;background:var(--info);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600"
+        style="padding:.5rem .75rem;background:var(--info);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;transition:opacity 0.2s"
+        onmouseenter="this.style.opacity='0.85'"
+        onmouseleave="this.style.opacity='1'"
         title="Alterar seleção"
       >
         🔄 Alterar
       </button>
       <button 
         onclick="removerItemSelecionado()" 
-        style="padding:.5rem .75rem;background:var(--danger);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600"
+        style="padding:.5rem .75rem;background:var(--danger);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;transition:opacity 0.2s"
+        onmouseenter="this.style.opacity='0.85'"
+        onmouseleave="this.style.opacity='1'"
         title="Remover seleção"
       >
         ✕ Remover
@@ -1723,9 +1787,6 @@ function removerItemSelecionado() {
   // Esconde item selecionado
   document.getElementById('disparo-item-selecionado').style.display = 'none';
   
-  // Salva configuração
-  salvarConfigDisparo();
-  
   // Atualiza botão
   atualizarBotaoDisparo();
 }
@@ -1748,9 +1809,6 @@ function atualizarCalculoIntervalo() {
   document.getElementById('calc-detalhe').textContent = 
     `${quantidade} mensagens em ${intervaloValor} ${unidadeTexto} = intervalo de ${intervaloSegundos}s entre cada envio`;
     
-  // Salva configuração
-  salvarConfigDisparo();
-  
   atualizarBotaoDisparo();
 }
 
@@ -2127,31 +2185,22 @@ async function iniciarDisparo() {
 document.addEventListener('DOMContentLoaded', () => {
   const msgInput = document.getElementById('disparo-mensagem');
   if (msgInput) {
-    msgInput.addEventListener('input', () => {
-      salvarConfigDisparo();
-      atualizarBotaoDisparo();
-    });
+    msgInput.addEventListener('input', atualizarBotaoDisparo);
   }
   
   const qtdInput = document.getElementById('disparo-quantidade');
   if (qtdInput) {
-    qtdInput.addEventListener('input', () => {
-      salvarConfigDisparo();
-    });
+    qtdInput.addEventListener('input', atualizarCalculoIntervalo);
   }
   
   const intervaloValorInput = document.getElementById('disparo-intervalo-valor');
   if (intervaloValorInput) {
-    intervaloValorInput.addEventListener('input', () => {
-      salvarConfigDisparo();
-    });
+    intervaloValorInput.addEventListener('input', atualizarCalculoIntervalo);
   }
   
   const intervaloUnidadeSelect = document.getElementById('disparo-intervalo-unidade');
   if (intervaloUnidadeSelect) {
-    intervaloUnidadeSelect.addEventListener('change', () => {
-      salvarConfigDisparo();
-    });
+    intervaloUnidadeSelect.addEventListener('change', atualizarCalculoIntervalo);
   }
 });
 
