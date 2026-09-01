@@ -1885,28 +1885,46 @@ async function enviarTeste() {
     // Adiciona DDI +55 se não tiver
     const numeroCompleto = numero.startsWith('55') ? numero : '55' + numero;
     
-    const res = await fetch('/api/disparos/enviar-teste', {
+    // Envia via WhatsApp sidecar diretamente
+    const res = await fetch('/api/whatsapp/enviar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         numero: numeroCompleto,
-        mensagem: mensagem,
-        item_id: itemSelecionado.id,
-        item_tipo: itemSelecionado.tipo
+        mensagem: mensagem
       })
     });
     
     if (!res.ok) {
-      const erro = await res.text();
-      throw new Error(erro);
+      const erro = await res.json().catch(() => ({ erro: 'Erro desconhecido' }));
+      throw new Error(erro.erro || 'Erro ao enviar');
+    }
+    
+    const data = await res.json();
+    if (!data.ok) {
+      throw new Error(data.erro || 'Erro ao enviar');
     }
     
     alert('✓ Mensagem de teste enviada com sucesso!');
     fecharModalTeste();
     
+    // Adiciona ao histórico local
+    adicionarLog('success', `✓ Teste enviado para ${formatarTel(numeroCompleto)}`);
+    
   } catch (err) {
-    console.error('[Teste] Erro:', err);
-    alert('❌ Erro ao enviar teste: ' + err.message);
+    console.error('[Teste] Erro completo:', err);
+    let mensagemErro = err.message;
+    
+    // Melhora mensagens de erro comuns
+    if (mensagemErro.includes('WhatsApp não está conectado')) {
+      mensagemErro = '❌ WhatsApp não está conectado. Escaneie o QR Code primeiro.';
+    } else if (mensagemErro.includes('Luna Server inacessível') || mensagemErro.includes('503')) {
+      mensagemErro = '❌ Luna Server (computador) não está acessível.\n\nVerifique:\n• Cloudflare Tunnel está rodando?\n• INICIAR-LUNA-SERVER-COMPLETO.bat foi executado?';
+    } else if (mensagemErro.includes('Sidecar')) {
+      mensagemErro = '❌ WhatsApp Sidecar não está rodando.\n\nExecute: INICIAR-LUNA-SERVER-COMPLETO.bat';
+    }
+    
+    alert(mensagemErro);
   } finally {
     btn.disabled = false;
     btn.textContent = '📋 Enviar Teste';
