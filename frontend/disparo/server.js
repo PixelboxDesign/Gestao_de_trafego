@@ -8,8 +8,8 @@ const PORT = process.env.PORT || 3000;
 
 // URL do Luna Server local (via Cloudflare Tunnel)
 // ⚠️ AVISO: Atualizar esta URL quando o tunnel mudar!
-// URL atual: adipex-korea-evolution-declare
-const LUNA_API = process.env.LUNA_API_URL || 'https://adipex-korea-evolution-declare.trycloudflare.com';
+// URL atual: shield-required-enjoy-trained
+const LUNA_API = process.env.LUNA_API_URL || 'https://shield-required-enjoy-trained.trycloudflare.com';
 
 app.use(express.json());
 

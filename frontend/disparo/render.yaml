@@ -7,4 +7,4 @@ services:
     startCommand: npm start
     envVars:
       - key: LUNA_API_URL
-        value: https://adipex-korea-evolution-declare.trycloudflare.com
+        value: https://shield-required-enjoy-trained.trycloudflare.com
