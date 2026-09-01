@@ -518,7 +518,7 @@
 
 <!-- Header -->
 <header class="header">
-  <span style="font-size:20px">­ƒîÖ</span>
+  <span style="font-size:20px">🌙</span>
   <span class="header-title">Luna Cosméticos — Disparo</span>
   <div class="header-right">
     <span class="dot" id="server-dot" style="background:var(--text2)"></span>
@@ -528,14 +528,14 @@
 
 <!-- Offline banner -->
 <div id="offline-banner">
-  ÔÜá´©Å Luna Server inacessível — verifique se o programa está rodando no computador
+  ⚠️ Luna Server inacessível — verifique se o programa está rodando no computador
 </div>
 
 <!-- Tabs -->
 <nav class="tabs">
-  <button class="tab active" onclick="trocarAba('whatsapp', this)">­ƒÆ¼ WhatsApp</button>
-  <button class="tab" onclick="trocarAba('catalogo', this)">­ƒôª Kits</button>
-  <button class="tab" onclick="trocarAba('produtos', this)">­ƒº┤ Produtos</button>
+  <button class="tab active" onclick="trocarAba('whatsapp', this)">📱 WhatsApp</button>
+  <button class="tab" onclick="trocarAba('catalogo', this)">📦 Kits</button>
+  <button class="tab" onclick="trocarAba('produtos', this)">🧴 Produtos</button>
 </nav>
 
 <!-- Content -->
@@ -551,7 +551,7 @@
       onclick="abrirModalTeste()"
       disabled
     >
-      ­ƒº¬ Enviar Teste
+      🚀 Enviar Teste
     </button>
 
     <!-- Card de status -->
@@ -561,7 +561,7 @@
         <span class="wa-status-text" id="wa-status-texto">Verificando...</span>
       </div>
       <div id="wa-numero" style="font-size:13px;color:var(--text2);display:none">
-        ­ƒô▒ Conectado: <strong id="wa-numero-val" style="color:var(--success)"></strong>
+        📞 Conectado: <strong id="wa-numero-val" style="color:var(--success)"></strong>
       </div>
       <div id="wa-erro" style="font-size:12px;color:var(--danger);display:none;background:rgba(239,68,68,.1);padding:.5rem .75rem;border-radius:6px"></div>
       <div id="wa-acoes" style="display:flex;gap:.5rem;margin-top:.25rem"></div>
@@ -570,7 +570,7 @@
     <!-- QR Code (visível só quando status=qr) -->
     <div id="wa-qr-area" style="display:none;flex-direction:column;gap:.75rem">
       <p class="qr-hint">
-        Abra o WhatsApp no celular ÔåÆ <strong>Dispositivos conectados</strong> ÔåÆ <strong>Conectar dispositivo</strong> ÔåÆ escaneie o QR Code abaixo
+        Abra o WhatsApp no celular → <strong>Dispositivos conectados</strong> → <strong>Conectar dispositivo</strong> → escaneie o QR Code abaixo
       </p>
       <div class="qr-wrap">
         <img id="wa-qr-img" src="" alt="QR Code WhatsApp"/>
@@ -581,8 +581,8 @@
     <!-- Sub-tabs (aparecem quando conectado) -->
     <div id="wa-sub-tabs-container" style="display:none;flex-direction:column;width:100%">
       <nav class="sub-tabs">
-        <button class="sub-tab active" onclick="trocarSubAba('gerenciamento', this)">­ƒôñ Gerenciamento</button>
-        <button class="sub-tab" onclick="trocarSubAba('historico', this)">­ƒôè Histórico</button>
+        <button class="sub-tab active" onclick="trocarSubAba('gerenciamento', this)">📋 Gerenciamento</button>
+        <button class="sub-tab" onclick="trocarSubAba('historico', this)">📊 Histórico</button>
       </nav>
 
       <!-- Sub-página: Gerenciamento -->
@@ -669,7 +669,7 @@
 
         <!-- Cálculo do intervalo -->
         <div id="disparo-calculo" style="padding:1rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2)">
-          ÔÅ▒´©Å Cada mensagem será enviada a cada <strong style="color:var(--primary)" id="intervalo-segundos">360</strong> segundos
+          ℹ️ Cada mensagem será enviada a cada <strong style="color:var(--primary)" id="intervalo-segundos">360</strong> segundos
           <br />
           (<span id="calc-detalhe">10 mensagens em 1 hora(s) = intervalo de 360s entre cada envio</span>)
         </div>
@@ -695,7 +695,7 @@
             </label>
             
             <div id="disparo-massa-info" style="display:none;padding:.75rem;background:var(--bg3);border:1px solid var(--success);border-radius:8px;font-size:12px;color:var(--text2)">
-              Ô£à <strong style="color:var(--success)">Disparo ativo</strong><br />
+              ✓ <strong style="color:var(--success)">Disparo ativo</strong><br />
               <span id="info-progresso">0 de 10 mensagens enviadas</span>
             </div>
           </div>
@@ -703,7 +703,7 @@
           <!-- Log em tempo real -->
           <div class="log-container">
             <div class="log-header">
-              ­ƒôè Log de Envios em Tempo Real
+              📊 Log de Envios em Tempo Real
             </div>
             <div id="log-content" class="log-content">
               <div class="log-empty">
@@ -725,7 +725,7 @@
 
     <!-- Mensagem quando desconectado -->
     <div id="wa-desconectado-msg" style="display:none;flex-direction:column;gap:.5rem;align-items:center;text-align:center;color:var(--text2)">
-      <div style="font-size:40px">­ƒôÁ</div>
+      <div style="font-size:40px">📴</div>
       <p style="font-size:14px;max-width:420px">
         Conecte o WhatsApp para acessar o gerenciamento de disparos
       </p>
@@ -745,7 +745,7 @@
         onkeyup="filtrarKits(this.value)"
       />
       <button class="btn btn-secondary" onclick="carregarCatalogo()">
-        ­ƒöä Atualizar
+        🔄 Atualizar
       </button>
       <span style="margin-left:auto;font-size:12px;color:var(--text2)" id="catalogo-count">
         Carregando...
@@ -769,7 +769,7 @@
         onkeyup="filtrarProdutos(this.value)"
       />
       <button class="btn btn-secondary" onclick="carregarProdutos()">
-        ­ƒöä Atualizar
+        🔄 Atualizar
       </button>
       <span style="margin-left:auto;font-size:12px;color:var(--text2)" id="produtos-count">
         Carregando...
@@ -796,7 +796,7 @@
         placeholder="Nome do kit"
         style="font-size:16px;font-weight:700;flex:1;margin-right:1rem"
       />
-      <button class="modal-close" onclick="fecharModalKit()">Ô£ò</button>
+      <button class="modal-close" onclick="fecharModalKit()">✕</button>
     </div>
 
     <!-- Imagem preview -->
@@ -822,7 +822,7 @@
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Editar preço"
           >
-            Ô£Å´©Å
+            ✏️
           </button>
           <button 
             id="btn-salvar-preco"
@@ -830,7 +830,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            ✓
           </button>
           <button 
             id="btn-cancelar-preco"
@@ -838,7 +838,7 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            ✕
           </button>
         </div>
       </div>
@@ -870,7 +870,7 @@
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Editar SKU"
           >
-            Ô£Å´©Å
+            ✏️
           </button>
           <button 
             id="btn-salvar-sku"
@@ -878,7 +878,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            ✓
           </button>
           <button 
             id="btn-cancelar-sku"
@@ -886,7 +886,7 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            ✕
           </button>
         </div>
       </div>
@@ -899,7 +899,7 @@
       </div>
 
       <div class="form-group" style="border-top:1px solid var(--border);padding-top:1rem">
-        <label class="form-label">­ƒô© Imagem Thumbnail (Capa)</label>
+        <label class="form-label">📷 Imagem Thumbnail (Capa)</label>
         <input
           type="file"
           id="modal-kit-file-thumb"
@@ -909,7 +909,7 @@
         />
         <div style="display:flex;gap:.5rem">
           <button class="btn btn-secondary" onclick="document.getElementById('modal-kit-file-thumb').click()" style="flex:1">
-            <span id="thumb-btn-text">­ƒöä Alterar Thumbnail</span>
+            <span id="thumb-btn-text">🔄 Alterar Thumbnail</span>
           </button>
           <button 
             id="btn-deletar-thumb" 
@@ -917,7 +917,7 @@
             onclick="deletarThumb()" 
             style="display:none"
           >
-            ­ƒùæ´©Å Deletar
+            🗑️ Deletar
           </button>
         </div>
         <span id="file-name-thumb" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
@@ -928,13 +928,13 @@
     <!-- Footer -->
     <div class="modal-footer">
       <span id="modal-save-success" class="save-success" style="display:none">
-        Ô£à Salvo com sucesso!
+        ✓ Salvo com sucesso!
       </span>
       <button class="btn btn-secondary" onclick="fecharModalKit()">
         Cancelar
       </button>
       <button class="btn btn-primary" id="modal-save-btn" onclick="salvarKit()">
-        ­ƒÆ¥ Salvar
+        💾 Salvar
       </button>
     </div>
 
@@ -954,7 +954,7 @@
         placeholder="Nome do produto"
         style="font-size:16px;font-weight:700;flex:1;margin-right:1rem"
       />
-      <button class="modal-close" onclick="fecharModalProduto()">Ô£ò</button>
+      <button class="modal-close" onclick="fecharModalProduto()">✕</button>
     </div>
 
     <!-- Imagem preview -->
@@ -980,7 +980,7 @@
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Editar SKU"
           >
-            Ô£Å´©Å
+            ✏️
           </button>
           <button 
             id="btn-salvar-produto-sku"
@@ -988,7 +988,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            ✓
           </button>
           <button 
             id="btn-cancelar-produto-sku"
@@ -996,7 +996,7 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            ✕
           </button>
         </div>
       </div>
@@ -1018,7 +1018,7 @@
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Editar preço"
           >
-            Ô£Å´©Å
+            ✏️
           </button>
           <button 
             id="btn-salvar-produto-preco"
@@ -1026,7 +1026,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            ✓
           </button>
           <button 
             id="btn-cancelar-produto-preco"
@@ -1034,7 +1034,7 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            ✕
           </button>
         </div>
       </div>
@@ -1057,7 +1057,7 @@
               style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
               title="Editar descrição"
             >
-              Ô£Å´©Å
+              ✏️
             </button>
             <button 
               id="btn-salvar-produto-descricao"
@@ -1065,7 +1065,7 @@
               style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
               title="Salvar"
             >
-              Ô£à
+              ✓
             </button>
             <button 
               id="btn-cancelar-produto-descricao"
@@ -1073,7 +1073,7 @@
               style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
               title="Cancelar"
             >
-              Ô£ò
+              ✕
             </button>
           </div>
         </div>
@@ -1096,7 +1096,7 @@
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Editar peso"
           >
-            Ô£Å´©Å
+            ✏️
           </button>
           <button 
             id="btn-salvar-produto-peso"
@@ -1104,7 +1104,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            ✓
           </button>
           <button 
             id="btn-cancelar-produto-peso"
@@ -1112,7 +1112,7 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            ✕
           </button>
         </div>
       </div>
@@ -1134,7 +1134,7 @@
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Editar tamanho"
           >
-            Ô£Å´©Å
+            ✏️
           </button>
           <button 
             id="btn-salvar-produto-tamanho"
@@ -1142,7 +1142,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            ✓
           </button>
           <button 
             id="btn-cancelar-produto-tamanho"
@@ -1150,7 +1150,7 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            ✕
           </button>
         </div>
       </div>
@@ -1173,7 +1173,7 @@
               style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
               title="Editar composição"
             >
-              Ô£Å´©Å
+              ✏️
             </button>
             <button 
               id="btn-salvar-produto-composicao"
@@ -1181,7 +1181,7 @@
               style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
               title="Salvar"
             >
-              Ô£à
+              ✓
             </button>
             <button 
               id="btn-cancelar-produto-composicao"
@@ -1189,14 +1189,14 @@
               style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
               title="Cancelar"
             >
-              Ô£ò
+              ✕
             </button>
           </div>
         </div>
       </div>
 
       <div class="form-group" style="border-top:1px solid var(--border);padding-top:1rem">
-        <label class="form-label">­ƒô© Imagem Thumbnail (Capa)</label>
+        <label class="form-label">📷 Imagem Thumbnail (Capa)</label>
         <input
           type="file"
           id="modal-produto-file-thumb"
@@ -1206,7 +1206,7 @@
         />
         <div style="display:flex;gap:.5rem">
           <button class="btn btn-secondary" onclick="document.getElementById('modal-produto-file-thumb').click()" style="flex:1">
-            <span id="produto-thumb-btn-text">­ƒöä Alterar Thumbnail</span>
+            <span id="produto-thumb-btn-text">🔄 Alterar Thumbnail</span>
           </button>
           <button 
             id="btn-deletar-produto-thumb" 
@@ -1214,7 +1214,7 @@
             onclick="deletarProdutoThumb()" 
             style="display:none"
           >
-            ­ƒùæ´©Å Deletar
+            🗑️ Deletar
           </button>
         </div>
         <span id="file-name-produto-thumb" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
@@ -1222,7 +1222,7 @@
 
       <div class="form-group">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-          <label class="form-label" style="margin:0">­ƒû╝´©Å Imagens do Carrossel</label>
+          <label class="form-label" style="margin:0">🖼️ Imagens do Carrossel</label>
           <input
             type="file"
             id="modal-produto-file-carrossel"
@@ -1231,7 +1231,7 @@
             onchange="handleProdutoCarrosselSelect(this)"
           />
           <button class="btn btn-secondary" onclick="document.getElementById('modal-produto-file-carrossel').click()" style="padding:.25rem .5rem;font-size:12px">
-            Ô×ò Adicionar Imagem
+            ➕ Adicionar Imagem
           </button>
         </div>
         <div id="produto-carrossel-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem"></div>
@@ -1242,13 +1242,13 @@
     <!-- Footer -->
     <div class="modal-footer">
       <span id="modal-produto-save-success" class="save-success" style="display:none">
-        Ô£à Salvo com sucesso!
+        ✓ Salvo com sucesso!
       </span>
       <button class="btn btn-secondary" onclick="fecharModalProduto()">
         Cancelar
       </button>
       <button class="btn btn-primary" id="modal-produto-save-btn" onclick="salvarProduto()">
-        ­ƒÆ¥ Salvar
+        💾 Salvar
       </button>
     </div>
 
@@ -1261,8 +1261,8 @@
     
     <!-- Header -->
     <div class="modal-header">
-      <div class="modal-title">­ƒº¬ Enviar Mensagem de Teste</div>
-      <button class="modal-close" onclick="fecharModalTeste()">Ô£ò</button>
+      <div class="modal-title">🚀 Enviar Mensagem de Teste</div>
+      <button class="modal-close" onclick="fecharModalTeste()">✕</button>
     </div>
 
     <!-- Body -->
@@ -1314,7 +1314,7 @@
         class="btn btn-primary" 
         style="padding:.75rem 1.25rem;font-size:14px;font-weight:600;border-radius:6px;background:var(--info)"
       >
-        ­ƒôñ Enviar Teste
+        📋 Enviar Teste
       </button>
     </div>
 
@@ -1505,7 +1505,7 @@ function renderHistorico(lista) {
   if (lista.length === 0) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <span>­ƒô¡</span>
+        <span>📭</span>
         <p>Nenhum disparo registrado ainda</p>
       </div>`;
     return;
@@ -1612,7 +1612,7 @@ function selecionarItemDisparo(id, tipo) {
   container.innerHTML = `
     ${itemSelecionado.thumb_url ? `<img src="${itemSelecionado.thumb_url}" alt="${esc(itemSelecionado.nome)}" style="width:60px;height:60px;border-radius:8px;object-fit:cover"/>` : ''}
     <div style="flex:1">
-      <div style="font-size:15px;font-weight:700;color:var(--success)">Ô£ô Selecionado</div>
+      <div style="font-size:15px;font-weight:700;color:var(--success)">✔️ Selecionado</div>
       <div style="font-size:14px;color:var(--text)">${esc(itemSelecionado.nome)}</div>
       <div style="font-size:12px;color:var(--text2)">${itemSelecionado.tipo === 'kit' ? 'Kit' : 'Produto'}</div>
     </div>
@@ -1720,14 +1720,14 @@ async function iniciarDisparoMassa() {
     }
     
     const data = await res.json();
-    adicionarLog('success', `Ô£à Disparo configurado no servidor (ID: ${data.disparo_id || 'N/A'})`);
+    adicionarLog('success', `✓ Disparo configurado no servidor (ID: ${data.disparo_id || 'N/A'})`);
     
     // Inicia polling para acompanhar envios
     iniciarPollingLogEnvios();
     
   } catch (err) {
     console.error('[Disparo Massa] Erro:', err);
-    adicionarLog('error', `ÔØî Erro ao iniciar: ${err.message}`);
+    adicionarLog('error', `❌ Erro ao iniciar: ${err.message}`);
     document.getElementById('disparo-massa-ativo').checked = false;
     disparoMassaAtivo = false;
   }
@@ -1771,7 +1771,7 @@ function iniciarPollingLogEnvios() {
       if (data.ultimos_envios && Array.isArray(data.ultimos_envios)) {
         data.ultimos_envios.forEach(envio => {
           const tipo = envio.status === 'enviado' ? 'success' : 'error';
-          const icone = envio.status === 'enviado' ? 'Ô£à' : 'ÔØî';
+          const icone = envio.status === 'enviado' ? '✓' : '❌';
           adicionarLog(tipo, `${icone} ${envio.numero} - ${envio.mensagem_preview || 'Mensagem enviada'}`, false);
         });
       }
@@ -1780,7 +1780,7 @@ function iniciarPollingLogEnvios() {
       if (data.concluido) {
         document.getElementById('disparo-massa-ativo').checked = false;
         disparoMassaAtivo = false;
-        adicionarLog('success', '­ƒÄë Disparo em massa concluído!');
+        adicionarLog('success', '🎉 Disparo em massa concluído!');
         clearInterval(pollingInterval);
       }
       
@@ -1901,15 +1901,15 @@ async function enviarTeste() {
       throw new Error(erro);
     }
     
-    alert('Ô£à Mensagem de teste enviada com sucesso!');
+    alert('✓ Mensagem de teste enviada com sucesso!');
     fecharModalTeste();
     
   } catch (err) {
     console.error('[Teste] Erro:', err);
-    alert('ÔØî Erro ao enviar teste: ' + err.message);
+    alert('❌ Erro ao enviar teste: ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = '­ƒôñ Enviar Teste';
+    btn.textContent = '📋 Enviar Teste';
   }
 }
 
@@ -1945,7 +1945,7 @@ async function iniciarDisparo() {
       throw new Error(erro);
     }
     
-    alert('Ô£à Disparo iniciado com sucesso!');
+    alert('✓ Disparo iniciado com sucesso!');
     
     // Limpa formulário
     document.getElementById('disparo-mensagem').value = '';
@@ -1958,10 +1958,10 @@ async function iniciarDisparo() {
     
   } catch (err) {
     console.error('[Disparo] Erro:', err);
-    alert('ÔØî Erro ao iniciar disparo: ' + err.message);
+    alert('❌ Erro ao iniciar disparo: ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = '­ƒÜÇ Iniciar Disparo';
+    btn.textContent = '▶️ Iniciar Disparo';
     atualizarBotaoDisparo();
   }
 }
@@ -2041,7 +2041,7 @@ async function carregarCatalogo() {
     console.error('[Catálogo] Erro ao carregar:', e);
     document.getElementById('catalogo-grid').innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <span>ÔÜá´©Å</span>
+        <span>⚠️</span>
         <p>Erro ao carregar catálogo</p>
         <p style="font-size:11px;color:var(--text2)">Verifique se o servidor está rodando</p>
       </div>`;
@@ -2059,7 +2059,7 @@ function renderKits(lista) {
   if (lista.length === 0) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <span>­ƒôª</span>
+        <span>📦</span>
         <p>Nenhum kit no catálogo</p>
       </div>`;
     return;
@@ -2087,7 +2087,7 @@ function renderKits(lista) {
               class="lazy-img"
               style="background:var(--bg3)"
             />`
-          : `<span class="kit-img-placeholder">­ƒôª</span>`
+          : `<span class="kit-img-placeholder">📦</span>`
         }
       </div>
       <div class="kit-info">
@@ -2101,7 +2101,7 @@ function renderKits(lista) {
         }
       </div>
       <div class="kit-footer">
-        Ô£Å´©Å Editar
+        ✏️ Editar
       </div>
     </div>
   `;
@@ -2147,7 +2147,7 @@ function abrirModalKit(nomeKit, marca) {
     if (!kitAtual) {
       console.error('[DEBUG] Kit não encontrado! Buscando:', { nome: nomeKit, marca: marca });
       console.error('[DEBUG] Primeiro kit no array:', kitsData[0]);
-      alert(`ÔØî Kit "${nomeKit}" não encontrado!`);
+      alert(`❌ Kit "${nomeKit}" não encontrado!`);
       return;
     }
 
@@ -2199,9 +2199,9 @@ function abrirModalKit(nomeKit, marca) {
     
     console.log('[DEBUG] 12. Mostrando modal...');
     document.getElementById('modal-kit').style.display = 'flex';
-    console.log('[DEBUG] Ô£à Modal ABERTO com sucesso!');
+    console.log('[DEBUG] ✓ Modal ABERTO com sucesso!');
   } catch (error) {
-    console.error('[DEBUG] ÔØî ERRO ao abrir modal:', error);
+    console.error('[DEBUG] ❌ ERRO ao abrir modal:', error);
     alert(`Erro ao abrir modal: ${error.message}`);
   }
 }
@@ -2237,7 +2237,7 @@ function renderCarrossel(imagens) {
         onclick="deletarImagemCarrossel('${esc(img)}')"
         style="position:absolute;top:4px;right:4px;background:rgba(239,68,68,0.9);color:white;border:none;border-radius:4px;padding:.25rem .35rem;cursor:pointer;font-size:10px"
       >
-        ­ƒùæ´©Å
+        🗑️
       </button>
     </div>
   `).join('');
@@ -2334,10 +2334,10 @@ async function salvarOrdemCarrossel(imagens) {
       throw new Error(data.erro || 'Erro ao salvar ordem');
     }
     
-    showToast('Ô£ô Ordem atualizada', 'success');
+    showToast('✔️ Ordem atualizada', 'success');
   } catch (err) {
     console.error('Erro ao salvar ordem:', err);
-    showToast('ÔØî Erro ao salvar ordem', 'error');
+    showToast('❌ Erro ao salvar ordem', 'error');
   }
 }
 
@@ -2362,7 +2362,7 @@ function renderSkusItens(skus) {
         onclick="removerSkuItem(${idx})"
         style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:4px;padding:.25rem .5rem;cursor:pointer;font-size:12px"
       >
-        ­ƒùæ´©Å
+        🗑️
       </button>
     </div>
   `).join('');
@@ -2394,7 +2394,7 @@ function renderComponentesKit(componentes) {
         style="background:var(--info);color:white;border:none;border-radius:6px;padding:.4rem .7rem;cursor:pointer;font-size:11px;font-weight:600"
         title="Ver detalhes"
       >
-        ­ƒæü´©Å Ver
+        👁️ Ver
       </button>
     </div>
   `).join('');
@@ -2442,7 +2442,7 @@ function handleThumbSelect(input) {
   // Validação de tipo
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    alert('ÔÜá´©Å Formato inválido. Use apenas: JPG, PNG ou WebP');
+    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
     input.value = '';
     arquivoThumb = null;
     document.getElementById('file-name-thumb').textContent = '';
@@ -2452,7 +2452,7 @@ function handleThumbSelect(input) {
   // Validação de tamanho (5MB)
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
-    alert('ÔÜá´©Å Arquivo muito grande. Tamanho máximo: 5MB');
+    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
     input.value = '';
     arquivoThumb = null;
     document.getElementById('file-name-thumb').textContent = '';
@@ -2460,7 +2460,7 @@ function handleThumbSelect(input) {
   }
 
   arquivoThumb = file;
-  document.getElementById('file-name-thumb').textContent = `Ô£ô ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  document.getElementById('file-name-thumb').textContent = `✔️ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
 }
 
 function handleCarrosselSelect(input) {
@@ -2473,7 +2473,7 @@ function handleCarrosselSelect(input) {
   // Validação de tipo
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    alert('ÔÜá´©Å Formato inválido. Use apenas: JPG, PNG ou WebP');
+    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
     input.value = '';
     arquivoCarrossel = null;
     return;
@@ -2482,7 +2482,7 @@ function handleCarrosselSelect(input) {
   // Validação de tamanho (5MB)
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
-    alert('ÔÜá´©Å Arquivo muito grande. Tamanho máximo: 5MB');
+    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
     input.value = '';
     arquivoCarrossel = null;
     return;
@@ -2519,10 +2519,10 @@ async function uploadCarrossel() {
     document.getElementById('modal-kit-file-carrossel').value = '';
     arquivoCarrossel = null;
 
-    showToast('Ô£ô Imagem adicionada ao carrossel', 'success');
+    showToast('✔️ Imagem adicionada ao carrossel', 'success');
   } catch (err) {
     console.error('Erro ao upload carrossel:', err);
-    alert('ÔØî Erro ao adicionar imagem: ' + err.message);
+    alert('❌ Erro ao adicionar imagem: ' + err.message);
   }
 }
 
@@ -2546,10 +2546,10 @@ async function deletarImagemCarrossel(arquivo) {
     kitAtual = kitsData.find(k => k.nome === kitAtual.nome);
     renderCarrossel(kitAtual.imagens_carrossel || []);
 
-    showToast('Ô£ô Imagem deletada', 'success');
+    showToast('✔️ Imagem deletada', 'success');
   } catch (err) {
     console.error('Erro ao deletar imagem:', err);
-    alert('ÔØî Erro ao deletar: ' + err.message);
+    alert('❌ Erro ao deletar: ' + err.message);
   }
 }
 
@@ -2610,7 +2610,7 @@ async function salvarKit() {
     kitAtual.descricao = descricao;
 
     // Mostra sucesso
-    showToast('Ô£ô Kit salvo com sucesso', 'success');
+    showToast('✔️ Kit salvo com sucesso', 'success');
     document.getElementById('modal-save-success').style.display = 'block';
     setTimeout(() => {
       document.getElementById('modal-save-success').style.display = 'none';
@@ -2629,7 +2629,7 @@ async function salvarKit() {
     alert('Erro ao salvar: ' + e.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = '­ƒÆ¥ Salvar';
+    btn.textContent = '💾 Salvar';
   }
 }
 
@@ -2657,7 +2657,7 @@ async function carregarProdutos() {
     console.error('[Produtos] Erro ao carregar:', e);
     document.getElementById('produtos-grid').innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <span>ÔÜá´©Å</span>
+        <span>⚠️</span>
         <p>Erro ao carregar produtos</p>
         <p style="font-size:11px;color:var(--text2)">Verifique se o servidor está rodando</p>
       </div>`;
@@ -2675,7 +2675,7 @@ function renderProdutos(lista) {
   if (lista.length === 0) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <span>­ƒº┤</span>
+        <span>🧴</span>
         <p>Nenhum produto no catálogo</p>
       </div>`;
     return;
@@ -2703,7 +2703,7 @@ function renderProdutos(lista) {
               class="lazy-img"
               style="background:var(--bg3)"
             />`
-          : `<span class="kit-img-placeholder">­ƒº┤</span>`
+          : `<span class="kit-img-placeholder">🧴</span>`
         }
       </div>
       <div class="kit-info">
@@ -2717,7 +2717,7 @@ function renderProdutos(lista) {
         }
       </div>
       <div class="kit-footer">
-        Ô£Å´©Å Editar
+        ✏️ Editar
       </div>
     </div>
   `;
@@ -2791,10 +2791,10 @@ function abrirModalProduto(nomeProduto, marca) {
   const temThumb = produtoAtual.caminho_thumb_bd || produtoAtual.tem_thumb;
   const btnDeletarThumb = document.getElementById('btn-deletar-produto-thumb');
   if (temThumb) {
-    document.getElementById('produto-thumb-btn-text').textContent = '­ƒöä Alterar Thumbnail';
+    document.getElementById('produto-thumb-btn-text').textContent = '🔄 Alterar Thumbnail';
     btnDeletarThumb.style.display = 'block';
   } else {
-    document.getElementById('produto-thumb-btn-text').textContent = 'Ô×ò Adicionar Thumbnail';
+    document.getElementById('produto-thumb-btn-text').textContent = '➕ Adicionar Thumbnail';
     btnDeletarThumb.style.display = 'none';
   }
 
@@ -2811,7 +2811,7 @@ function abrirModalProduto(nomeProduto, marca) {
   } else {
     imgWrap.innerHTML = `
       <div class="modal-no-img">
-        <span style="font-size:32px">­ƒû╝´©Å</span>
+        <span style="font-size:32px">🖼️</span>
         <span>Escolha uma thumb abaixo</span>
       </div>`;
   }
@@ -2905,13 +2905,13 @@ async function salvarCampoProduto(campo) {
     document.getElementById(`btn-salvar-produto-${campo}`).style.display = 'none';
     document.getElementById(`btn-cancelar-produto-${campo}`).style.display = 'none';
     
-    showToast(`Ô£ô ${campo.charAt(0).toUpperCase() + campo.slice(1)} atualizado`, 'success');
+    showToast(`✔️ ${campo.charAt(0).toUpperCase() + campo.slice(1)} atualizado`, 'success');
     
     // Recarrega catálogo
     await carregarProdutos();
   } catch (err) {
     console.error(`Erro ao salvar ${campo}:`, err);
-    alert(`ÔØî Erro ao salvar ${campo}: ` + err.message);
+    alert(`❌ Erro ao salvar ${campo}: ` + err.message);
     cancelarEditarCampo(campo);
   }
 }
@@ -2927,7 +2927,7 @@ function handleProdutoThumbSelect(input) {
   // Validação de tipo
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    alert('ÔÜá´©Å Formato inválido. Use apenas: JPG, PNG ou WebP');
+    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
     input.value = '';
     arquivoProdutoThumb = null;
     document.getElementById('file-name-produto-thumb').textContent = '';
@@ -2937,7 +2937,7 @@ function handleProdutoThumbSelect(input) {
   // Validação de tamanho (5MB)
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
-    alert('ÔÜá´©Å Arquivo muito grande. Tamanho máximo: 5MB');
+    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
     input.value = '';
     arquivoProdutoThumb = null;
     document.getElementById('file-name-produto-thumb').textContent = '';
@@ -2945,7 +2945,7 @@ function handleProdutoThumbSelect(input) {
   }
 
   arquivoProdutoThumb = file;
-  document.getElementById('file-name-produto-thumb').textContent = `Ô£ô ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  document.getElementById('file-name-produto-thumb').textContent = `✔️ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
   
   // Upload automático
   uploadProdutoThumb();
@@ -2978,7 +2978,7 @@ async function uploadProdutoThumb() {
         <img src="/api/catalogo/imagem/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}/thumb.${ext}?tipo=produto&t=${Date.now()}" alt="${esc(produtoAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
       </div>`;
     
-    document.getElementById('produto-thumb-btn-text').textContent = '­ƒöä Alterar Thumbnail';
+    document.getElementById('produto-thumb-btn-text').textContent = '🔄 Alterar Thumbnail';
     document.getElementById('btn-deletar-produto-thumb').style.display = 'block';
     
     // Limpa input
@@ -2986,13 +2986,13 @@ async function uploadProdutoThumb() {
     document.getElementById('file-name-produto-thumb').textContent = '';
     arquivoProdutoThumb = null;
 
-    showToast('Ô£ô Thumbnail atualizada', 'success');
+    showToast('✔️ Thumbnail atualizada', 'success');
     
     // Recarrega catálogo
     await carregarProdutos();
   } catch (err) {
     console.error('Erro ao upload thumbnail:', err);
-    alert('ÔØî Erro ao atualizar thumbnail: ' + err.message);
+    alert('❌ Erro ao atualizar thumbnail: ' + err.message);
   }
 }
 
@@ -3015,20 +3015,20 @@ async function deletarProdutoThumb() {
     produtoAtual.tem_thumb = false;
     document.getElementById('modal-produto-img-wrap').innerHTML = `
       <div class="modal-no-img">
-        <span style="font-size:32px">­ƒû╝´©Å</span>
+        <span style="font-size:32px">🖼️</span>
         <span>Escolha uma thumb abaixo</span>
       </div>`;
     
-    document.getElementById('produto-thumb-btn-text').textContent = 'Ô×ò Adicionar Thumbnail';
+    document.getElementById('produto-thumb-btn-text').textContent = '➕ Adicionar Thumbnail';
     document.getElementById('btn-deletar-produto-thumb').style.display = 'none';
 
-    showToast('Ô£ô Thumbnail deletada', 'success');
+    showToast('✔️ Thumbnail deletada', 'success');
     
     // Recarrega catálogo
     await carregarProdutos();
   } catch (err) {
     console.error('Erro ao deletar thumbnail:', err);
-    alert('ÔØî Erro ao deletar: ' + err.message);
+    alert('❌ Erro ao deletar: ' + err.message);
   }
 }
 
@@ -3085,13 +3085,13 @@ async function salvarSku() {
     document.getElementById('btn-salvar-sku').style.display = 'none';
     document.getElementById('btn-cancelar-sku').style.display = 'none';
     
-    showToast('Ô£ô SKU atualizado', 'success');
+    showToast('✔️ SKU atualizado', 'success');
     
     // Recarrega catálogo
     await carregarCatalogo();
   } catch (err) {
     console.error('Erro ao salvar SKU:', err);
-    alert('ÔØî Erro ao salvar SKU: ' + err.message);
+    alert('❌ Erro ao salvar SKU: ' + err.message);
     cancelarEditarSku();
   }
 }
@@ -3149,13 +3149,13 @@ async function salvarPreco() {
     document.getElementById('btn-salvar-preco').style.display = 'none';
     document.getElementById('btn-cancelar-preco').style.display = 'none';
     
-    showToast('Ô£ô Preço atualizado', 'success');
+    showToast('✔️ Preço atualizado', 'success');
     
     // Recarrega catálogo
     await carregarCatalogo();
   } catch (err) {
     console.error('Erro ao salvar preço:', err);
-    alert('ÔØî Erro ao salvar preço: ' + err.message);
+    alert('❌ Erro ao salvar preço: ' + err.message);
     cancelarEditarPreco();
   }
 }
@@ -3180,20 +3180,20 @@ async function deletarThumb() {
     kitAtual.tem_thumb = false;
     document.getElementById('modal-kit-img-wrap').innerHTML = `
       <div class="modal-no-img">
-        <span style="font-size:32px">­ƒû╝´©Å</span>
+        <span style="font-size:32px">🖼️</span>
         <span>Escolha uma thumb abaixo</span>
       </div>`;
     
-    document.getElementById('thumb-btn-text').textContent = 'Ô×ò Adicionar Thumbnail';
+    document.getElementById('thumb-btn-text').textContent = '➕ Adicionar Thumbnail';
     document.getElementById('btn-deletar-thumb').style.display = 'none';
 
-    showToast('Ô£ô Thumbnail deletada', 'success');
+    showToast('✔️ Thumbnail deletada', 'success');
     
     // Recarrega catálogo
     await carregarCatalogo();
   } catch (err) {
     console.error('Erro ao deletar thumbnail:', err);
-    alert('ÔØî Erro ao deletar: ' + err.message);
+    alert('❌ Erro ao deletar: ' + err.message);
   }
 }
 
@@ -3221,7 +3221,7 @@ function initLazyLoad() {
           
           // Fallback se der erro
           img.onerror = function() {
-            this.parentElement.innerHTML = '<span class="kit-img-placeholder">­ƒôª</span>';
+            this.parentElement.innerHTML = '<span class="kit-img-placeholder">📦</span>';
           };
         }
       });
@@ -3271,7 +3271,7 @@ async function salvarProduto() {
     produtoAtual.descricao = descricao;
 
     // Mostra sucesso
-    showToast('Ô£ô Produto salvo com sucesso', 'success');
+    showToast('✔️ Produto salvo com sucesso', 'success');
     document.getElementById('modal-produto-save-success').style.display = 'block';
     setTimeout(() => {
       document.getElementById('modal-produto-save-success').style.display = 'none';
@@ -3285,7 +3285,7 @@ async function salvarProduto() {
     alert('Erro ao salvar: ' + e.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = '­ƒÆ¥ Salvar';
+    btn.textContent = '💾 Salvar';
   }
 }
 
@@ -3299,7 +3299,7 @@ function handleProdutoCarrosselSelect(input) {
   // Validação de tipo
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    alert('ÔÜá´©Å Formato inválido. Use apenas: JPG, PNG ou WebP');
+    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
     input.value = '';
     arquivoProdutoCarrossel = null;
     return;
@@ -3308,7 +3308,7 @@ function handleProdutoCarrosselSelect(input) {
   // Validação de tamanho (5MB)
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
-    alert('ÔÜá´©Å Arquivo muito grande. Tamanho máximo: 5MB');
+    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
     input.value = '';
     arquivoProdutoCarrossel = null;
     return;
@@ -3346,10 +3346,10 @@ async function uploadProdutoCarrossel() {
     document.getElementById('modal-produto-file-carrossel').value = '';
     arquivoProdutoCarrossel = null;
 
-    showToast('Ô£ô Imagem adicionada ao carrossel', 'success');
+    showToast('✔️ Imagem adicionada ao carrossel', 'success');
   } catch (err) {
     console.error('Erro ao upload carrossel:', err);
-    alert('ÔØî Erro ao adicionar imagem: ' + err.message);
+    alert('❌ Erro ao adicionar imagem: ' + err.message);
   }
 }
 
@@ -3385,7 +3385,7 @@ function renderProdutoCarrossel(imagens) {
         onclick="deletarProdutoImagemCarrossel('${esc(img)}')"
         style="position:absolute;top:4px;right:4px;background:rgba(239,68,68,0.9);color:white;border:none;border-radius:4px;padding:.25rem .35rem;cursor:pointer;font-size:10px"
       >
-        ­ƒùæ´©Å
+        🗑️
       </button>
     </div>
   `).join('');
@@ -3472,10 +3472,10 @@ async function salvarOrdemProdutoCarrossel(imagens) {
       throw new Error(data.erro || 'Erro ao salvar ordem');
     }
     
-    showToast('Ô£ô Ordem atualizada', 'success');
+    showToast('✔️ Ordem atualizada', 'success');
   } catch (err) {
     console.error('Erro ao salvar ordem:', err);
-    showToast('ÔØî Erro ao salvar ordem', 'error');
+    showToast('❌ Erro ao salvar ordem', 'error');
   }
 }
 
@@ -3499,10 +3499,10 @@ async function deletarProdutoImagemCarrossel(arquivo) {
     produtoAtual = produtosData.find(p => p.nome === produtoAtual.nome);
     renderProdutoCarrossel(produtoAtual.imagens_carrossel || []);
 
-    showToast('Ô£ô Imagem deletada', 'success');
+    showToast('✔️ Imagem deletada', 'success');
   } catch (err) {
     console.error('Erro ao deletar imagem:', err);
-    alert('ÔØî Erro ao deletar: ' + err.message);
+    alert('❌ Erro ao deletar: ' + err.message);
   }
 }
 
