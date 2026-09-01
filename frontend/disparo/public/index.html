@@ -1376,43 +1376,54 @@ function abrirModalKit(nomeKit, marca) {
     }
 
     console.log('[DEBUG] Inicializando modal...');
+    console.log('[DEBUG] 1. Limpando variáveis...');
     arquivoThumb = null;
     arquivoCarrossel = null;
+    
+    console.log('[DEBUG] 2. Acessando file-name-thumb...');
     document.getElementById('file-name-thumb').textContent = '';
+    
+    console.log('[DEBUG] 3. Acessando modal-kit-file-thumb...');
     document.getElementById('modal-kit-file-thumb').value = '';
+    
+    console.log('[DEBUG] 4. Acessando modal-save-success...');
     document.getElementById('modal-save-success').style.display = 'none';
 
-    console.log('[DEBUG] Preenchendo campos...');
+    console.log('[DEBUG] 5. Preenchendo nome...');
     document.getElementById('modal-kit-nome-edit').value = kitAtual.nome;
     
-    // Preço - desabilitado por padrão
+    console.log('[DEBUG] 6. Configurando preço...');
     const inputPreco = document.getElementById('modal-kit-preco');
     inputPreco.value = kitAtual.preco ? `R$ ${parseFloat(kitAtual.preco).toFixed(2)}` : '';
     inputPreco.disabled = true;
     precoOriginal = inputPreco.value;
+    
+    console.log('[DEBUG] 7. Botões de preço...');
     document.getElementById('btn-editar-preco').style.display = 'block';
     document.getElementById('btn-salvar-preco').style.display = 'none';
     document.getElementById('btn-cancelar-preco').style.display = 'none';
     
+    console.log('[DEBUG] 8. Preenchendo descrição...');
     document.getElementById('modal-kit-descricao').value = kitAtual.descricao || '';
     
-    // SKU - desabilitado por padrão
+    console.log('[DEBUG] 9. Configurando SKU...');
     const inputSku = document.getElementById('modal-kit-sku');
     inputSku.value = kitAtual.codigo_sku || '';
     inputSku.disabled = true;
     skuOriginal = inputSku.value;
+    
+    console.log('[DEBUG] 10. Botões de SKU...');
     document.getElementById('btn-editar-sku').style.display = 'block';
     document.getElementById('btn-salvar-sku').style.display = 'none';
     document.getElementById('btn-cancelar-sku').style.display = 'none';
     
-    console.log('[DEBUG] Renderizando componentes...');
-    // Renderiza componentes do kit
+    console.log('[DEBUG] 11. Renderizando componentes...');
     const componentes = kitAtual.componentes || [];
     renderComponentesKit(componentes);
     
-    console.log('[DEBUG] Mostrando modal...');
+    console.log('[DEBUG] 12. Mostrando modal...');
     document.getElementById('modal-kit').style.display = 'flex';
-    console.log('[DEBUG] ✅ Modal deveria estar visível agora!');
+    console.log('[DEBUG] ✅ Modal ABERTO com sucesso!');
   } catch (error) {
     console.error('[DEBUG] ❌ ERRO ao abrir modal:', error);
     alert(`Erro ao abrir modal: ${error.message}`);
