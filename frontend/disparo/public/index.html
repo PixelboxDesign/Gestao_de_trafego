@@ -533,6 +533,8 @@
 <!-- Tabs -->
 <nav class="tabs">
   <button class="tab active" onclick="trocarAba('whatsapp', this)">💬 WhatsApp</button>
+  <button class="tab" onclick="trocarAba('catalogo', this)">📦 Kits</button>
+  <button class="tab" onclick="trocarAba('produtos', this)">🧴 Produtos</button>
 </nav>
 
 <!-- Content -->
@@ -3502,6 +3504,411 @@ async function deletarProdutoImagemCarrossel(arquivo) {
     alert('❌ Erro ao deletar: ' + err.message);
   }
 }
+
+// ══ FUNÇÕES DE CATÁLOGO (KITS) ══════════════════════════════════════════════
+
+let kitsData = [];
+let kitAtual = null;
+let arquivoThumb = null;
+let skuOriginal = '';
+let precoOriginal = '';
+
+async function carregarCatalogo() {
+  try {
+    const data = await api(`/api/catalogo/v2/kits`);
+    kitsData = data || [];
+    console.log('[DEBUG] Kits carregados:', kitsData.length);
+    renderKits(kitsData);
+  } catch (e) {
+    console.error('[Catálogo] Erro ao carregar:', e);
+    document.getElementById('catalogo-grid').innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <span>⚠️</span>
+        <p>Erro ao carregar catálogo</p>
+      </div>`;
+  }
+}
+
+function renderKits(lista) {
+  const grid = document.getElementById('catalogo-grid');
+  const count = document.getElementById('catalogo-count');
+  
+  count.textContent = `${lista.length} kit${lista.length !== 1 ? 's' : ''}`;
+
+  if (lista.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><span>📦</span><p>Nenhum kit no catálogo</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = lista.map(kit => {
+    const temThumb = kit.caminho_thumb_bd || kit.tem_thumb;
+    const marca = kit.marca || 'Alphahall';
+    const thumbUrl = kit.caminho_thumb_bd 
+      ? `/api/catalogo/files/${encodeURIComponent(kit.caminho_thumb_bd)}` 
+      : kit.tem_thumb 
+        ? `/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}` 
+        : null;
+    
+    return `
+    <div class="kit-card" data-kit-nome="${escAttr(kit.nome)}" data-kit-marca="${escAttr(marca)}">
+      <div class="kit-img-area">
+        ${temThumb
+          ? `<img loading="lazy" data-src="${thumbUrl}" alt="${esc(kit.nome)}" class="lazy-img" style="background:var(--bg3)"/>`
+          : `<span class="kit-img-placeholder">📦</span>`
+        }
+      </div>
+      <div class="kit-info">
+        <h3 class="kit-nome">${esc(kit.nome)}</h3>
+        ${kit.preco ? `<span class="kit-preco">R$ ${parseFloat(kit.preco).toFixed(2)}</span>` : ''}
+        ${kit.descricao ? `<p class="kit-mensagem">${esc(kit.descricao)}</p>` : ''}
+      </div>
+      <div class="kit-footer">✏️ Editar</div>
+    </div>`;
+  }).join('');
+
+  setTimeout(() => {
+    document.querySelectorAll('.kit-card[data-kit-nome]').forEach(card => {
+      card.addEventListener('click', () => {
+        const nome = card.getAttribute('data-kit-nome').trim();
+        const marca = card.getAttribute('data-kit-marca').trim();
+        abrirModalKit(nome, marca);
+      });
+    });
+  }, 100);
+
+  initLazyLoad();
+}
+
+function filtrarKits(busca) {
+  const termo = busca.toLowerCase().trim();
+  const filtrados = termo ? kitsData.filter(k => k.nome.toLowerCase().includes(termo)) : kitsData;
+  renderKits(filtrados);
+}
+
+function abrirModalKit(nomeKit, marca) {
+  kitAtual = kitsData.find(k => k.nome === nomeKit);
+  if (!kitAtual) {
+    alert(`❌ Kit "${nomeKit}" não encontrado!`);
+    return;
+  }
+
+  arquivoThumb = null;
+  document.getElementById('file-name-thumb').textContent = '';
+  document.getElementById('modal-kit-file-thumb').value = '';
+  document.getElementById('modal-save-success').style.display = 'none';
+  document.getElementById('modal-kit-nome-edit').value = kitAtual.nome;
+  
+  const inputPreco = document.getElementById('modal-kit-preco');
+  inputPreco.value = kitAtual.preco ? `R$ ${parseFloat(kitAtual.preco).toFixed(2)}` : '';
+  inputPreco.disabled = true;
+  precoOriginal = inputPreco.value;
+  
+  document.getElementById('btn-editar-preco').style.display = 'block';
+  document.getElementById('btn-salvar-preco').style.display = 'none';
+  document.getElementById('btn-cancelar-preco').style.display = 'none';
+  document.getElementById('modal-kit-descricao').value = kitAtual.descricao || '';
+  
+  const inputSku = document.getElementById('modal-kit-sku');
+  inputSku.value = kitAtual.codigo_sku || '';
+  inputSku.disabled = true;
+  skuOriginal = inputSku.value;
+  
+  document.getElementById('btn-editar-sku').style.display = 'block';
+  document.getElementById('btn-salvar-sku').style.display = 'none';
+  document.getElementById('btn-cancelar-sku').style.display = 'none';
+  
+  renderComponentesKit(kitAtual.componentes || []);
+  document.getElementById('modal-kit').style.display = 'flex';
+}
+
+function renderComponentesKit(componentes) {
+  const container = document.getElementById('skus-itens-container');
+  if (componentes.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic">Nenhum componente cadastrado.</p>';
+    return;
+  }
+  container.innerHTML = componentes.map(comp => `
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.75rem;display:flex;align-items:center;gap:.75rem">
+      <div style="background:var(--primary);color:white;border-radius:6px;padding:.35rem .6rem;font-size:13px;font-weight:700;min-width:40px;text-align:center">
+        ${comp.quantidade}x
+      </div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${esc(comp.nome)}</div>
+        ${comp.sku ? `<div style="font-size:11px;color:var(--text2)"><span style="background:var(--bg);padding:.15rem .4rem;border-radius:4px;font-family:monospace">${esc(comp.sku)}</span></div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function fecharModalKit() {
+  document.getElementById('modal-kit').style.display = 'none';
+  kitAtual = null;
+}
+
+function handleThumbSelect(input) {
+  const file = input.files?.[0];
+  if (!file) {
+    arquivoThumb = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    return;
+  }
+
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
+    input.value = '';
+    return;
+  }
+
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
+    input.value = '';
+    return;
+  }
+
+  arquivoThumb = file;
+  document.getElementById('file-name-thumb').textContent = `✓ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+}
+
+async function salvarKit() {
+  if (!kitAtual) return;
+
+  const btn = document.getElementById('modal-save-btn');
+  const preco = document.getElementById('modal-kit-preco').value.trim();
+  const descricao = document.getElementById('modal-kit-descricao').value.trim();
+  const skuKit = document.getElementById('modal-kit-sku').value.trim();
+
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  try {
+    const marca = kitAtual.marca || 'Alphahall';
+    const precoLimpo = preco.replace('R$ ', '').replace(',', '.');
+    const precoNumero = parseFloat(precoLimpo) || 0;
+    
+    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        preco: precoNumero,
+        codigo_sku: skuKit,
+        descricao: descricao
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Erro ao salvar');
+    }
+
+    if (arquivoThumb) {
+      const formData = new FormData();
+      formData.append('imagem', arquivoThumb);
+
+      const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}?tipo=kit`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!uploadRes.ok) {
+        const err = await uploadRes.text();
+        throw new Error('Erro no upload da thumb: ' + err);
+      }
+    }
+
+    alert('✓ Kit salvo com sucesso!');
+    document.getElementById('modal-save-success').style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('modal-save-success').style.display = 'none';
+    }, 2000);
+
+    arquivoThumb = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    document.getElementById('modal-kit-file-thumb').value = '';
+
+    await carregarCatalogo();
+
+  } catch (e) {
+    console.error('Erro ao salvar kit:', e);
+    alert('Erro ao salvar: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 Salvar';
+  }
+}
+
+function toggleEditarPreco() {
+  const input = document.getElementById('modal-kit-preco');
+  precoOriginal = input.value;
+  input.disabled = false;
+  input.focus();
+  document.getElementById('btn-editar-preco').style.display = 'none';
+  document.getElementById('btn-salvar-preco').style.display = 'block';
+  document.getElementById('btn-cancelar-preco').style.display = 'block';
+}
+
+function cancelarEditarPreco() {
+  const input = document.getElementById('modal-kit-preco');
+  input.value = precoOriginal;
+  input.disabled = true;
+  document.getElementById('btn-editar-preco').style.display = 'block';
+  document.getElementById('btn-salvar-preco').style.display = 'none';
+  document.getElementById('btn-cancelar-preco').style.display = 'none';
+}
+
+async function salvarPreco() {
+  if (!kitAtual) return;
+  
+  const input = document.getElementById('modal-kit-preco');
+  const novoPreco = input.value.trim();
+  
+  try {
+    const marca = kitAtual.marca || 'Alphahall';
+    const precoLimpo = novoPreco.replace('R$ ', '').replace(',', '.');
+    const precoNumero = parseFloat(precoLimpo) || 0;
+    
+    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ preco: precoNumero })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    kitAtual.preco = precoLimpo;
+    precoOriginal = novoPreco;
+    
+    input.disabled = true;
+    document.getElementById('btn-editar-preco').style.display = 'block';
+    document.getElementById('btn-salvar-preco').style.display = 'none';
+    document.getElementById('btn-cancelar-preco').style.display = 'none';
+    
+    alert('✓ Preço atualizado');
+    await carregarCatalogo();
+  } catch (err) {
+    console.error('Erro ao salvar preço:', err);
+    alert('❌ Erro ao salvar preço: ' + err.message);
+    cancelarEditarPreco();
+  }
+}
+
+function toggleEditarSku() {
+  const input = document.getElementById('modal-kit-sku');
+  skuOriginal = input.value;
+  input.disabled = false;
+  input.focus();
+  document.getElementById('btn-editar-sku').style.display = 'none';
+  document.getElementById('btn-salvar-sku').style.display = 'block';
+  document.getElementById('btn-cancelar-sku').style.display = 'block';
+}
+
+function cancelarEditarSku() {
+  const input = document.getElementById('modal-kit-sku');
+  input.value = skuOriginal;
+  input.disabled = true;
+  document.getElementById('btn-editar-sku').style.display = 'block';
+  document.getElementById('btn-salvar-sku').style.display = 'none';
+  document.getElementById('btn-cancelar-sku').style.display = 'none';
+}
+
+async function salvarSku() {
+  if (!kitAtual) return;
+  
+  const input = document.getElementById('modal-kit-sku');
+  const novoSku = input.value.trim();
+  
+  try {
+    const marca = kitAtual.marca || 'Alphahall';
+    
+    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigo_sku: novoSku })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    kitAtual.codigo_sku = novoSku;
+    skuOriginal = novoSku;
+    
+    input.disabled = true;
+    document.getElementById('btn-editar-sku').style.display = 'block';
+    document.getElementById('btn-salvar-sku').style.display = 'none';
+    document.getElementById('btn-cancelar-sku').style.display = 'none';
+    
+    alert('✓ SKU atualizado');
+    await carregarCatalogo();
+  } catch (err) {
+    console.error('Erro ao salvar SKU:', err);
+    alert('❌ Erro ao salvar SKU: ' + err.message);
+    cancelarEditarSku();
+  }
+}
+
+function deletarThumb() {
+  alert('Função deletarThumb ainda não implementada');
+}
+
+let lazyLoadObserver = null;
+
+function initLazyLoad() {
+  if (lazyLoadObserver) {
+    lazyLoadObserver.disconnect();
+  }
+
+  const lazyImages = document.querySelectorAll('img.lazy-img[data-src]');
+  
+  if ('IntersectionObserver' in window) {
+    lazyLoadObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          const src = img.getAttribute('data-src');
+          
+          img.src = src;
+          img.removeAttribute('data-src');
+          img.classList.remove('lazy-img');
+          
+          observer.unobserve(img);
+          
+          img.onerror = function() {
+            this.parentElement.innerHTML = '<span class="kit-img-placeholder">📦</span>';
+          };
+        }
+      });
+    }, {
+      rootMargin: '50px'
+    });
+    
+    lazyImages.forEach(img => lazyLoadObserver.observe(img));
+  } else {
+    lazyImages.forEach(img => {
+      const src = img.getAttribute('data-src');
+      img.src = src;
+      img.removeAttribute('data-src');
+    });
+  }
+}
+
+// Modificar trocarAba para carregar catálogo
+const _trocarAbaOriginal = window.trocarAba;
+window.trocarAba = function(id, btn) {
+  if (_trocarAbaOriginal) _trocarAbaOriginal(id, btn);
+  
+  if (id === 'catalogo' && kitsData.length === 0) {
+    carregarCatalogo();
+  }
+  if (id === 'produtos' && produtosData.length === 0) {
+    carregarProdutos();
+  }
+};
 
 </script>
 </body>
