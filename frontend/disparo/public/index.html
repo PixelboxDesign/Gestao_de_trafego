@@ -1362,83 +1362,62 @@ function abrirModalKit(nomeKit, marca) {
   console.log('[DEBUG] abrirModalKit chamado com:', nomeKit, marca);
   console.log('[DEBUG] kitsData tem', kitsData.length, 'kits');
   
-  // Busca apenas por nome, pois o campo marca não existe no banco
-  kitAtual = kitsData.find(k => k.nome === nomeKit);
-  
-  console.log('[DEBUG] kitAtual encontrado?', kitAtual ? 'SIM' : 'NÃO');
-  
-  if (!kitAtual) {
-    console.error('[DEBUG] Kit não encontrado! Buscando:', { nome: nomeKit, marca: marca });
-    console.error('[DEBUG] Primeiro kit no array:', kitsData[0]);
-    return;
-  }
-
-  arquivoThumb = null;
-  arquivoCarrossel = null;
-  document.getElementById('file-name-thumb').textContent = '';
-  document.getElementById('modal-kit-file-thumb').value = '';
-  document.getElementById('modal-kit-file-carrossel').value = '';
-  document.getElementById('modal-save-success').style.display = 'none';
-
-  document.getElementById('modal-kit-nome-edit').value = kitAtual.nome;
-  
-  // Preço - desabilitado por padrão
-  const inputPreco = document.getElementById('modal-kit-preco');
-  inputPreco.value = kitAtual.preco ? `R$ ${parseFloat(kitAtual.preco).toFixed(2)}` : '';
-  inputPreco.disabled = true;
-  precoOriginal = inputPreco.value;
-  document.getElementById('btn-editar-preco').style.display = 'block';
-  document.getElementById('btn-salvar-preco').style.display = 'none';
-  document.getElementById('btn-cancelar-preco').style.display = 'none';
-  
-  document.getElementById('modal-kit-descricao').value = kitAtual.descricao || '';
-  
-  // SKU - desabilitado por padrão
-  const inputSku = document.getElementById('modal-kit-sku');
-  inputSku.value = kitAtual.codigo_sku || '';
-  inputSku.disabled = true;
-  skuOriginal = inputSku.value;
-  document.getElementById('btn-editar-sku').style.display = 'block';
-  document.getElementById('btn-salvar-sku').style.display = 'none';
-  document.getElementById('btn-cancelar-sku').style.display = 'none';
-  
-  // Atualiza texto do botão thumb e mostra botão deletar se existir
-  const temThumb = kitAtual.caminho_thumb_bd || kitAtual.tem_thumb;
-  const btnDeletarThumb = document.getElementById('btn-deletar-thumb');
-  if (temThumb) {
-    document.getElementById('thumb-btn-text').textContent = '🔄 Alterar Thumbnail';
-    btnDeletarThumb.style.display = 'block';
-  } else {
-    document.getElementById('thumb-btn-text').textContent = '➕ Adicionar Thumbnail';
-    btnDeletarThumb.style.display = 'none';
-  }
-  
-  // Renderiza componentes do kit
-  const componentes = kitAtual.componentes || [];
-  renderComponentesKit(componentes);
-  
-  // Renderiza carrossel (vazio por enquanto - dados do banco não tem essa estrutura)
-  renderCarrossel([]);
-
-  const imgWrap = document.getElementById('modal-kit-img-wrap');
-  if (temThumb) {
-    const thumbUrl = kitAtual.caminho_thumb_bd 
-      ? `/api/catalogo/files/${encodeURIComponent(kitAtual.caminho_thumb_bd)}` 
-      : `/api/catalogo/imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}/thumb.${kitAtual.thumb_ext}`;
+  try {
+    // Busca apenas por nome, pois o campo marca não existe no banco
+    kitAtual = kitsData.find(k => k.nome === nomeKit);
     
-    imgWrap.innerHTML = `
-      <div class="modal-img-preview">
-        <img src="${thumbUrl}" alt="${esc(kitAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
-      </div>`;
-  } else {
-    imgWrap.innerHTML = `
-      <div class="modal-no-img">
-        <span style="font-size:32px">🖼️</span>
-        <span>Escolha uma thumb abaixo</span>
-      </div>`;
-  }
+    console.log('[DEBUG] kitAtual encontrado?', kitAtual ? 'SIM' : 'NÃO');
+    
+    if (!kitAtual) {
+      console.error('[DEBUG] Kit não encontrado! Buscando:', { nome: nomeKit, marca: marca });
+      console.error('[DEBUG] Primeiro kit no array:', kitsData[0]);
+      alert(`❌ Kit "${nomeKit}" não encontrado!`);
+      return;
+    }
 
-  document.getElementById('modal-kit').style.display = 'flex';
+    console.log('[DEBUG] Inicializando modal...');
+    arquivoThumb = null;
+    arquivoCarrossel = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    document.getElementById('modal-kit-file-thumb').value = '';
+    document.getElementById('modal-kit-file-carrossel').value = '';
+    document.getElementById('modal-save-success').style.display = 'none';
+
+    console.log('[DEBUG] Preenchendo campos...');
+    document.getElementById('modal-kit-nome-edit').value = kitAtual.nome;
+    
+    // Preço - desabilitado por padrão
+    const inputPreco = document.getElementById('modal-kit-preco');
+    inputPreco.value = kitAtual.preco ? `R$ ${parseFloat(kitAtual.preco).toFixed(2)}` : '';
+    inputPreco.disabled = true;
+    precoOriginal = inputPreco.value;
+    document.getElementById('btn-editar-preco').style.display = 'block';
+    document.getElementById('btn-salvar-preco').style.display = 'none';
+    document.getElementById('btn-cancelar-preco').style.display = 'none';
+    
+    document.getElementById('modal-kit-descricao').value = kitAtual.descricao || '';
+    
+    // SKU - desabilitado por padrão
+    const inputSku = document.getElementById('modal-kit-sku');
+    inputSku.value = kitAtual.codigo_sku || '';
+    inputSku.disabled = true;
+    skuOriginal = inputSku.value;
+    document.getElementById('btn-editar-sku').style.display = 'block';
+    document.getElementById('btn-salvar-sku').style.display = 'none';
+    document.getElementById('btn-cancelar-sku').style.display = 'none';
+    
+    console.log('[DEBUG] Renderizando componentes...');
+    // Renderiza componentes do kit
+    const componentes = kitAtual.componentes || [];
+    renderComponentesKit(componentes);
+    
+    console.log('[DEBUG] Mostrando modal...');
+    document.getElementById('modal-kit').style.display = 'flex';
+    console.log('[DEBUG] ✅ Modal deveria estar visível agora!');
+  } catch (error) {
+    console.error('[DEBUG] ❌ ERRO ao abrir modal:', error);
+    alert(`Erro ao abrir modal: ${error.message}`);
+  }
 }
 
 function renderCarrossel(imagens) {
