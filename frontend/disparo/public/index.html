@@ -1344,6 +1344,22 @@ function trocarSubAba(id, btn) {
   btn.classList.add('active');
 }
 
+// ── Troca de aba ─────────────────────────────────────────────────────────────
+function trocarAba(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Troca de sub-aba (WhatsApp) ──────────────────────────────────────────────
+function trocarSubAba(id, btn) {
+  document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sub-page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
 // ── API helper ───────────────────────────────────────────────────────────────
 async function api(path, opts) {
   const r = await fetch(path, opts);
@@ -1706,7 +1722,7 @@ async function iniciarDisparoMassa() {
     adicionarLog('success', `✅ Disparo configurado no servidor (ID: ${data.disparo_id || 'N/A'})`);
     
     // Inicia polling para acompanhar envios
-    iniciarPol lingLogEnvios();
+    iniciarPollingLogEnvios();
     
   } catch (err) {
     console.error('[Disparo Massa] Erro:', err);
