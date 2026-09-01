@@ -1117,8 +1117,15 @@ async function atualizarWhatsApp() {
 
     // Erro
     const elErro = document.getElementById('wa-erro');
-    if (d.erro && d.status === 'error') {
-      elErro.textContent = d.erro;
+    if (d.erro) {
+      let mensagemErro = d.erro;
+      
+      // Se for o erro de sidecar não rodando, melhora a mensagem
+      if (d.erro.includes('Sidecar') || d.erro.includes('sidecar') || d.status === 'disconnected') {
+        mensagemErro = 'WhatsApp Sidecar não está rodando. Execute INICIAR-LUNA-SERVER-COMPLETO.bat ou inicie manualmente: cd whatsapp-sidecar && node server.js';
+      }
+      
+      elErro.textContent = mensagemErro;
       elErro.style.display = 'block';
     } else {
       elErro.style.display = 'none';

@@ -127,12 +127,15 @@ export default function AbaWhatsApp() {
       {wa.status === "disconnected" && (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem", color: "var(--text2)" }}>
           <div style={{ fontSize: 40 }}>📵</div>
-          <p style={{ fontSize: 14, textAlign: "center", maxWidth: 320 }}>
-            Aguardando o QR Code ser gerado pelo sidecar WhatsApp...
+          <p style={{ fontSize: 14, textAlign: "center", maxWidth: 420 }}>
+            O WhatsApp Sidecar não está rodando ou não conseguiu inicializar.
           </p>
-          <p style={{ fontSize: 12, color: "var(--text2)" }}>
-            {wa.erro ?? "O sidecar inicializa automaticamente junto com o Luna Server"}
-          </p>
+          <div style={{ fontSize: 12, background: "var(--bg3)", padding: "1rem", borderRadius: 8, maxWidth: 420, lineHeight: 1.6 }}>
+            <strong>Para iniciar o WhatsApp:</strong><br />
+            1. Execute <code style={{ background: "var(--bg)", padding: "2px 6px", borderRadius: 4 }}>INICIAR-LUNA-SERVER-COMPLETO.bat</code><br />
+            2. Ou manualmente: <code style={{ background: "var(--bg)", padding: "2px 6px", borderRadius: 4 }}>cd whatsapp-sidecar && node server.js</code><br /><br />
+            {wa.erro && <span style={{ color: "var(--danger)" }}>Erro: {wa.erro}</span>}
+          </div>
         </div>
       )}
 
