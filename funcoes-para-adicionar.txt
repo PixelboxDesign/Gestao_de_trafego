@@ -1,0 +1,703 @@
+﻿let kitsData = [];
+let kitAtual = null;
+let arquivoThumb = null;
+let arquivoCarrossel = null;
+const MARCA_PADRAO = 'Alphahall'; // Marca padr├úo por enquanto
+
+// Estados de edi├º├úo inline (Kits)
+let skuOriginal = '';
+let precoOriginal = '';
+
+// Produtos
+let produtosData = [];
+let produtoAtual = null;
+let arquivoProdutoThumb = null;
+
+// Estados de edi├º├úo inline (Produtos)
+let camposOriginais = {
+  sku: '',
+  preco: '',
+  descricao: '',
+  peso: '',
+  tamanho: '',
+  composicao: ''
+};
+
+function showToast(message, type = 'info') {
+  // Simples alert por enquanto, pode ser melhorado com um toast bonito
+  console.log(`[${type.toUpperCase()}] ${message}`);
+}
+
+async function carregarCatalogo() {
+  try {
+    const data = await api(`/api/catalogo/v2/kits`);
+    kitsData = data || [];
+    console.log('[DEBUG] Kits carregados:', kitsData.length, '- Exemplo:', kitsData[0]);
+    renderKits(kitsData);
+  } catch (e) {
+    console.error('[Cat├ílogo] Erro ao carregar:', e);
+    document.getElementById('catalogo-grid').innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <span>ÔÜá´©Å</span>
+        <p>Erro ao carregar cat├ílogo</p>
+        <p style="font-size:11px;color:var(--text2)">Verifique se o servidor est├í rodando</p>
+      </div>`;
+  }
+}
+
+function renderKits(lista) {
+  const grid = document.getElementById('catalogo-grid');
+  const count = document.getElementById('catalogo-count');
+  
+  count.textContent = `${lista.length} kit${lista.length !== 1 ? 's' : ''}`;
+
+  console.log('[DEBUG] renderKits - total:', lista.length);
+
+  if (lista.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <span>­ƒôª</span>
+        <p>Nenhum kit no cat├ílogo</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = lista.map(kit => {
+    const temThumb = kit.caminho_thumb_bd || kit.tem_thumb;
+    const marca = kit.marca || 'Alphahall'; // Fallback para Alphahall se marca estiver vazia
+    const thumbUrl = kit.caminho_thumb_bd 
+      ? `/api/catalogo/files/${encodeURIComponent(kit.caminho_thumb_bd)}` 
+      : kit.tem_thumb 
+        ? `/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}` 
+        : null;
+    
+    console.log('[DEBUG] Renderizando kit:', kit.nome, '- marca:', marca, '- data-kit-marca:', escAttr(marca));
+    
+    return `
+    <div class="kit-card" data-kit-nome="${escAttr(kit.nome)}" data-kit-marca="${escAttr(marca)}">
+      <div class="kit-img-area">
+        ${temThumb
+          ? `<img 
+              loading="lazy" 
+              data-src="${thumbUrl}" 
+              alt="${esc(kit.nome)}" 
+              class="lazy-img"
+              style="background:var(--bg3)"
+            />`
+          : `<span class="kit-img-placeholder">­ƒôª</span>`
+        }
+      </div>
+      <div class="kit-info">
+        <h3 class="kit-nome">${esc(kit.nome)}</h3>
+        ${kit.preco ? `<span class="kit-preco">R$ ${parseFloat(kit.preco).toFixed(2)}</span>` : ''}
+        ${kit.descricao 
+          ? `<p class="kit-mensagem">${esc(kit.descricao)}</p>` 
+          : !kit.preco 
+            ? '<span style="font-size:11px;color:var(--border);font-style:italic">Clique para editar</span>' 
+            : ''
+        }
+      </div>
+      <div class="kit-footer">
+        Ô£Å´©Å Editar
+      </div>
+    </div>
+  `;
+  }).join('');
+
+  // Adiciona event listeners aos cards
+  setTimeout(() => {
+    const cards = document.querySelectorAll('.kit-card[data-kit-nome]');
+    console.log('[DEBUG] Cards encontrados:', cards.length);
+    cards.forEach(card => {
+      console.log('[DEBUG] Adicionando listener ao kit:', card.getAttribute('data-kit-nome'));
+      card.addEventListener('click', () => {
+        const nome = card.getAttribute('data-kit-nome').trim();
+        const marca = card.getAttribute('data-kit-marca').trim();
+        console.log('[DEBUG] Kit clicado:', nome, marca);
+        abrirModalKit(nome, marca);
+      });
+    });
+  }, 100);
+
+  // Inicializa lazy loading
+  initLazyLoad();
+}
+
+function filtrarKits(busca) {
+  const termo = busca.toLowerCase().trim();
+  const filtrados = termo
+    ? kitsData.filter(k => k.nome.toLowerCase().includes(termo))
+    : kitsData;
+  renderKits(filtrados);
+}
+
+function abrirModalKit(nomeKit, marca) {
+  console.log('[DEBUG] abrirModalKit chamado com:', nomeKit, marca);
+  console.log('[DEBUG] kitsData tem', kitsData.length, 'kits');
+  
+  try {
+    // Busca apenas por nome, pois o campo marca n├úo existe no banco
+    kitAtual = kitsData.find(k => k.nome === nomeKit);
+    
+    console.log('[DEBUG] kitAtual encontrado?', kitAtual ? 'SIM' : 'N├âO');
+    
+    if (!kitAtual) {
+      console.error('[DEBUG] Kit n├úo encontrado! Buscando:', { nome: nomeKit, marca: marca });
+      console.error('[DEBUG] Primeiro kit no array:', kitsData[0]);
+      alert(`ÔØî Kit "${nomeKit}" n├úo encontrado!`);
+      return;
+    }
+
+    console.log('[DEBUG] Inicializando modal...');
+    console.log('[DEBUG] 1. Limpando vari├íveis...');
+    arquivoThumb = null;
+    arquivoCarrossel = null;
+    
+    console.log('[DEBUG] 2. Acessando file-name-thumb...');
+    document.getElementById('file-name-thumb').textContent = '';
+    
+    console.log('[DEBUG] 3. Acessando modal-kit-file-thumb...');
+    document.getElementById('modal-kit-file-thumb').value = '';
+    
+    console.log('[DEBUG] 4. Acessando modal-save-success...');
+    document.getElementById('modal-save-success').style.display = 'none';
+
+    console.log('[DEBUG] 5. Preenchendo nome...');
+    document.getElementById('modal-kit-nome-edit').value = kitAtual.nome;
+    
+    console.log('[DEBUG] 6. Configurando pre├ºo...');
+    const inputPreco = document.getElementById('modal-kit-preco');
+    inputPreco.value = kitAtual.preco ? `R$ ${parseFloat(kitAtual.preco).toFixed(2)}` : '';
+    inputPreco.disabled = true;
+    precoOriginal = inputPreco.value;
+    
+    console.log('[DEBUG] 7. Bot├Áes de pre├ºo...');
+    document.getElementById('btn-editar-preco').style.display = 'block';
+    document.getElementById('btn-salvar-preco').style.display = 'none';
+    document.getElementById('btn-cancelar-preco').style.display = 'none';
+    
+    console.log('[DEBUG] 8. Preenchendo descri├º├úo...');
+    document.getElementById('modal-kit-descricao').value = kitAtual.descricao || '';
+    
+    console.log('[DEBUG] 9. Configurando SKU...');
+    const inputSku = document.getElementById('modal-kit-sku');
+    inputSku.value = kitAtual.codigo_sku || '';
+    inputSku.disabled = true;
+    skuOriginal = inputSku.value;
+    
+    console.log('[DEBUG] 10. Bot├Áes de SKU...');
+    document.getElementById('btn-editar-sku').style.display = 'block';
+    document.getElementById('btn-salvar-sku').style.display = 'none';
+    document.getElementById('btn-cancelar-sku').style.display = 'none';
+    
+    console.log('[DEBUG] 11. Renderizando componentes...');
+    const componentes = kitAtual.componentes || [];
+    renderComponentesKit(componentes);
+    
+    console.log('[DEBUG] 12. Mostrando modal...');
+    document.getElementById('modal-kit').style.display = 'flex';
+    console.log('[DEBUG] Ô£à Modal ABERTO com sucesso!');
+  } catch (error) {
+    console.error('[DEBUG] ÔØî ERRO ao abrir modal:', error);
+    alert(`Erro ao abrir modal: ${error.message}`);
+  }
+}
+
+function renderCarrossel(imagens) {
+  const container = document.getElementById('carrossel-container');
+  if (imagens.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic;grid-column:1/-1">Nenhuma imagem. Clique em "Adicionar Imagem".</p>';
+    return;
+  }
+  
+  container.innerHTML = imagens.map((img, idx) => `
+    <div 
+      draggable="true"
+      data-index="${idx}"
+      data-filename="${esc(img)}"
+      class="carrossel-item"
+      style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border);cursor:move"
+      ondragstart="handleDragStart(event)"
+      ondragover="handleDragOver(event)"
+      ondrop="handleDrop(event)"
+      ondragend="handleDragEnd(event)"
+    >
+      <img
+        src="/api/catalogo/imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}/${encodeURIComponent(img)}"
+        alt="Carrossel"
+        style="width:100%;height:100%;object-fit:cover;pointer-events:none"
+      />
+      <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.6);color:white;border-radius:4px;padding:.15rem .35rem;font-size:10px;font-weight:700">
+        ${idx + 1}
+      </div>
+      <button
+        onclick="deletarImagemCarrossel('${esc(img)}')"
+        style="position:absolute;top:4px;right:4px;background:rgba(239,68,68,0.9);color:white;border:none;border-radius:4px;padding:.25rem .35rem;cursor:pointer;font-size:10px"
+      >
+        ­ƒùæ´©Å
+      </button>
+    </div>
+  `).join('');
+}
+
+// ÔöÇÔöÇ Drag and Drop para Carrossel ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+let draggedElement = null;
+
+function handleDragStart(e) {
+  draggedElement = e.target;
+  e.target.style.opacity = '0.4';
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault();
+  }
+  e.dataTransfer.dropEffect = 'move';
+  
+  // Visual feedback
+  const target = e.target.closest('.carrossel-item');
+  if (target && target !== draggedElement) {
+    target.style.borderColor = '#3b82f6';
+    target.style.borderWidth = '2px';
+  }
+  
+  return false;
+}
+
+function handleDrop(e) {
+  if (e.stopPropagation) {
+    e.stopPropagation();
+  }
+  
+  const target = e.target.closest('.carrossel-item');
+  if (!target || !draggedElement || target === draggedElement) {
+    return false;
+  }
+  
+  // Remove visual feedback
+  target.style.borderColor = '';
+  target.style.borderWidth = '';
+  
+  // Pega ├¡ndices
+  const fromIndex = parseInt(draggedElement.getAttribute('data-index'));
+  const toIndex = parseInt(target.getAttribute('data-index'));
+  
+  // Reordena array de imagens
+  const imagens = [...(kitAtual.imagens_carrossel || [])];
+  const [movedImage] = imagens.splice(fromIndex, 1);
+  imagens.splice(toIndex, 0, movedImage);
+  
+  // Atualiza kitAtual
+  kitAtual.imagens_carrossel = imagens;
+  
+  // Re-renderiza
+  renderCarrossel(imagens);
+  
+  // Salva automaticamente a nova ordem
+  salvarOrdemCarrossel(imagens);
+  
+  return false;
+}
+
+function handleDragEnd(e) {
+  e.target.style.opacity = '1';
+  
+  // Remove todos os feedbacks visuais
+  document.querySelectorAll('.carrossel-item').forEach(item => {
+    item.style.borderColor = '';
+    item.style.borderWidth = '';
+  });
+  
+  draggedElement = null;
+}
+
+async function salvarOrdemCarrossel(imagens) {
+  if (!kitAtual) return;
+  
+  try {
+    const res = await fetch('/api/catalogo/reordenar-carrossel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        marca: kitAtual.marca,
+        kit: kitAtual.nome,
+        ordem: imagens
+      })
+    });
+    
+    const data = await res.json();
+    if (!data.ok) {
+      throw new Error(data.erro || 'Erro ao salvar ordem');
+    }
+    
+    showToast('Ô£ô Ordem atualizada', 'success');
+  } catch (err) {
+    console.error('Erro ao salvar ordem:', err);
+    showToast('ÔØî Erro ao salvar ordem', 'error');
+  }
+}
+
+function renderSkusItens(skus) {
+  const container = document.getElementById('skus-itens-container');
+  if (skus.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic">Nenhum SKU de item. Clique em "Adicionar SKU".</p>';
+    return;
+  }
+  
+  container.innerHTML = skus.map((sku, idx) => `
+    <div style="display:flex;gap:.5rem;align-items:center">
+      <input
+        type="text"
+        class="form-input sku-item-input"
+        value="${esc(sku)}"
+        placeholder="SKU do item ${idx + 1}"
+        data-index="${idx}"
+        style="flex:1"
+      />
+      <button
+        onclick="removerSkuItem(${idx})"
+        style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:4px;padding:.25rem .5rem;cursor:pointer;font-size:12px"
+      >
+        ­ƒùæ´©Å
+      </button>
+    </div>
+  `).join('');
+}
+
+function renderComponentesKit(componentes) {
+  const container = document.getElementById('skus-itens-container');
+  
+  if (componentes.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic">Nenhum componente cadastrado.</p>';
+    return;
+  }
+  
+  container.innerHTML = componentes.map((comp, idx) => `
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.75rem;display:flex;align-items:center;gap:.75rem">
+      <div style="background:var(--primary);color:white;border-radius:6px;padding:.35rem .6rem;font-size:13px;font-weight:700;min-width:40px;text-align:center">
+        ${comp.quantidade}x
+      </div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:.25rem">
+          ${esc(comp.nome)}
+        </div>
+        ${comp.sku ? `<div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:.35rem">
+          <span style="background:var(--bg);padding:.15rem .4rem;border-radius:4px;font-family:monospace">${esc(comp.sku)}</span>
+        </div>` : ''}
+      </div>
+      <button
+        onclick="verDetalhesComponente('${escAttr(comp.sku || '')}')"
+        style="background:var(--info);color:white;border:none;border-radius:6px;padding:.4rem .7rem;cursor:pointer;font-size:11px;font-weight:600"
+        title="Ver detalhes"
+      >
+        ­ƒæü´©Å Ver
+      </button>
+    </div>
+  `).join('');
+}
+
+function adicionarSkuItem() {
+  const inputs = document.querySelectorAll('.sku-item-input');
+  const skusAtuais = Array.from(inputs).map(inp => inp.value);
+  skusAtuais.push('');
+  renderSkusItens(skusAtuais);
+}
+
+function removerSkuItem(idx) {
+  const inputs = document.querySelectorAll('.sku-item-input');
+  const skusAtuais = Array.from(inputs).map(inp => inp.value);
+  skusAtuais.splice(idx, 1);
+  renderSkusItens(skusAtuais);
+}
+
+function verDetalhesComponente(sku) {
+  if (!sku) {
+    alert('SKU n├úo dispon├¡vel para este componente.');
+    return;
+  }
+  // TODO: Implementar visualiza├º├úo de detalhes do componente
+  alert(`Detalhes do componente com SKU: ${sku}`);
+}
+
+function fecharModalKit() {
+  document.getElementById('modal-kit').style.display = 'none';
+  kitAtual = null;
+  arquivoSelecionado = null;
+}
+
+// Fun├º├úo removida - n├úo ├® mais utilizada
+
+function handleThumbSelect(input) {
+  const file = input.files?.[0];
+  if (!file) {
+    arquivoThumb = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    return;
+  }
+
+  // Valida├º├úo de tipo
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    alert('ÔÜá´©Å Formato inv├ílido. Use apenas: JPG, PNG ou WebP');
+    input.value = '';
+    arquivoThumb = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    return;
+  }
+
+  // Valida├º├úo de tamanho (5MB)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    alert('ÔÜá´©Å Arquivo muito grande. Tamanho m├íximo: 5MB');
+    input.value = '';
+    arquivoThumb = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    return;
+  }
+
+  arquivoThumb = file;
+  document.getElementById('file-name-thumb').textContent = `Ô£ô ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+}
+
+function handleCarrosselSelect(input) {
+  const file = input.files?.[0];
+  if (!file) {
+    arquivoCarrossel = null;
+    return;
+  }
+
+  // Valida├º├úo de tipo
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    alert('ÔÜá´©Å Formato inv├ílido. Use apenas: JPG, PNG ou WebP');
+    input.value = '';
+    arquivoCarrossel = null;
+    return;
+  }
+
+  // Valida├º├úo de tamanho (5MB)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    alert('ÔÜá´©Å Arquivo muito grande. Tamanho m├íximo: 5MB');
+    input.value = '';
+    arquivoCarrossel = null;
+    return;
+  }
+
+  arquivoCarrossel = file;
+  // Upload autom├ítico ap├│s sele├º├úo
+  uploadCarrossel();
+}
+
+async function uploadCarrossel() {
+  if (!arquivoCarrossel || !kitAtual) return;
+
+  const formData = new FormData();
+  formData.append('imagem', arquivoCarrossel);
+
+  try {
+    const res = await fetch(`/api/catalogo/upload-carrossel/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Recarrega dados do kit
+    await carregarCatalogo();
+    kitAtual = kitsData.find(k => k.nome === kitAtual.nome);
+    renderCarrossel(kitAtual.imagens_carrossel || []);
+    
+    // Limpa input
+    document.getElementById('modal-kit-file-carrossel').value = '';
+    arquivoCarrossel = null;
+
+    showToast('Ô£ô Imagem adicionada ao carrossel', 'success');
+  } catch (err) {
+    console.error('Erro ao upload carrossel:', err);
+    alert('ÔØî Erro ao adicionar imagem: ' + err.message);
+  }
+}
+
+async function deletarImagemCarrossel(arquivo) {
+  if (!kitAtual) return;
+  
+  if (!confirm(`Deletar imagem "${arquivo}"?`)) return;
+
+  try {
+    const res = await fetch(`/api/catalogo/deletar-imagem/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}/${encodeURIComponent(arquivo)}`, {
+      method: 'DELETE'
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+
+    // Recarrega dados do kit
+    await carregarCatalogo();
+    kitAtual = kitsData.find(k => k.nome === kitAtual.nome);
+    renderCarrossel(kitAtual.imagens_carrossel || []);
+
+    showToast('Ô£ô Imagem deletada', 'success');
+  } catch (err) {
+    console.error('Erro ao deletar imagem:', err);
+    alert('ÔØî Erro ao deletar: ' + err.message);
+  }
+}
+
+async function salvarKit() {
+  if (!kitAtual) return;
+
+  const btn = document.getElementById('modal-save-btn');
+  const novoNome = document.getElementById('modal-kit-nome-edit').value.trim();
+  const preco = document.getElementById('modal-kit-preco').value.trim();
+  const descricao = document.getElementById('modal-kit-descricao').value.trim();
+  const skuKit = document.getElementById('modal-kit-sku').value.trim();
+
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  try {
+    // 1. Atualizar dados do kit via API v2
+    const marca = kitAtual.marca || 'Alphahall';
+    
+    // Converte pre├ºo para n├║mero
+    const precoLimpo = preco.replace('R$ ', '').replace(',', '.');
+    const precoNumero = parseFloat(precoLimpo) || 0;
+    
+    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        preco: precoNumero,  // Envia como n├║mero, n├úo string
+        codigo_sku: skuKit,
+        descricao: descricao
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err || 'Erro ao salvar');
+    }
+
+    // 2. Upload de thumbnail (se selecionou)
+    if (arquivoThumb) {
+      const formData = new FormData();
+      formData.append('imagem', arquivoThumb);
+
+      const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}?tipo=kit`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!uploadRes.ok) {
+        const err = await uploadRes.text();
+        throw new Error('Erro no upload da thumb: ' + err);
+      }
+    }
+
+    // Atualiza dados locais
+    kitAtual.preco = preco.replace('R$ ', '').replace(',', '.');
+    kitAtual.codigo_sku = skuKit;
+    kitAtual.descricao = descricao;
+
+    // Mostra sucesso
+    showToast('Ô£ô Kit salvo com sucesso', 'success');
+    document.getElementById('modal-save-success').style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('modal-save-success').style.display = 'none';
+    }, 2000);
+
+    // Limpa arquivo thumb selecionado
+    arquivoThumb = null;
+    document.getElementById('file-name-thumb').textContent = '';
+    document.getElementById('modal-kit-file-thumb').value = '';
+
+    // Recarrega cat├ílogo
+    await carregarCatalogo();
+
+  } catch (e) {
+    console.error('Erro ao salvar kit:', e);
+    alert('Erro ao salvar: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '­ƒÆ¥ Salvar';
+  }
+}
+
+// Carregar cat├ílogo ao trocar para a aba
+const originalTrocarAba = trocarAba;
+trocarAba = function(id, btn) {
+  originalTrocarAba(id, btn);
+  if (id === 'catalogo' && kitsData.length === 0) {
+    carregarCatalogo();
+  }
+  if (id === 'produtos' && produtosData.length === 0) {
+    carregarProdutos();
+  }
+};
+
+// ÔöÇÔöÇ Produtos ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+async function carregarProdutos() {
+  try {
+    const data = await api(`/api/catalogo/v2/produtos-individuais`);
+    produtosData = data || [];
+    console.log('[DEBUG] Produtos carregados:', produtosData.length, '- Exemplo:', produtosData[0]);
+    renderProdutos(produtosData);
+  } catch (e) {
+    console.error('[Produtos] Erro ao carregar:', e);
+    document.getElementById('produtos-grid').innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <span>ÔÜá´©Å</span>
+        <p>Erro ao carregar produtos</p>
+        <p style="font-size:11px;color:var(--text2)">Verifique se o servidor est├í rodando</p>
+      </div>`;
+  }
+}
+
+function renderProdutos(lista) {
+  const grid = document.getElementById('produtos-grid');
+  const count = document.getElementById('produtos-count');
+  
+  count.textContent = `${lista.length} produto${lista.length !== 1 ? 's' : ''}`;
+
+  console.log('[DEBUG] renderProdutos - total:', lista.length);
+
+  if (lista.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <span>­ƒº┤</span>
+        <p>Nenhum produto no cat├ílogo</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = lista.map(produto => {
+    const temThumb = produto.caminho_thumb_bd || produto.tem_thumb;
+    const marca = produto.marca || 'Alphahall'; // Fallback para Alphahall se marca estiver vazia
+    const thumbUrl = produto.caminho_thumb_bd 
+      ? `/api/catalogo/files/${encodeURIComponent(produto.caminho_thumb_bd)}` 
+      : produto.tem_thumb 
+        ? `/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(produto.nome)}/thumb.${produto.thumb_ext}?tipo=produto` 
+        : null;
+    
+    console.log('[DEBUG] Renderizando produto:', produto.nome, '- marca:', marca, '- data-produto-marca:', escAttr(marca));
+    
+    return `
+    <div class="kit-card" data-produto-nome="${escAttr(produto.nome)}" data-produto-marca="${escAttr(marca)}">
+      <div class="kit-img-area">
+        ${temThumb
+          ? `<img 
+              loading="lazy" 
+              data-src="${thumbUrl}" 
+              alt="${esc(produto.nome)}" 
+              class="lazy-img"
+              style="background:var(--bg3)"
+            />`
+          : `<span class="kit-img-placeholder">­ƒº┤</span>`

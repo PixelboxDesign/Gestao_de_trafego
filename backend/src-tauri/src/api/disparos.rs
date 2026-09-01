@@ -239,3 +239,118 @@ pub async fn iniciar_disparo(
         }),
     }
 }
+
+// ─── Configuração persistente do disparo ──────────────────────────────────────
+
+#[derive(Debug, Deserialize, Serialize, sqlx::FromRow)]
+pub struct ConfigDisparo {
+    pub id: Option<u32>,
+    pub mensagem: String,
+    pub item_id: Option<i32>,
+    pub item_tipo: Option<String>, // "kit" ou "produto"
+    pub item_nome: Option<String>,
+    pub item_thumb_url: Option<String>,
+    pub quantidade: u32,
+    pub intervalo_valor: f64,
+    pub intervalo_unidade: String, // "horas" ou "minutos"
+    pub criado_em: Option<String>,
+    pub atualizado_em: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SalvarConfigRequest {
+    pub mensagem: String,
+    pub item_id: i32,
+    pub item_tipo: String,
+    pub item_nome: String,
+    pub item_thumb_url: Option<String>,
+    pub quantidade: u32,
+    pub intervalo_valor: f64,
+    pub intervalo_unidade: String,
+}
+
+/// POST /api/disparos/config — salva configuração do disparo
+pub async fn salvar_config(
+    State(state): State<Arc<Mutex<AppState>>>,
+    Json(body): Json<SalvarConfigRequest>,
+) -> Json<serde_json::Value> {
+    let state_lock = state.lock().await;
+
+    // Verifica se já existe uma configuração
+    let existe: Option<(u32,)> = sqlx::query_as(
+        "SELECT id FROM app_disparo_config LIMIT 1"
+    )
+    .fetch_optional(&state_lock.db)
+    .await
+    .unwrap_or(None);
+
+    let result = if let Some((id,)) = existe {
+        // Atualiza configuração existente
+        sqlx::query(
+            r#"UPDATE app_disparo_config 
+               SET mensagem = ?, item_id = ?, item_tipo = ?, item_nome = ?, 
+                   item_thumb_url = ?, quantidade = ?, intervalo_valor = ?, 
+                   intervalo_unidade = ?, atualizado_em = NOW()
+               WHERE id = ?"#
+        )
+        .bind(&body.mensagem)
+        .bind(body.item_id)
+        .bind(&body.item_tipo)
+        .bind(&body.item_nome)
+        .bind(&body.item_thumb_url)
+        .bind(body.quantidade)
+        .bind(body.intervalo_valor)
+        .bind(&body.intervalo_unidade)
+        .bind(id)
+        .execute(&state_lock.db)
+        .await
+    } else {
+        // Cria nova configuração
+        sqlx::query(
+            r#"INSERT INTO app_disparo_config 
+               (mensagem, item_id, item_tipo, item_nome, item_thumb_url, 
+                quantidade, intervalo_valor, intervalo_unidade, criado_em, atualizado_em)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())"#
+        )
+        .bind(&body.mensagem)
+        .bind(body.item_id)
+        .bind(&body.item_tipo)
+        .bind(&body.item_nome)
+        .bind(&body.item_thumb_url)
+        .bind(body.quantidade)
+        .bind(body.intervalo_valor)
+        .bind(&body.intervalo_unidade)
+        .execute(&state_lock.db)
+        .await
+    };
+
+    match result {
+        Ok(_) => Json(serde_json::json!({ "ok": true })),
+        Err(e) => Json(serde_json::json!({ "ok": false, "erro": e.to_string() })),
+    }
+}
+
+/// GET /api/disparos/config — retorna configuração do disparo
+pub async fn obter_config(
+    State(state): State<Arc<Mutex<AppState>>>,
+) -> Json<serde_json::Value> {
+    let state_lock = state.lock().await;
+
+    let config: Option<ConfigDisparo> = sqlx::query_as(
+        r#"SELECT id, mensagem, item_id, item_tipo, item_nome, item_thumb_url,
+                  quantidade, intervalo_valor, intervalo_unidade,
+                  DATE_FORMAT(criado_em, '%Y-%m-%dT%T') as criado_em,
+                  DATE_FORMAT(atualizado_em, '%Y-%m-%dT%T') as atualizado_em
+           FROM app_disparo_config 
+           ORDER BY id DESC 
+           LIMIT 1"#
+    )
+    .fetch_optional(&state_lock.db)
+    .await
+    .unwrap_or(None);
+
+    match config {
+        Some(cfg) => Json(serde_json::json!({ "ok": true, "config": cfg })),
+        None => Json(serde_json::json!({ "ok": true, "config": null })),
+    }
+}

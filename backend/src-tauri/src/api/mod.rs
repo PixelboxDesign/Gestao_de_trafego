@@ -156,6 +156,8 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .route("/api/disparos", get(disparos::list))
         .route("/api/disparos", axum::routing::post(disparos::criar))
         .route("/api/disparos/iniciar", axum::routing::post(disparos::iniciar_disparo))
+        .route("/api/disparos/config", get(disparos::obter_config))
+        .route("/api/disparos/config", axum::routing::post(disparos::salvar_config))
         // Rota de deploy Render
         .route("/api/render/deploy-com-url-nova", axum::routing::post(render_deploy::deploy_com_url_nova))
         .layer(middleware::from_fn_with_state(state.clone(), log_middleware))
