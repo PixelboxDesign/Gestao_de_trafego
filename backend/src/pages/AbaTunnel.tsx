@@ -166,18 +166,21 @@ export default function AbaTunnel() {
       return;
     }
 
-    if (!isConfigured) {
-      showMessage('error', '⚠️ Configure o Render primeiro');
-      setShowConfig(true);
-      return;
-    }
-
     setLoading(true);
     try {
-      const result = await invoke<string>('update_render_env');
-      showMessage('success', result);
+      const response = await fetch('http://localhost:3001/api/render/deploy-com-url-nova', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+
+      const result = await response.json();
+      showMessage('success', result.mensagem + '\n\n🌐 Acesse: https://luna-disparo.onrender.com');
     } catch (error) {
-      showMessage('error', String(error));
+      showMessage('error', '❌ Erro: ' + String(error));
     } finally {
       setLoading(false);
     }
@@ -259,27 +262,21 @@ export default function AbaTunnel() {
 
             <button
               onClick={updateRenderEnv}
-              disabled={loading || !isConfigured}
+              disabled={loading}
               style={{
                 width: '100%',
                 padding: '14px',
                 borderRadius: '8px',
                 border: 'none',
-                backgroundColor: loading ? '#666' : isConfigured ? '#28a745' : '#666',
+                backgroundColor: loading ? '#666' : '#28a745',
                 color: '#fff',
-                cursor: loading || !isConfigured ? 'not-allowed' : 'pointer',
+                cursor: loading ? 'not-allowed' : 'pointer',
                 fontWeight: 'bold',
                 fontSize: '16px'
               }}
             >
               {loading ? '⏳ Atualizando...' : '🔄 Atualizar URL no Render.com'}
             </button>
-
-            {!isConfigured && (
-              <p style={{ marginTop: '12px', color: '#ffc107', fontSize: '14px' }}>
-                ⚠️ Configure o Render primeiro para ativar este botão
-              </p>
-            )}
           </>
         ) : (
           <div style={{

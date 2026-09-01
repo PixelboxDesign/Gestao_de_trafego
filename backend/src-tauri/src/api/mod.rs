@@ -3,6 +3,7 @@ pub mod catalogo_db;
 pub mod clientes;
 pub mod disparos;
 pub mod logs;
+pub mod render_deploy;
 pub mod whatsapp;
 
 use axum::{
@@ -155,11 +156,13 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .route("/api/disparos", get(disparos::list))
         .route("/api/disparos", axum::routing::post(disparos::criar))
         .route("/api/disparos/iniciar", axum::routing::post(disparos::iniciar_disparo))
+        // Rota de deploy Render
+        .route("/api/render/deploy-com-url-nova", axum::routing::post(render_deploy::deploy_com_url_nova))
         .layer(middleware::from_fn_with_state(state.clone(), log_middleware))
         .layer(cors)
         .with_state(state);
     
-    info!("✅ [HTTP] {} rotas registradas", 32);
+    info!("✅ [HTTP] {} rotas registradas", 33);
 
     info!("🔌 [HTTP] Vinculando à porta...");
     let (listener, port) = bind_available_port(3001).await;
