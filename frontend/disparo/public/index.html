@@ -384,91 +384,6 @@
       line-height: 1;
       padding: 0;
     }
-
-    .modal-img-preview {
-      background: var(--bg3);
-      display: flex;
-      justify-content: center;
-      padding: 1rem;
-    }
-
-    .modal-img-preview img {
-      max-height: 200px;
-      max-width: 100%;
-      object-fit: contain;
-      border-radius: 8px;
-    }
-
-    .modal-no-img {
-      background: var(--bg3);
-      height: 120px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: .5rem;
-      color: var(--text2);
-      font-size: 12px;
-    }
-
-    .modal-body {
-      padding: 1.25rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: .4rem;
-    }
-
-    .form-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text2);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-
-    .form-input, .form-textarea {
-      padding: .5rem .75rem;
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-size: 13px;
-      font-family: inherit;
-    }
-
-    .form-input::placeholder, .form-textarea::placeholder {
-      color: var(--text2);
-    }
-
-    .form-textarea {
-      resize: vertical;
-      line-height: 1.6;
-    }
-
-    .form-file {
-      display: none;
-    }
-
-    .modal-footer {
-      padding: 1rem 1.5rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: flex-end;
-      gap: .75rem;
-      align-items: center;
-    }
-
-    .save-success {
-      font-size: 13px;
-      color: var(--success);
-      font-weight: 600;
-    }
   </style>
 </head>
 <body>
@@ -611,15 +526,26 @@
           (<span id="calc-detalhe">10 mensagens em 1h = intervalo de 360s entre cada envio</span>)
         </div>
 
-        <!-- Botão: Iniciar Disparo -->
-        <button
-          id="btn-iniciar-disparo"
-          onclick="iniciarDisparo()"
-          disabled
-          style="padding:1rem;font-size:16px;font-weight:700;border-radius:8px;background:var(--primary);color:white;border:none;cursor:not-allowed;opacity:0.5"
-        >
-          🚀 Iniciar Disparo
-        </button>
+        <!-- Botões: Teste e Iniciar Disparo -->
+        <div style="display:flex;gap:1rem">
+          <button
+            id="btn-teste-disparo"
+            onclick="abrirModalTeste()"
+            disabled
+            style="padding:1rem;font-size:16px;font-weight:700;border-radius:8px;background:var(--info);color:white;border:none;cursor:not-allowed;opacity:0.5;flex:1"
+          >
+            🧪 Enviar Teste
+          </button>
+          
+          <button
+            id="btn-iniciar-disparo"
+            onclick="iniciarDisparo()"
+            disabled
+            style="padding:1rem;font-size:16px;font-weight:700;border-radius:8px;background:var(--primary);color:white;border:none;cursor:not-allowed;opacity:0.5;flex:2"
+          >
+            🚀 Iniciar Disparo em Massa
+          </button>
+        </div>
       </div>
 
       <!-- Sub-página: Histórico -->
@@ -1161,6 +1087,72 @@
   </div>
 </div>
 
+<!-- Modal de Teste de Disparo -->
+<div id="modal-teste-disparo" class="modal-overlay" style="display:none" onclick="if(event.target===this) fecharModalTeste()">
+  <div class="modal-box">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-title">🧪 Enviar Mensagem de Teste</div>
+      <button class="modal-close" onclick="fecharModalTeste()">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1rem">
+      
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin:0">
+        Envie a mensagem configurada para um número específico para testar antes do disparo em massa.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:.4rem">
+        <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">
+          Número de Telefone
+        </label>
+        <input
+          type="tel"
+          id="teste-numero"
+          placeholder="Ex: 11999887766 ou 5511999887766"
+          style="padding:.75rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;font-family:inherit"
+        />
+        <span style="font-size:11px;color:var(--text2)">
+          Digite apenas números (com ou sem DDI +55)
+        </span>
+      </div>
+
+      <!-- Preview da mensagem -->
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:1rem">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem">
+          Preview da Mensagem
+        </div>
+        <div id="teste-preview-mensagem" style="font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap">
+          (Digite uma mensagem na aba Gerenciamento)
+        </div>
+      </div>
+
+      <!-- Preview do item -->
+      <div id="teste-preview-item" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:1rem;align-items:center;gap:1rem">
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.75rem">
+      <button class="btn btn-secondary" onclick="fecharModalTeste()" style="padding:.75rem 1.25rem;font-size:14px;font-weight:600;border-radius:6px">
+        Cancelar
+      </button>
+      <button 
+        id="btn-enviar-teste" 
+        onclick="enviarTeste()" 
+        class="btn btn-primary" 
+        style="padding:.75rem 1.25rem;font-size:14px;font-weight:600;border-radius:6px;background:var(--info)"
+      >
+        📤 Enviar Teste
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <script>
 // ── Service Worker Killer ────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -1461,13 +1453,108 @@ function atualizarCalculoIntervalo() {
 
 function atualizarBotaoDisparo() {
   const mensagem = document.getElementById('disparo-mensagem').value.trim();
-  const btn = document.getElementById('btn-iniciar-disparo');
+  const btnTeste = document.getElementById('btn-teste-disparo');
+  const btnIniciar = document.getElementById('btn-iniciar-disparo');
   
   const podeIniciar = mensagem && itemSelecionado;
   
-  btn.disabled = !podeIniciar;
-  btn.style.opacity = podeIniciar ? '1' : '0.5';
-  btn.style.cursor = podeIniciar ? 'pointer' : 'not-allowed';
+  // Botão de teste
+  btnTeste.disabled = !podeIniciar;
+  btnTeste.style.opacity = podeIniciar ? '1' : '0.5';
+  btnTeste.style.cursor = podeIniciar ? 'pointer' : 'not-allowed';
+  
+  // Botão de iniciar disparo
+  btnIniciar.disabled = !podeIniciar;
+  btnIniciar.style.opacity = podeIniciar ? '1' : '0.5';
+  btnIniciar.style.cursor = podeIniciar ? 'pointer' : 'not-allowed';
+}
+
+// ── Modal de Teste ───────────────────────────────────────────────────────────
+function abrirModalTeste() {
+  const mensagem = document.getElementById('disparo-mensagem').value.trim();
+  
+  if (!mensagem || !itemSelecionado) {
+    alert('Preencha a mensagem e selecione um kit/produto primeiro');
+    return;
+  }
+  
+  // Atualiza preview da mensagem
+  document.getElementById('teste-preview-mensagem').textContent = mensagem;
+  
+  // Atualiza preview do item
+  const previewItem = document.getElementById('teste-preview-item');
+  if (itemSelecionado) {
+    previewItem.style.display = 'flex';
+    previewItem.innerHTML = `
+      ${itemSelecionado.thumb_url ? `<img src="${itemSelecionado.thumb_url}" alt="${esc(itemSelecionado.nome)}" style="width:50px;height:50px;border-radius:6px;object-fit:cover"/>` : ''}
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${esc(itemSelecionado.nome)}</div>
+        <div style="font-size:11px;color:var(--text2)">${itemSelecionado.tipo === 'kit' ? 'Kit' : 'Produto'}</div>
+      </div>
+    `;
+  } else {
+    previewItem.style.display = 'none';
+  }
+  
+  // Limpa campo de número
+  document.getElementById('teste-numero').value = '';
+  
+  // Mostra modal
+  document.getElementById('modal-teste-disparo').style.display = 'flex';
+}
+
+function fecharModalTeste() {
+  document.getElementById('modal-teste-disparo').style.display = 'none';
+}
+
+async function enviarTeste() {
+  const numero = document.getElementById('teste-numero').value.trim().replace(/\D/g, '');
+  const mensagem = document.getElementById('disparo-mensagem').value.trim();
+  
+  if (!numero) {
+    alert('Digite um número de telefone válido');
+    return;
+  }
+  
+  if (numero.length < 10) {
+    alert('Número de telefone deve ter pelo menos 10 dígitos (DDD + número)');
+    return;
+  }
+  
+  const btn = document.getElementById('btn-enviar-teste');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  
+  try {
+    // Adiciona DDI +55 se não tiver
+    const numeroCompleto = numero.startsWith('55') ? numero : '55' + numero;
+    
+    const res = await fetch('/api/disparos/enviar-teste', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        numero: numeroCompleto,
+        mensagem: mensagem,
+        item_id: itemSelecionado.id,
+        item_tipo: itemSelecionado.tipo
+      })
+    });
+    
+    if (!res.ok) {
+      const erro = await res.text();
+      throw new Error(erro);
+    }
+    
+    alert('✅ Mensagem de teste enviada com sucesso!');
+    fecharModalTeste();
+    
+  } catch (err) {
+    console.error('[Teste] Erro:', err);
+    alert('❌ Erro ao enviar teste: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📤 Enviar Teste';
+  }
 }
 
 async function iniciarDisparo() {
