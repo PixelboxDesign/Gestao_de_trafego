@@ -111,12 +111,15 @@ app.all('/api/*', async (req, res) => {
 
 // ─── SPA catch-all ────────────────────────────────────────────────────────────
 app.get('*', (req, res) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
   res.setHeader('Surrogate-Control', 'no-store');
   res.setHeader('Clear-Site-Data', '"cache", "storage"');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('CDN-Cache-Control', 'no-store');
+  res.setHeader('Cloudflare-CDN-Cache-Control', 'no-store');
+  res.setHeader('Vary', 'Accept-Encoding');
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
