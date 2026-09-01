@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Luna ÔÇö Disparo v9</title>
+  <title>Luna Ã”Ã‡Ã¶ Disparo v9</title>
   <!-- Build: 2026-08-31T15:45 FORCE-CACHE-BUST -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
-    // Force reload se estiver com vers├úo antiga no cache
+    // Force reload se estiver com versâ”œÃºo antiga no cache
     const CURRENT_VERSION = 29;
     const stored = localStorage.getItem('luna_version');
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
@@ -44,7 +44,7 @@
       flex-direction: column;
     }
 
-    /* ÔöÇÔöÇ Header ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Header Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     .header {
       background: var(--bg2);
       border-bottom: 1px solid var(--border);
@@ -58,7 +58,7 @@
     .header-title { font-size: 15px; font-weight: 700; }
     .header-right  { margin-left: auto; display: flex; align-items: center; gap: .5rem; font-size: 12px; color: var(--text2); }
 
-    /* ÔöÇÔöÇ Tabs ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Tabs Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     .tabs {
       background: var(--bg2);
       border-bottom: 1px solid var(--border);
@@ -77,12 +77,12 @@
     .tab:hover { color: var(--text); }
     .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-    /* ÔöÇÔöÇ Content ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Content Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     .content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
     .page    { display: none; flex: 1; flex-direction: column; overflow: auto; }
     .page.active { display: flex; }
 
-    /* ÔöÇÔöÇ Dot ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Dot Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
     .dot-green  { background: var(--success); box-shadow: 0 0 6px var(--success); }
     .dot-yellow { background: var(--warning); animation: pulse 1.5s infinite; }
@@ -90,7 +90,7 @@
     .dot-gray   { background: var(--text2); }
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.4} }
 
-    /* ÔöÇÔöÇ Btn ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Btn Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     .btn {
       padding: .45rem 1rem; border: none; border-radius: 6px;
       font-size: 12px; font-weight: 600; cursor: pointer; transition: opacity .15s;
@@ -101,7 +101,7 @@
     .btn-danger  { background: var(--danger); color: #fff; }
     .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
 
-    /* ÔöÇÔöÇ WhatsApp page ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ WhatsApp page Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     #page-whatsapp {
       padding: 1.5rem;
       gap: 1.5rem;
@@ -110,7 +110,7 @@
       position: relative;
     }
     
-    /* ÔöÇÔöÇ Bot├úo de teste flutuante ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Botâ”œÃºo de teste flutuante Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     .btn-teste-flutuante {
       position: absolute;
       top: 1.5rem;
@@ -137,7 +137,7 @@
       box-shadow: none;
     }
     
-    /* ÔöÇÔöÇ Checkbox e Log ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Checkbox e Log Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     .disparo-massa-container {
       display: flex;
       gap: 1.5rem;
@@ -236,7 +236,7 @@
       font-size: 13px;
     }
     
-    /* ÔöÇÔöÇ Sub-tabs ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Sub-tabs Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     .sub-tabs {
       display: flex;
       gap: .5rem;
@@ -287,7 +287,7 @@
 
     .qr-hint { font-size: 12px; color: var(--text2); max-width: 320px; line-height: 1.6; }
 
-    /* ÔöÇÔöÇ Hist├│rico ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Histâ”œâ”‚rico Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     #page-whatsapp .historico-titulo {
       font-size: 13px; font-weight: 700; color: var(--text2);
       text-transform: uppercase; letter-spacing: .05em;
@@ -335,7 +335,7 @@
     }
     .empty-state span { font-size: 36px; }
 
-    /* ÔöÇÔöÇ Offline banner ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Offline banner Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     #offline-banner {
       display: none;
       background: rgba(239,68,68,.15);
@@ -352,7 +352,7 @@
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* ÔöÇÔöÇ Cat├ílogo page ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Catâ”œÃ­logo page Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     #page-catalogo {
       padding: 1.5rem;
       gap: 1.5rem;
@@ -464,7 +464,7 @@
       gap: .4rem;
     }
 
-    /* ÔöÇÔöÇ Modal ÔöÇÔöÇ */
+    /* Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Modal Ã”Ã¶Ã‡Ã”Ã¶Ã‡ */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -517,8 +517,8 @@
 
 <!-- Header -->
 <header class="header">
-  <span style="font-size:20px">­ƒîÖ</span>
-  <span class="header-title">Luna Cosm├®ticos ÔÇö Disparo</span>
+  <span style="font-size:20px">Â­Æ’Ã®Ã–</span>
+  <span class="header-title">Luna Cosmâ”œÂ®ticos Ã”Ã‡Ã¶ Disparo</span>
   <div class="header-right">
     <span class="dot" id="server-dot" style="background:var(--text2)"></span>
     <span id="server-status">Verificando...</span>
@@ -527,14 +527,14 @@
 
 <!-- Offline banner -->
 <div id="offline-banner">
-  ÔÜá´©Å Luna Server inacess├¡vel ÔÇö verifique se o programa est├í rodando no computador
+  Ã”ÃœÃ¡Â´Â©Ã… Luna Server inacessâ”œÂ¡vel Ã”Ã‡Ã¶ verifique se o programa estâ”œÃ­ rodando no computador
 </div>
 
 <!-- Tabs -->
 <nav class="tabs">
-  <button class="tab active" onclick="trocarAba('whatsapp', this)">­ƒÆ¼ WhatsApp</button>
-  <button class="tab" onclick="trocarAba('catalogo', this)">­ƒôª Kits</button>
-  <button class="tab" onclick="trocarAba('produtos', this)">­ƒº┤ Produtos</button>
+  <button class="tab active" onclick="trocarAba('whatsapp', this)">Â­Æ’Ã†Â¼ WhatsApp</button>
+  <button class="tab" onclick="trocarAba('catalogo', this)">Â­Æ’Ã´Âª Kits</button>
+  <button class="tab" onclick="trocarAba('produtos', this)">Â­Æ’Âºâ”¤ Produtos</button>
 </nav>
 
 <!-- Content -->
@@ -543,14 +543,14 @@
   <!-- Aba WhatsApp -->
   <div id="page-whatsapp" class="page active">
 
-    <!-- Bot├úo de Teste (canto superior direito) -->
+    <!-- Botâ”œÃºo de Teste (canto superior direito) -->
     <button
       id="btn-teste-flutuante"
       class="btn-teste-flutuante"
       onclick="abrirModalTeste()"
       disabled
     >
-      ­ƒº¬ Enviar Teste
+      Â­Æ’ÂºÂ¬ Enviar Teste
     </button>
 
     <!-- Card de status -->
@@ -560,16 +560,16 @@
         <span class="wa-status-text" id="wa-status-texto">Verificando...</span>
       </div>
       <div id="wa-numero" style="font-size:13px;color:var(--text2);display:none">
-        ­ƒô▒ Conectado: <strong id="wa-numero-val" style="color:var(--success)"></strong>
+        Â­Æ’Ã´â–’ Conectado: <strong id="wa-numero-val" style="color:var(--success)"></strong>
       </div>
       <div id="wa-erro" style="font-size:12px;color:var(--danger);display:none;background:rgba(239,68,68,.1);padding:.5rem .75rem;border-radius:6px"></div>
       <div id="wa-acoes" style="display:flex;gap:.5rem;margin-top:.25rem"></div>
     </div>
 
-    <!-- QR Code (vis├¡vel s├│ quando status=qr) -->
+    <!-- QR Code (visâ”œÂ¡vel sâ”œâ”‚ quando status=qr) -->
     <div id="wa-qr-area" style="display:none;flex-direction:column;gap:.75rem">
       <p class="qr-hint">
-        Abra o WhatsApp no celular ÔåÆ <strong>Dispositivos conectados</strong> ÔåÆ <strong>Conectar dispositivo</strong> ÔåÆ escaneie o QR Code abaixo
+        Abra o WhatsApp no celular Ã”Ã¥Ã† <strong>Dispositivos conectados</strong> Ã”Ã¥Ã† <strong>Conectar dispositivo</strong> Ã”Ã¥Ã† escaneie o QR Code abaixo
       </p>
       <div class="qr-wrap">
         <img id="wa-qr-img" src="" alt="QR Code WhatsApp"/>
@@ -580,11 +580,11 @@
     <!-- Sub-tabs (aparecem quando conectado) -->
     <div id="wa-sub-tabs-container" style="display:none;flex-direction:column;width:100%">
       <nav class="sub-tabs">
-        <button class="sub-tab active" onclick="trocarSubAba('gerenciamento', this)">­ƒôñ Gerenciamento</button>
-        <button class="sub-tab" onclick="trocarSubAba('historico', this)">­ƒôè Hist├│rico</button>
+        <button class="sub-tab active" onclick="trocarSubAba('gerenciamento', this)">Â­Æ’Ã´Ã± Gerenciamento</button>
+        <button class="sub-tab" onclick="trocarSubAba('historico', this)">Â­Æ’Ã´Ã¨ Histâ”œâ”‚rico</button>
       </nav>
 
-      <!-- Sub-p├ígina: Gerenciamento -->
+      <!-- Sub-pâ”œÃ­gina: Gerenciamento -->
       <div id="sub-page-gerenciamento" class="sub-page active">
         <h3 style="font-size:18px;font-weight:700;color:var(--text);margin:0">
           Configurar Disparo de Mensagens
@@ -597,7 +597,7 @@
           </label>
           <textarea
             id="disparo-mensagem"
-            placeholder="Digite a mensagem que ser├í enviada..."
+            placeholder="Digite a mensagem que serâ”œÃ­ enviada..."
             style="padding:.75rem;font-size:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);resize:vertical;min-height:120px;font-family:inherit"
           ></textarea>
         </div>
@@ -666,9 +666,9 @@
           </div>
         </div>
 
-        <!-- C├ílculo do intervalo -->
+        <!-- Câ”œÃ­lculo do intervalo -->
         <div id="disparo-calculo" style="padding:1rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text2)">
-          ÔÅ▒´©Å Cada mensagem ser├í enviada a cada <strong style="color:var(--primary)" id="intervalo-segundos">360</strong> segundos
+          Ã”Ã…â–’Â´Â©Ã… Cada mensagem serâ”œÃ­ enviada a cada <strong style="color:var(--primary)" id="intervalo-segundos">360</strong> segundos
           <br />
           (<span id="calc-detalhe">10 mensagens em 1 hora(s) = intervalo de 360s entre cada envio</span>)
         </div>
@@ -688,13 +688,13 @@
               <span class="checkbox-label">
                 <div>Disparo em Massa</div>
                 <div style="font-size:11px;color:var(--text2);font-weight:400">
-                  Ativar envio autom├ítico
+                  Ativar envio automâ”œÃ­tico
                 </div>
               </span>
             </label>
             
             <div id="disparo-massa-info" style="display:none;padding:.75rem;background:var(--bg3);border:1px solid var(--success);border-radius:8px;font-size:12px;color:var(--text2)">
-              Ô£à <strong style="color:var(--success)">Disparo ativo</strong><br />
+              Ã”Â£Ã  <strong style="color:var(--success)">Disparo ativo</strong><br />
               <span id="info-progresso">0 de 10 mensagens enviadas</span>
             </div>
           </div>
@@ -702,11 +702,11 @@
           <!-- Log em tempo real -->
           <div class="log-container">
             <div class="log-header">
-              ­ƒôè Log de Envios em Tempo Real
+              Â­Æ’Ã´Ã¨ Log de Envios em Tempo Real
             </div>
             <div id="log-content" class="log-content">
               <div class="log-empty">
-                Aguardando ativa├º├úo do disparo em massa...
+                Aguardando ativaâ”œÂºâ”œÃºo do disparo em massa...
               </div>
             </div>
           </div>
@@ -715,16 +715,16 @@
 
       </div>
 
-      <!-- Sub-p├ígina: Hist├│rico -->
+      <!-- Sub-pâ”œÃ­gina: Histâ”œâ”‚rico -->
       <div id="sub-page-historico" class="sub-page">
-        <p class="historico-titulo" style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">Hist├│rico de disparos</p>
+        <p class="historico-titulo" style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">Histâ”œâ”‚rico de disparos</p>
         <div id="historico-grid" class="cards-grid"></div>
       </div>
     </div>
 
     <!-- Mensagem quando desconectado -->
     <div id="wa-desconectado-msg" style="display:none;flex-direction:column;gap:.5rem;align-items:center;text-align:center;color:var(--text2)">
-      <div style="font-size:40px">­ƒôÁ</div>
+      <div style="font-size:40px">Â­Æ’Ã´Ã</div>
       <p style="font-size:14px;max-width:420px">
         Conecte o WhatsApp para acessar o gerenciamento de disparos
       </p>
@@ -732,7 +732,7 @@
 
   </div><!-- /page-whatsapp -->
 
-  <!-- Aba Cat├ílogo -->
+  <!-- Aba Catâ”œÃ­logo -->
   <div id="page-catalogo" class="page">
     
     <!-- Toolbar -->
@@ -744,7 +744,7 @@
         onkeyup="filtrarKits(this.value)"
       />
       <button class="btn btn-secondary" onclick="carregarCatalogo()">
-        ­ƒöä Atualizar
+        Â­Æ’Ã¶Ã¤ Atualizar
       </button>
       <span style="margin-left:auto;font-size:12px;color:var(--text2)" id="catalogo-count">
         Carregando...
@@ -768,7 +768,7 @@
         onkeyup="filtrarProdutos(this.value)"
       />
       <button class="btn btn-secondary" onclick="carregarProdutos()">
-        ­ƒöä Atualizar
+        Â­Æ’Ã¶Ã¤ Atualizar
       </button>
       <span style="margin-left:auto;font-size:12px;color:var(--text2)" id="produtos-count">
         Carregando...
@@ -782,7 +782,7 @@
 
 </main>
 
-<!-- Modal de edi├º├úo de kit -->
+<!-- Modal de ediâ”œÂºâ”œÃºo de kit -->
 <div id="modal-kit" class="modal-overlay" style="display:none" onclick="if(event.target===this) fecharModalKit()">
   <div class="modal-box">
     
@@ -795,7 +795,7 @@
         placeholder="Nome do kit"
         style="font-size:16px;font-weight:700;flex:1;margin-right:1rem"
       />
-      <button class="modal-close" onclick="fecharModalKit()">Ô£ò</button>
+      <button class="modal-close" onclick="fecharModalKit()">Ã”Â£Ã²</button>
     </div>
 
     <!-- Imagem preview -->
@@ -805,7 +805,7 @@
     <div class="modal-body" style="max-height:400px;overflow-y:auto">
       
       <div class="form-group">
-        <label class="form-label">Pre├ºo</label>
+        <label class="form-label">Preâ”œÂºo</label>
         <div style="display:flex;gap:.5rem;align-items:center">
           <input
             type="text"
@@ -819,9 +819,9 @@
             id="btn-editar-preco"
             onclick="toggleEditarPreco()" 
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
-            title="Editar pre├ºo"
+            title="Editar preâ”œÂºo"
           >
-            Ô£Å´©Å
+            Ã”Â£Ã…Â´Â©Ã…
           </button>
           <button 
             id="btn-salvar-preco"
@@ -829,7 +829,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            Ã”Â£Ã 
           </button>
           <button 
             id="btn-cancelar-preco"
@@ -837,17 +837,17 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            Ã”Â£Ã²
           </button>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Descri├º├úo do Produto</label>
+        <label class="form-label">Descriâ”œÂºâ”œÃºo do Produto</label>
         <textarea
           id="modal-kit-descricao"
           class="form-textarea"
-          placeholder="Descri├º├úo do produto..."
+          placeholder="Descriâ”œÂºâ”œÃºo do produto..."
           rows="4"
         ></textarea>
       </div>
@@ -869,7 +869,7 @@
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Editar SKU"
           >
-            Ô£Å´©Å
+            Ã”Â£Ã…Â´Â©Ã…
           </button>
           <button 
             id="btn-salvar-sku"
@@ -877,7 +877,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            Ã”Â£Ã 
           </button>
           <button 
             id="btn-cancelar-sku"
@@ -885,20 +885,20 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            Ã”Â£Ã²
           </button>
         </div>
       </div>
 
       <div class="form-group">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-          <label class="form-label" style="margin:0" id="componentes-label">Produtos que comp├Áem este kit</label>
+          <label class="form-label" style="margin:0" id="componentes-label">Produtos que compâ”œÃem este kit</label>
         </div>
         <div id="skus-itens-container" style="display:flex;flex-direction:column;gap:.5rem"></div>
       </div>
 
       <div class="form-group" style="border-top:1px solid var(--border);padding-top:1rem">
-        <label class="form-label">­ƒô© Imagem Thumbnail (Capa)</label>
+        <label class="form-label">Â­Æ’Ã´Â© Imagem thumbnail (Capa)</label>
         <input
           type="file"
           id="modal-kit-file-thumb"
@@ -908,7 +908,7 @@
         />
         <div style="display:flex;gap:.5rem">
           <button class="btn btn-secondary" onclick="document.getElementById('modal-kit-file-thumb').click()" style="flex:1">
-            <span id="thumb-btn-text">­ƒöä Alterar Thumbnail</span>
+            <span id="thumb-btn-text">Â­Æ’Ã¶Ã¤ Alterar thumbnail</span>
           </button>
           <button 
             id="btn-deletar-thumb" 
@@ -916,7 +916,7 @@
             onclick="deletarThumb()" 
             style="display:none"
           >
-            ­ƒùæ´©Å Deletar
+            Â­Æ’Ã¹Ã¦Â´Â©Ã… Deletar
           </button>
         </div>
         <span id="file-name-thumb" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
@@ -927,20 +927,20 @@
     <!-- Footer -->
     <div class="modal-footer">
       <span id="modal-save-success" class="save-success" style="display:none">
-        Ô£à Salvo com sucesso!
+        Ã”Â£Ã  Salvo com sucesso!
       </span>
       <button class="btn btn-secondary" onclick="fecharModalKit()">
         Cancelar
       </button>
       <button class="btn btn-primary" id="modal-save-btn" onclick="salvarKit()">
-        ­ƒÆ¥ Salvar
+        Â­Æ’Ã†Â¥ Salvar
       </button>
     </div>
 
   </div>
 </div>
 
-<!-- Modal de edi├º├úo de produto -->
+<!-- Modal de ediâ”œÂºâ”œÃºo de produto -->
 <div id="modal-produto" class="modal-overlay" style="display:none" onclick="if(event.target===this) fecharModalProduto()">
   <div class="modal-box">
     
@@ -953,7 +953,7 @@
         placeholder="Nome do produto"
         style="font-size:16px;font-weight:700;flex:1;margin-right:1rem"
       />
-      <button class="modal-close" onclick="fecharModalProduto()">Ô£ò</button>
+      <button class="modal-close" onclick="fecharModalProduto()">Ã”Â£Ã²</button>
     </div>
 
     <!-- Imagem preview -->
@@ -979,7 +979,7 @@
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Editar SKU"
           >
-            Ô£Å´©Å
+            Ã”Â£Ã…Â´Â©Ã…
           </button>
           <button 
             id="btn-salvar-produto-sku"
@@ -987,7 +987,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            Ã”Â£Ã 
           </button>
           <button 
             id="btn-cancelar-produto-sku"
@@ -995,13 +995,13 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            Ã”Â£Ã²
           </button>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Pre├ºo</label>
+        <label class="form-label">Preâ”œÂºo</label>
         <div style="display:flex;gap:.5rem;align-items:center">
           <input
             type="text"
@@ -1015,9 +1015,9 @@
             id="btn-editar-produto-preco"
             onclick="toggleEditarCampo('preco')" 
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
-            title="Editar pre├ºo"
+            title="Editar preâ”œÂºo"
           >
-            Ô£Å´©Å
+            Ã”Â£Ã…Â´Â©Ã…
           </button>
           <button 
             id="btn-salvar-produto-preco"
@@ -1025,7 +1025,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            Ã”Â£Ã 
           </button>
           <button 
             id="btn-cancelar-produto-preco"
@@ -1033,18 +1033,18 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            Ã”Â£Ã²
           </button>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Descri├º├úo (Contra R├│tulo)</label>
+        <label class="form-label">Descriâ”œÂºâ”œÃºo (Contra Râ”œâ”‚tulo)</label>
         <div style="display:flex;gap:.5rem;align-items:flex-start">
           <textarea
             id="modal-produto-descricao"
             class="form-textarea"
-            placeholder="Descri├º├úo do contra r├│tulo..."
+            placeholder="Descriâ”œÂºâ”œÃºo do contra râ”œâ”‚tulo..."
             rows="3"
             style="flex:1"
             disabled
@@ -1054,9 +1054,9 @@
               id="btn-editar-produto-descricao"
               onclick="toggleEditarCampo('descricao')" 
               style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
-              title="Editar descri├º├úo"
+              title="Editar descriâ”œÂºâ”œÃºo"
             >
-              Ô£Å´©Å
+              Ã”Â£Ã…Â´Â©Ã…
             </button>
             <button 
               id="btn-salvar-produto-descricao"
@@ -1064,7 +1064,7 @@
               style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
               title="Salvar"
             >
-              Ô£à
+              Ã”Â£Ã 
             </button>
             <button 
               id="btn-cancelar-produto-descricao"
@@ -1072,7 +1072,7 @@
               style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
               title="Cancelar"
             >
-              Ô£ò
+              Ã”Â£Ã²
             </button>
           </div>
         </div>
@@ -1095,7 +1095,7 @@
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Editar peso"
           >
-            Ô£Å´©Å
+            Ã”Â£Ã…Â´Â©Ã…
           </button>
           <button 
             id="btn-salvar-produto-peso"
@@ -1103,7 +1103,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            Ã”Â£Ã 
           </button>
           <button 
             id="btn-cancelar-produto-peso"
@@ -1111,7 +1111,7 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            Ã”Â£Ã²
           </button>
         </div>
       </div>
@@ -1123,7 +1123,7 @@
             type="text"
             id="modal-produto-tamanho"
             class="form-input"
-            placeholder="Ex: Pequeno, M├®dio, Grande"
+            placeholder="Ex: Pequeno, Mâ”œÂ®dio, Grande"
             style="flex:1"
             disabled
           />
@@ -1133,7 +1133,7 @@
             style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Editar tamanho"
           >
-            Ô£Å´©Å
+            Ã”Â£Ã…Â´Â©Ã…
           </button>
           <button 
             id="btn-salvar-produto-tamanho"
@@ -1141,7 +1141,7 @@
             style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Salvar"
           >
-            Ô£à
+            Ã”Â£Ã 
           </button>
           <button 
             id="btn-cancelar-produto-tamanho"
@@ -1149,18 +1149,18 @@
             style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
             title="Cancelar"
           >
-            Ô£ò
+            Ã”Â£Ã²
           </button>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Composi├º├úo</label>
+        <label class="form-label">Composiâ”œÂºâ”œÃºo</label>
         <div style="display:flex;gap:.5rem;align-items:flex-start">
           <textarea
             id="modal-produto-composicao"
             class="form-textarea"
-            placeholder="Composi├º├úo do produto..."
+            placeholder="Composiâ”œÂºâ”œÃºo do produto..."
             rows="3"
             style="flex:1"
             disabled
@@ -1170,9 +1170,9 @@
               id="btn-editar-produto-composicao"
               onclick="toggleEditarCampo('composicao')" 
               style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
-              title="Editar composi├º├úo"
+              title="Editar composiâ”œÂºâ”œÃºo"
             >
-              Ô£Å´©Å
+              Ã”Â£Ã…Â´Â©Ã…
             </button>
             <button 
               id="btn-salvar-produto-composicao"
@@ -1180,7 +1180,7 @@
               style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
               title="Salvar"
             >
-              Ô£à
+              Ã”Â£Ã 
             </button>
             <button 
               id="btn-cancelar-produto-composicao"
@@ -1188,14 +1188,14 @@
               style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
               title="Cancelar"
             >
-              Ô£ò
+              Ã”Â£Ã²
             </button>
           </div>
         </div>
       </div>
 
       <div class="form-group" style="border-top:1px solid var(--border);padding-top:1rem">
-        <label class="form-label">­ƒô© Imagem Thumbnail (Capa)</label>
+        <label class="form-label">Â­Æ’Ã´Â© Imagem thumbnail (Capa)</label>
         <input
           type="file"
           id="modal-produto-file-thumb"
@@ -1205,7 +1205,7 @@
         />
         <div style="display:flex;gap:.5rem">
           <button class="btn btn-secondary" onclick="document.getElementById('modal-produto-file-thumb').click()" style="flex:1">
-            <span id="produto-thumb-btn-text">­ƒöä Alterar Thumbnail</span>
+            <span id="produto-thumb-btn-text">Â­Æ’Ã¶Ã¤ Alterar thumbnail</span>
           </button>
           <button 
             id="btn-deletar-produto-thumb" 
@@ -1213,7 +1213,7 @@
             onclick="deletarProdutoThumb()" 
             style="display:none"
           >
-            ­ƒùæ´©Å Deletar
+            Â­Æ’Ã¹Ã¦Â´Â©Ã… Deletar
           </button>
         </div>
         <span id="file-name-produto-thumb" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
@@ -1221,7 +1221,7 @@
 
       <div class="form-group">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-          <label class="form-label" style="margin:0">­ƒû╝´©Å Imagens do Carrossel</label>
+          <label class="form-label" style="margin:0">Â­Æ’Ã»â•Â´Â©Ã… Imagens do Carrossel</label>
           <input
             type="file"
             id="modal-produto-file-carrossel"
@@ -1230,7 +1230,7 @@
             onchange="handleProdutoCarrosselSelect(this)"
           />
           <button class="btn btn-secondary" onclick="document.getElementById('modal-produto-file-carrossel').click()" style="padding:.25rem .5rem;font-size:12px">
-            Ô×ò Adicionar Imagem
+            Ã”Ã—Ã² Adicionar Imagem
           </button>
         </div>
         <div id="produto-carrossel-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem"></div>
@@ -1241,13 +1241,13 @@
     <!-- Footer -->
     <div class="modal-footer">
       <span id="modal-produto-save-success" class="save-success" style="display:none">
-        Ô£à Salvo com sucesso!
+        Ã”Â£Ã  Salvo com sucesso!
       </span>
       <button class="btn btn-secondary" onclick="fecharModalProduto()">
         Cancelar
       </button>
       <button class="btn btn-primary" id="modal-produto-save-btn" onclick="salvarProduto()">
-        ­ƒÆ¥ Salvar
+        Â­Æ’Ã†Â¥ Salvar
       </button>
     </div>
 
@@ -1260,20 +1260,20 @@
     
     <!-- Header -->
     <div class="modal-header">
-      <div class="modal-title">­ƒº¬ Enviar Mensagem de Teste</div>
-      <button class="modal-close" onclick="fecharModalTeste()">Ô£ò</button>
+      <div class="modal-title">Â­Æ’ÂºÂ¬ Enviar Mensagem de Teste</div>
+      <button class="modal-close" onclick="fecharModalTeste()">Ã”Â£Ã²</button>
     </div>
 
     <!-- Body -->
     <div style="padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1rem">
       
       <p style="font-size:13px;color:var(--text2);line-height:1.6;margin:0">
-        Envie a mensagem configurada para um n├║mero espec├¡fico para testar antes do disparo em massa.
+        Envie a mensagem configurada para um nâ”œâ•‘mero especâ”œÂ¡fico para testar antes do disparo em massa.
       </p>
 
       <div style="display:flex;flex-direction:column;gap:.4rem">
         <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em">
-          N├║mero de Telefone
+          Nâ”œâ•‘mero de Telefone
         </label>
         <input
           type="tel"
@@ -1282,7 +1282,7 @@
           style="padding:.75rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;font-family:inherit"
         />
         <span style="font-size:11px;color:var(--text2)">
-          Digite apenas n├║meros (com ou sem DDI +55)
+          Digite apenas nâ”œâ•‘meros (com ou sem DDI +55)
         </span>
       </div>
 
@@ -1313,7 +1313,7 @@
         class="btn btn-primary" 
         style="padding:.75rem 1.25rem;font-size:14px;font-weight:600;border-radius:6px;background:var(--info)"
       >
-        ­ƒôñ Enviar Teste
+        Â­Æ’Ã´Ã± Enviar Teste
       </button>
     </div>
 
@@ -1321,21 +1321,21 @@
 </div>
 
 <script>
-// ÔöÇÔöÇ Service Worker Killer ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Service Worker Killer Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(regs => {
     regs.forEach(reg => reg.unregister());
   });
 }
 
-// ÔöÇÔöÇ Troca de aba ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Troca de aba Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 function trocarAba(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + id).classList.add('active');
   btn.classList.add('active');
   
-  // Carrega cat├ílogo/produtos quando trocar para essas abas
+  // Carrega catâ”œÃ­logo/produtos quando trocar para essas abas
   if (id === 'catalogo' && typeof kitsData !== 'undefined' && kitsData.length === 0) {
     carregarCatalogo();
   }
@@ -1344,7 +1344,7 @@ function trocarAba(id, btn) {
   }
 }
 
-// ÔöÇÔöÇ Troca de sub-aba (WhatsApp) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Troca de sub-aba (WhatsApp) Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 function trocarSubAba(id, btn) {
   document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
@@ -1352,14 +1352,14 @@ function trocarSubAba(id, btn) {
   btn.classList.add('active');
 }
 
-// ÔöÇÔöÇ API helper ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ API helper Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 async function api(path, opts) {
   const r = await fetch(path, opts);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
 }
 
-// ÔöÇÔöÇ Status do servidor ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Status do servidor Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 async function verificarServidor() {
   const buildVersion = 'v10-thumb-carrossel';
   console.log(`[Luna ${buildVersion}] verificando servidor via /health`);
@@ -1394,13 +1394,13 @@ async function verificarServidor() {
   }
 }
 
-// ÔöÇÔöÇ WhatsApp status ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ WhatsApp status Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 const STATUS_CFG = {
   disconnected: { cls: 'dot-red',    texto: 'Desconectado',         cor: 'var(--danger)'  },
   qr:           { cls: 'dot-yellow', texto: 'Aguardando QR Code',   cor: 'var(--warning)' },
   connecting:   { cls: 'dot-yellow', texto: 'Conectando...',         cor: 'var(--warning)' },
   connected:    { cls: 'dot-green',  texto: 'Conectado',             cor: 'var(--success)' },
-  error:        { cls: 'dot-red',    texto: 'Erro de conex├úo',       cor: 'var(--danger)'  },
+  error:        { cls: 'dot-red',    texto: 'Erro de conexâ”œÃºo',       cor: 'var(--danger)'  },
 };
 
 async function atualizarWhatsApp() {
@@ -1412,7 +1412,7 @@ async function atualizarWhatsApp() {
     document.getElementById('wa-status-texto').textContent = cfg.texto;
     document.getElementById('wa-status-texto').style.color = cfg.cor;
 
-    // N├║mero conectado
+    // Nâ”œâ•‘mero conectado
     const elNum = document.getElementById('wa-numero');
     if (d.numero) {
       document.getElementById('wa-numero-val').textContent = '+' + d.numero;
@@ -1426,9 +1426,9 @@ async function atualizarWhatsApp() {
     if (d.erro) {
       let mensagemErro = d.erro;
       
-      // Se for o erro de sidecar n├úo rodando, melhora a mensagem
+      // Se for o erro de sidecar nâ”œÃºo rodando, melhora a mensagem
       if (d.erro.includes('Sidecar') || d.erro.includes('sidecar') || d.status === 'disconnected') {
-        mensagemErro = 'WhatsApp Sidecar n├úo est├í rodando. Execute INICIAR-LUNA-SERVER-COMPLETO.bat ou inicie manualmente: cd whatsapp-sidecar && node server.js';
+        mensagemErro = 'WhatsApp Sidecar nâ”œÃºo estâ”œÃ­ rodando. Execute INICIAR-LUNA-SERVER-COMPLETO.bat ou inicie manualmente: cd whatsapp-sidecar && node server.js';
       }
       
       elErro.textContent = mensagemErro;
@@ -1437,7 +1437,7 @@ async function atualizarWhatsApp() {
       elErro.style.display = 'none';
     }
 
-    // Bot├Áes de a├º├úo
+    // Botâ”œÃes de aâ”œÂºâ”œÃºo
     const elAcoes = document.getElementById('wa-acoes');
     elAcoes.innerHTML = '';
     if (d.status === 'connected') {
@@ -1470,7 +1470,7 @@ async function atualizarWhatsApp() {
     }
 
   } catch {
-    // servidor offline ÔÇö j├í tratado em verificarServidor
+    // servidor offline Ã”Ã‡Ã¶ jâ”œÃ­ tratado em verificarServidor
   }
 }
 
@@ -1480,7 +1480,7 @@ async function desconectarWhatsApp() {
   } catch {}
 }
 
-// ÔöÇÔöÇ Hist├│rico de disparos ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Histâ”œâ”‚rico de disparos Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 async function carregarHistorico() {
   try {
     const d = await api('/api/disparos?limit=60');
@@ -1496,7 +1496,7 @@ function renderHistorico(lista) {
   if (lista.length === 0) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <span>­ƒô¡</span>
+        <span>Â­Æ’Ã´Â¡</span>
         <p>Nenhum disparo registrado ainda</p>
       </div>`;
     return;
@@ -1537,7 +1537,7 @@ function formatarTel(n) {
   return n;
 }
 
-// ÔöÇÔöÇ Gerenciamento de Disparos ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Gerenciamento de Disparos Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 let itensDisponiveis = [];
 let itemSelecionado = null;
 
@@ -1603,13 +1603,13 @@ function selecionarItemDisparo(id, tipo) {
   container.innerHTML = `
     ${itemSelecionado.thumb_url ? `<img src="${itemSelecionado.thumb_url}" alt="${esc(itemSelecionado.nome)}" style="width:60px;height:60px;border-radius:8px;object-fit:cover"/>` : ''}
     <div style="flex:1">
-      <div style="font-size:15px;font-weight:700;color:var(--success)">Ô£ô Selecionado</div>
+      <div style="font-size:15px;font-weight:700;color:var(--success)">Ã”Â£Ã´ Selecionado</div>
       <div style="font-size:14px;color:var(--text)">${esc(itemSelecionado.nome)}</div>
       <div style="font-size:12px;color:var(--text2)">${itemSelecionado.tipo === 'kit' ? 'Kit' : 'Produto'}</div>
     </div>
   `;
   
-  // Atualiza bot├úo
+  // Atualiza botâ”œÃºo
   atualizarBotaoDisparo();
 }
 
@@ -1641,14 +1641,14 @@ function atualizarBotaoDisparo() {
   
   const podeIniciar = mensagem && itemSelecionado;
   
-  // Bot├úo de teste flutuante
+  // Botâ”œÃºo de teste flutuante
   btnTeste.disabled = !podeIniciar;
   
   // Checkbox de disparo em massa
   checkbox.disabled = !podeIniciar;
 }
 
-// ÔöÇÔöÇ Disparo em Massa com Log ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Disparo em Massa com Log Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 let disparoMassaAtivo = false;
 let disparoMassaConfig = null;
 
@@ -1676,7 +1676,7 @@ function toggleDisparoMassa(ativo) {
     info.style.display = 'block';
     atualizarInfoProgresso();
     
-    // Adiciona log de in├¡cio
+    // Adiciona log de inâ”œÂ¡cio
     adicionarLog('info', `Disparo em massa iniciado: ${quantidade} mensagens`);
     
     // Inicia disparo no backend
@@ -1711,14 +1711,14 @@ async function iniciarDisparoMassa() {
     }
     
     const data = await res.json();
-    adicionarLog('success', `Ô£à Disparo configurado no servidor (ID: ${data.disparo_id || 'N/A'})`);
+    adicionarLog('success', `Ã”Â£Ã  Disparo configurado no servidor (ID: ${data.disparo_id || 'N/A'})`);
     
     // Inicia polling para acompanhar envios
     iniciarPollingLogEnvios();
     
   } catch (err) {
     console.error('[Disparo Massa] Erro:', err);
-    adicionarLog('error', `ÔØî Erro ao iniciar: ${err.message}`);
+    adicionarLog('error', `Ã”Ã˜Ã® Erro ao iniciar: ${err.message}`);
     document.getElementById('disparo-massa-ativo').checked = false;
     disparoMassaAtivo = false;
   }
@@ -1762,7 +1762,7 @@ function iniciarPollingLogEnvios() {
       if (data.ultimos_envios && Array.isArray(data.ultimos_envios)) {
         data.ultimos_envios.forEach(envio => {
           const tipo = envio.status === 'enviado' ? 'success' : 'error';
-          const icone = envio.status === 'enviado' ? 'Ô£à' : 'ÔØî';
+          const icone = envio.status === 'enviado' ? 'Ã”Â£Ã ' : 'Ã”Ã˜Ã®';
           adicionarLog(tipo, `${icone} ${envio.numero} - ${envio.mensagem_preview || 'Mensagem enviada'}`, false);
         });
       }
@@ -1771,7 +1771,7 @@ function iniciarPollingLogEnvios() {
       if (data.concluido) {
         document.getElementById('disparo-massa-ativo').checked = false;
         disparoMassaAtivo = false;
-        adicionarLog('success', '­ƒÄë Disparo em massa conclu├¡do!');
+        adicionarLog('success', 'Â­Æ’Ã„Ã« Disparo em massa concluâ”œÂ¡do!');
         clearInterval(pollingInterval);
       }
       
@@ -1816,7 +1816,7 @@ function adicionarLog(tipo, mensagem, scroll = true) {
   }
 }
 
-// ÔöÇÔöÇ Modal de Teste ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Modal de Teste Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 function abrirModalTeste() {
   const mensagem = document.getElementById('disparo-mensagem').value.trim();
   
@@ -1843,7 +1843,7 @@ function abrirModalTeste() {
     previewItem.style.display = 'none';
   }
   
-  // Limpa campo de n├║mero
+  // Limpa campo de nâ”œâ•‘mero
   document.getElementById('teste-numero').value = '';
   
   // Mostra modal
@@ -1859,12 +1859,12 @@ async function enviarTeste() {
   const mensagem = document.getElementById('disparo-mensagem').value.trim();
   
   if (!numero) {
-    alert('Digite um n├║mero de telefone v├ílido');
+    alert('Digite um nâ”œâ•‘mero de telefone vâ”œÃ­lido');
     return;
   }
   
   if (numero.length < 10) {
-    alert('N├║mero de telefone deve ter pelo menos 10 d├¡gitos (DDD + n├║mero)');
+    alert('Nâ”œâ•‘mero de telefone deve ter pelo menos 10 dâ”œÂ¡gitos (DDD + nâ”œâ•‘mero)');
     return;
   }
   
@@ -1873,7 +1873,7 @@ async function enviarTeste() {
   btn.textContent = 'Enviando...';
   
   try {
-    // Adiciona DDI +55 se n├úo tiver
+    // Adiciona DDI +55 se nâ”œÃºo tiver
     const numeroCompleto = numero.startsWith('55') ? numero : '55' + numero;
     
     const res = await fetch('/api/disparos/enviar-teste', {
@@ -1892,15 +1892,15 @@ async function enviarTeste() {
       throw new Error(erro);
     }
     
-    alert('Ô£à Mensagem de teste enviada com sucesso!');
+    alert('Ã”Â£Ã  Mensagem de teste enviada com sucesso!');
     fecharModalTeste();
     
   } catch (err) {
     console.error('[Teste] Erro:', err);
-    alert('ÔØî Erro ao enviar teste: ' + err.message);
+    alert('Ã”Ã˜Ã® Erro ao enviar teste: ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = '­ƒôñ Enviar Teste';
+    btn.textContent = 'Â­Æ’Ã´Ã± Enviar Teste';
   }
 }
 
@@ -1936,23 +1936,23 @@ async function iniciarDisparo() {
       throw new Error(erro);
     }
     
-    alert('Ô£à Disparo iniciado com sucesso!');
+    alert('Ã”Â£Ã  Disparo iniciado com sucesso!');
     
-    // Limpa formul├írio
+    // Limpa formulâ”œÃ­rio
     document.getElementById('disparo-mensagem').value = '';
     document.getElementById('disparo-busca-item').value = '';
     document.getElementById('disparo-item-selecionado').style.display = 'none';
     itemSelecionado = null;
     
-    // Vai para aba de hist├│rico
+    // Vai para aba de histâ”œâ”‚rico
     trocarSubAba('historico', document.querySelectorAll('.sub-tab')[1]);
     
   } catch (err) {
     console.error('[Disparo] Erro:', err);
-    alert('ÔØî Erro ao iniciar disparo: ' + err.message);
+    alert('Ã”Ã˜Ã® Erro ao iniciar disparo: ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = '­ƒÜÇ Iniciar Disparo';
+    btn.textContent = 'Â­Æ’ÃœÃ‡ Iniciar Disparo';
     atualizarBotaoDisparo();
   }
 }
@@ -1965,7 +1965,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// ÔöÇÔöÇ Loop principal ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Loop principal Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 async function tick() {
   const online = await verificarServidor();
   if (online) {
@@ -1991,14 +1991,14 @@ async function tick() {
 tick();
 setInterval(tick, 4000); // atualiza a cada 4s
 
-// ÔöÇÔöÇ Cat├ílogo ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Catâ”œÃ­logo Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 let kitsData = [];
 let kitAtual = null;
 let arquivoThumb = null;
 let arquivoCarrossel = null;
-const MARCA_PADRAO = 'Alphahall'; // Marca padr├úo por enquanto
+const MARCA_PADRAO = 'Alphahall'; // Marca padrâ”œÃºo por enquanto
 
-// Estados de edi├º├úo inline (Kits)
+// Estados de ediâ”œÂºâ”œÃºo inline (Kits)
 let skuOriginal = '';
 let precoOriginal = '';
 
@@ -2007,7 +2007,7 @@ let produtosData = [];
 let produtoAtual = null;
 let arquivoProdutoThumb = null;
 
-// Estados de edi├º├úo inline (Produtos)
+// Estados de ediâ”œÂºâ”œÃºo inline (Produtos)
 let camposOriginais = {
   sku: '',
   preco: '',
@@ -2029,12 +2029,12 @@ async function carregarCatalogo() {
     console.log('[DEBUG] Kits carregados:', kitsData.length, '- Exemplo:', kitsData[0]);
     renderKits(kitsData);
   } catch (e) {
-    console.error('[Cat├ílogo] Erro ao carregar:', e);
+    console.error('[Catâ”œÃ­logo] Erro ao carregar:', e);
     document.getElementById('catalogo-grid').innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <span>ÔÜá´©Å</span>
-        <p>Erro ao carregar cat├ílogo</p>
-        <p style="font-size:11px;color:var(--text2)">Verifique se o servidor est├í rodando</p>
+        <span>Ã”ÃœÃ¡Â´Â©Ã…</span>
+        <p>Erro ao carregar catâ”œÃ­logo</p>
+        <p style="font-size:11px;color:var(--text2)">Verifique se o servidor estâ”œÃ­ rodando</p>
       </div>`;
   }
 }
@@ -2050,8 +2050,8 @@ function renderKits(lista) {
   if (lista.length === 0) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <span>­ƒôª</span>
-        <p>Nenhum kit no cat├ílogo</p>
+        <span>Â­Æ’Ã´Âª</span>
+        <p>Nenhum kit no catâ”œÃ­logo</p>
       </div>`;
     return;
   }
@@ -2078,7 +2078,7 @@ function renderKits(lista) {
               class="lazy-img"
               style="background:var(--bg3)"
             />`
-          : `<span class="kit-img-placeholder">­ƒôª</span>`
+          : `<span class="kit-img-placeholder">Â­Æ’Ã´Âª</span>`
         }
       </div>
       <div class="kit-info">
@@ -2092,7 +2092,7 @@ function renderKits(lista) {
         }
       </div>
       <div class="kit-footer">
-        Ô£Å´©Å Editar
+        Ã”Â£Ã…Â´Â©Ã… Editar
       </div>
     </div>
   `;
@@ -2130,20 +2130,20 @@ function abrirModalKit(nomeKit, marca) {
   console.log('[DEBUG] kitsData tem', kitsData.length, 'kits');
   
   try {
-    // Busca apenas por nome, pois o campo marca n├úo existe no banco
+    // Busca apenas por nome, pois o campo marca nâ”œÃºo existe no banco
     kitAtual = kitsData.find(k => k.nome === nomeKit);
     
-    console.log('[DEBUG] kitAtual encontrado?', kitAtual ? 'SIM' : 'N├âO');
+    console.log('[DEBUG] kitAtual encontrado?', kitAtual ? 'SIM' : 'Nâ”œÃ¢O');
     
     if (!kitAtual) {
-      console.error('[DEBUG] Kit n├úo encontrado! Buscando:', { nome: nomeKit, marca: marca });
+      console.error('[DEBUG] Kit nâ”œÃºo encontrado! Buscando:', { nome: nomeKit, marca: marca });
       console.error('[DEBUG] Primeiro kit no array:', kitsData[0]);
-      alert(`ÔØî Kit "${nomeKit}" n├úo encontrado!`);
+      alert(`Ã”Ã˜Ã® Kit "${nomeKit}" nâ”œÃºo encontrado!`);
       return;
     }
 
     console.log('[DEBUG] Inicializando modal...');
-    console.log('[DEBUG] 1. Limpando vari├íveis...');
+    console.log('[DEBUG] 1. Limpando variâ”œÃ­veis...');
     arquivoThumb = null;
     arquivoCarrossel = null;
     
@@ -2159,18 +2159,18 @@ function abrirModalKit(nomeKit, marca) {
     console.log('[DEBUG] 5. Preenchendo nome...');
     document.getElementById('modal-kit-nome-edit').value = kitAtual.nome;
     
-    console.log('[DEBUG] 6. Configurando pre├ºo...');
+    console.log('[DEBUG] 6. Configurando preâ”œÂºo...');
     const inputPreco = document.getElementById('modal-kit-preco');
     inputPreco.value = kitAtual.preco ? `R$ ${parseFloat(kitAtual.preco).toFixed(2)}` : '';
     inputPreco.disabled = true;
     precoOriginal = inputPreco.value;
     
-    console.log('[DEBUG] 7. Bot├Áes de pre├ºo...');
+    console.log('[DEBUG] 7. Botâ”œÃes de preâ”œÂºo...');
     document.getElementById('btn-editar-preco').style.display = 'block';
     document.getElementById('btn-salvar-preco').style.display = 'none';
     document.getElementById('btn-cancelar-preco').style.display = 'none';
     
-    console.log('[DEBUG] 8. Preenchendo descri├º├úo...');
+    console.log('[DEBUG] 8. Preenchendo descriâ”œÂºâ”œÃºo...');
     document.getElementById('modal-kit-descricao').value = kitAtual.descricao || '';
     
     console.log('[DEBUG] 9. Configurando SKU...');
@@ -2179,7 +2179,7 @@ function abrirModalKit(nomeKit, marca) {
     inputSku.disabled = true;
     skuOriginal = inputSku.value;
     
-    console.log('[DEBUG] 10. Bot├Áes de SKU...');
+    console.log('[DEBUG] 10. Botâ”œÃes de SKU...');
     document.getElementById('btn-editar-sku').style.display = 'block';
     document.getElementById('btn-salvar-sku').style.display = 'none';
     document.getElementById('btn-cancelar-sku').style.display = 'none';
@@ -2190,9 +2190,9 @@ function abrirModalKit(nomeKit, marca) {
     
     console.log('[DEBUG] 12. Mostrando modal...');
     document.getElementById('modal-kit').style.display = 'flex';
-    console.log('[DEBUG] Ô£à Modal ABERTO com sucesso!');
+    console.log('[DEBUG] Ã”Â£Ã  Modal ABERTO com sucesso!');
   } catch (error) {
-    console.error('[DEBUG] ÔØî ERRO ao abrir modal:', error);
+    console.error('[DEBUG] Ã”Ã˜Ã® ERRO ao abrir modal:', error);
     alert(`Erro ao abrir modal: ${error.message}`);
   }
 }
@@ -2228,13 +2228,13 @@ function renderCarrossel(imagens) {
         onclick="deletarImagemCarrossel('${esc(img)}')"
         style="position:absolute;top:4px;right:4px;background:rgba(239,68,68,0.9);color:white;border:none;border-radius:4px;padding:.25rem .35rem;cursor:pointer;font-size:10px"
       >
-        ­ƒùæ´©Å
+        Â­Æ’Ã¹Ã¦Â´Â©Ã…
       </button>
     </div>
   `).join('');
 }
 
-// ÔöÇÔöÇ Drag and Drop para Carrossel ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Drag and Drop para Carrossel Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 let draggedElement = null;
 
 function handleDragStart(e) {
@@ -2273,7 +2273,7 @@ function handleDrop(e) {
   target.style.borderColor = '';
   target.style.borderWidth = '';
   
-  // Pega ├¡ndices
+  // Pega â”œÂ¡ndices
   const fromIndex = parseInt(draggedElement.getAttribute('data-index'));
   const toIndex = parseInt(target.getAttribute('data-index'));
   
@@ -2325,10 +2325,10 @@ async function salvarOrdemCarrossel(imagens) {
       throw new Error(data.erro || 'Erro ao salvar ordem');
     }
     
-    showToast('Ô£ô Ordem atualizada', 'success');
+    showToast('Ã”Â£Ã´ Ordem atualizada', 'success');
   } catch (err) {
     console.error('Erro ao salvar ordem:', err);
-    showToast('ÔØî Erro ao salvar ordem', 'error');
+    showToast('Ã”Ã˜Ã® Erro ao salvar ordem', 'error');
   }
 }
 
@@ -2353,7 +2353,7 @@ function renderSkusItens(skus) {
         onclick="removerSkuItem(${idx})"
         style="background:none;border:1px solid var(--danger);color:var(--danger);border-radius:4px;padding:.25rem .5rem;cursor:pointer;font-size:12px"
       >
-        ­ƒùæ´©Å
+        Â­Æ’Ã¹Ã¦Â´Â©Ã…
       </button>
     </div>
   `).join('');
@@ -2385,7 +2385,7 @@ function renderComponentesKit(componentes) {
         style="background:var(--info);color:white;border:none;border-radius:6px;padding:.4rem .7rem;cursor:pointer;font-size:11px;font-weight:600"
         title="Ver detalhes"
       >
-        ­ƒæü´©Å Ver
+        Â­Æ’Ã¦Ã¼Â´Â©Ã… Ver
       </button>
     </div>
   `).join('');
@@ -2407,10 +2407,10 @@ function removerSkuItem(idx) {
 
 function verDetalhesComponente(sku) {
   if (!sku) {
-    alert('SKU n├úo dispon├¡vel para este componente.');
+    alert('SKU nâ”œÃºo disponâ”œÂ¡vel para este componente.');
     return;
   }
-  // TODO: Implementar visualiza├º├úo de detalhes do componente
+  // TODO: Implementar visualizaâ”œÂºâ”œÃºo de detalhes do componente
   alert(`Detalhes do componente com SKU: ${sku}`);
 }
 
@@ -2420,7 +2420,7 @@ function fecharModalKit() {
   arquivoSelecionado = null;
 }
 
-// Fun├º├úo removida - n├úo ├® mais utilizada
+// Funâ”œÂºâ”œÃºo removida - nâ”œÃºo â”œÂ® mais utilizada
 
 function handleThumbSelect(input) {
   const file = input.files?.[0];
@@ -2430,20 +2430,20 @@ function handleThumbSelect(input) {
     return;
   }
 
-  // Valida├º├úo de tipo
+  // Validaâ”œÂºâ”œÃºo de tipo
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    alert('ÔÜá´©Å Formato inv├ílido. Use apenas: JPG, PNG ou WebP');
+    alert('Ã”ÃœÃ¡Â´Â©Ã… Formato invâ”œÃ­lido. Use apenas: JPG, PNG ou WebP');
     input.value = '';
     arquivoThumb = null;
     document.getElementById('file-name-thumb').textContent = '';
     return;
   }
 
-  // Valida├º├úo de tamanho (5MB)
+  // Validaâ”œÂºâ”œÃºo de tamanho (5MB)
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
-    alert('ÔÜá´©Å Arquivo muito grande. Tamanho m├íximo: 5MB');
+    alert('Ã”ÃœÃ¡Â´Â©Ã… Arquivo muito grande. Tamanho mâ”œÃ­ximo: 5MB');
     input.value = '';
     arquivoThumb = null;
     document.getElementById('file-name-thumb').textContent = '';
@@ -2451,7 +2451,7 @@ function handleThumbSelect(input) {
   }
 
   arquivoThumb = file;
-  document.getElementById('file-name-thumb').textContent = `Ô£ô ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  document.getElementById('file-name-thumb').textContent = `Ã”Â£Ã´ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
 }
 
 function handleCarrosselSelect(input) {
@@ -2461,26 +2461,26 @@ function handleCarrosselSelect(input) {
     return;
   }
 
-  // Valida├º├úo de tipo
+  // Validaâ”œÂºâ”œÃºo de tipo
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    alert('ÔÜá´©Å Formato inv├ílido. Use apenas: JPG, PNG ou WebP');
+    alert('Ã”ÃœÃ¡Â´Â©Ã… Formato invâ”œÃ­lido. Use apenas: JPG, PNG ou WebP');
     input.value = '';
     arquivoCarrossel = null;
     return;
   }
 
-  // Valida├º├úo de tamanho (5MB)
+  // Validaâ”œÂºâ”œÃºo de tamanho (5MB)
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
-    alert('ÔÜá´©Å Arquivo muito grande. Tamanho m├íximo: 5MB');
+    alert('Ã”ÃœÃ¡Â´Â©Ã… Arquivo muito grande. Tamanho mâ”œÃ­ximo: 5MB');
     input.value = '';
     arquivoCarrossel = null;
     return;
   }
 
   arquivoCarrossel = file;
-  // Upload autom├ítico ap├│s sele├º├úo
+  // Upload automâ”œÃ­tico apâ”œâ”‚s seleâ”œÂºâ”œÃºo
   uploadCarrossel();
 }
 
@@ -2510,10 +2510,10 @@ async function uploadCarrossel() {
     document.getElementById('modal-kit-file-carrossel').value = '';
     arquivoCarrossel = null;
 
-    showToast('Ô£ô Imagem adicionada ao carrossel', 'success');
+    showToast('Ã”Â£Ã´ Imagem adicionada ao carrossel', 'success');
   } catch (err) {
     console.error('Erro ao upload carrossel:', err);
-    alert('ÔØî Erro ao adicionar imagem: ' + err.message);
+    alert('Ã”Ã˜Ã® Erro ao adicionar imagem: ' + err.message);
   }
 }
 
@@ -2537,10 +2537,10 @@ async function deletarImagemCarrossel(arquivo) {
     kitAtual = kitsData.find(k => k.nome === kitAtual.nome);
     renderCarrossel(kitAtual.imagens_carrossel || []);
 
-    showToast('Ô£ô Imagem deletada', 'success');
+    showToast('Ã”Â£Ã´ Imagem deletada', 'success');
   } catch (err) {
     console.error('Erro ao deletar imagem:', err);
-    alert('ÔØî Erro ao deletar: ' + err.message);
+    alert('Ã”Ã˜Ã® Erro ao deletar: ' + err.message);
   }
 }
 
@@ -2560,7 +2560,7 @@ async function salvarKit() {
     // 1. Atualizar dados do kit via API v2
     const marca = kitAtual.marca || 'Alphahall';
     
-    // Converte pre├ºo para n├║mero
+    // Converte preâ”œÂºo para nâ”œâ•‘mero
     const precoLimpo = preco.replace('R$ ', '').replace(',', '.');
     const precoNumero = parseFloat(precoLimpo) || 0;
     
@@ -2568,7 +2568,7 @@ async function salvarKit() {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        preco: precoNumero,  // Envia como n├║mero, n├úo string
+        preco: precoNumero,  // Envia como nâ”œâ•‘mero, nâ”œÃºo string
         codigo_sku: skuKit,
         descricao: descricao
       })
@@ -2601,7 +2601,7 @@ async function salvarKit() {
     kitAtual.descricao = descricao;
 
     // Mostra sucesso
-    showToast('Ô£ô Kit salvo com sucesso', 'success');
+    showToast('Ã”Â£Ã´ Kit salvo com sucesso', 'success');
     document.getElementById('modal-save-success').style.display = 'block';
     setTimeout(() => {
       document.getElementById('modal-save-success').style.display = 'none';
@@ -2612,7 +2612,7 @@ async function salvarKit() {
     document.getElementById('file-name-thumb').textContent = '';
     document.getElementById('modal-kit-file-thumb').value = '';
 
-    // Recarrega cat├ílogo
+    // Recarrega catâ”œÃ­logo
     await carregarCatalogo();
 
   } catch (e) {
@@ -2620,11 +2620,11 @@ async function salvarKit() {
     alert('Erro ao salvar: ' + e.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = '­ƒÆ¥ Salvar';
+    btn.textContent = 'Â­Æ’Ã†Â¥ Salvar';
   }
 }
 
-// Carregar cat├ílogo ao trocar para a aba
+// Carregar catâ”œÃ­logo ao trocar para a aba
 const originalTrocarAba = trocarAba;
 trocarAba = function(id, btn) {
   originalTrocarAba(id, btn);
@@ -2636,7 +2636,7 @@ trocarAba = function(id, btn) {
   }
 };
 
-// ÔöÇÔöÇ Produtos ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Produtos Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 async function carregarProdutos() {
   try {
@@ -2648,9 +2648,9 @@ async function carregarProdutos() {
     console.error('[Produtos] Erro ao carregar:', e);
     document.getElementById('produtos-grid').innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <span>ÔÜá´©Å</span>
+        <span>Ã”ÃœÃ¡Â´Â©Ã…</span>
         <p>Erro ao carregar produtos</p>
-        <p style="font-size:11px;color:var(--text2)">Verifique se o servidor est├í rodando</p>
+        <p style="font-size:11px;color:var(--text2)">Verifique se o servidor estâ”œÃ­ rodando</p>
       </div>`;
   }
 }
@@ -2666,8 +2666,8 @@ function renderProdutos(lista) {
   if (lista.length === 0) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <span>­ƒº┤</span>
-        <p>Nenhum produto no cat├ílogo</p>
+        <span>Â­Æ’Âºâ”¤</span>
+        <p>Nenhum produto no catâ”œÃ­logo</p>
       </div>`;
     return;
   }
@@ -2694,7 +2694,7 @@ function renderProdutos(lista) {
               class="lazy-img"
               style="background:var(--bg3)"
             />`
-          : `<span class="kit-img-placeholder">­ƒº┤</span>`
+          : `<span class="kit-img-placeholder">Â­Æ’Âºâ”¤</span>`
         }
       </div>
       <div class="kit-info">
@@ -2708,7 +2708,7 @@ function renderProdutos(lista) {
         }
       </div>
       <div class="kit-footer">
-        Ô£Å´©Å Editar
+        Ã”Â£Ã…Â´Â©Ã… Editar
       </div>
     </div>
   `;
@@ -2742,7 +2742,7 @@ function filtrarProdutos(busca) {
 }
 
 function abrirModalProduto(nomeProduto, marca) {
-  // Busca apenas por nome, pois o campo marca n├úo existe no banco
+  // Busca apenas por nome, pois o campo marca nâ”œÃºo existe no banco
   produtoAtual = produtosData.find(p => p.nome === nomeProduto);
   if (!produtoAtual) return;
 
@@ -2759,7 +2759,7 @@ function abrirModalProduto(nomeProduto, marca) {
     const input = document.getElementById(`modal-produto-${campo}`);
     let valor = '';
     
-    // Mapeia os campos do banco para os campos do formul├írio
+    // Mapeia os campos do banco para os campos do formulâ”œÃ­rio
     switch(campo) {
       case 'sku': valor = produtoAtual.codigo_sku || ''; break;
       case 'preco': valor = produtoAtual.preco ? `R$ ${parseFloat(produtoAtual.preco).toFixed(2)}` : ''; break;
@@ -2778,14 +2778,14 @@ function abrirModalProduto(nomeProduto, marca) {
     document.getElementById(`btn-cancelar-produto-${campo}`).style.display = 'none';
   });
   
-  // Bot├úo deletar thumb
+  // Botâ”œÃºo deletar thumb
   const temThumb = produtoAtual.caminho_thumb_bd || produtoAtual.tem_thumb;
   const btnDeletarThumb = document.getElementById('btn-deletar-produto-thumb');
   if (temThumb) {
-    document.getElementById('produto-thumb-btn-text').textContent = '­ƒöä Alterar Thumbnail';
+    document.getElementById('produto-thumb-btn-text').textContent = 'Â­Æ’Ã¶Ã¤ Alterar thumbnail';
     btnDeletarThumb.style.display = 'block';
   } else {
-    document.getElementById('produto-thumb-btn-text').textContent = 'Ô×ò Adicionar Thumbnail';
+    document.getElementById('produto-thumb-btn-text').textContent = 'Ã”Ã—Ã² Adicionar thumbnail';
     btnDeletarThumb.style.display = 'none';
   }
 
@@ -2802,7 +2802,7 @@ function abrirModalProduto(nomeProduto, marca) {
   } else {
     imgWrap.innerHTML = `
       <div class="modal-no-img">
-        <span style="font-size:32px">­ƒû╝´©Å</span>
+        <span style="font-size:32px">Â­Æ’Ã»â•Â´Â©Ã…</span>
         <span>Escolha uma thumb abaixo</span>
       </div>`;
   }
@@ -2819,7 +2819,7 @@ function fecharModalProduto() {
   arquivoProdutoThumb = null;
 }
 
-// Fun├º├Áes de edi├º├úo inline para produtos
+// Funâ”œÂºâ”œÃes de ediâ”œÂºâ”œÃºo inline para produtos
 function toggleEditarCampo(campo) {
   const input = document.getElementById(`modal-produto-${campo}`);
   camposOriginais[campo] = input.value;
@@ -2859,7 +2859,7 @@ async function salvarCampoProduto(campo) {
       'composicao': 'descricao_composicao'
     };
     
-    // Se for pre├ºo, converte para n├║mero
+    // Se for preâ”œÂºo, converte para nâ”œâ•‘mero
     if (campo === 'preco') {
       const precoLimpo = novoValor.replace('R$ ', '').replace(',', '.');
       const precoNumero = parseFloat(precoLimpo) || 0;
@@ -2896,13 +2896,13 @@ async function salvarCampoProduto(campo) {
     document.getElementById(`btn-salvar-produto-${campo}`).style.display = 'none';
     document.getElementById(`btn-cancelar-produto-${campo}`).style.display = 'none';
     
-    showToast(`Ô£ô ${campo.charAt(0).toUpperCase() + campo.slice(1)} atualizado`, 'success');
+    showToast(`Ã”Â£Ã´ ${campo.charAt(0).toUpperCase() + campo.slice(1)} atualizado`, 'success');
     
-    // Recarrega cat├ílogo
+    // Recarrega catâ”œÃ­logo
     await carregarProdutos();
   } catch (err) {
     console.error(`Erro ao salvar ${campo}:`, err);
-    alert(`ÔØî Erro ao salvar ${campo}: ` + err.message);
+    alert(`Ã”Ã˜Ã® Erro ao salvar ${campo}: ` + err.message);
     cancelarEditarCampo(campo);
   }
 }
@@ -2915,20 +2915,20 @@ function handleProdutoThumbSelect(input) {
     return;
   }
 
-  // Valida├º├úo de tipo
+  // Validaâ”œÂºâ”œÃºo de tipo
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    alert('ÔÜá´©Å Formato inv├ílido. Use apenas: JPG, PNG ou WebP');
+    alert('Ã”ÃœÃ¡Â´Â©Ã… Formato invâ”œÃ­lido. Use apenas: JPG, PNG ou WebP');
     input.value = '';
     arquivoProdutoThumb = null;
     document.getElementById('file-name-produto-thumb').textContent = '';
     return;
   }
 
-  // Valida├º├úo de tamanho (5MB)
+  // Validaâ”œÂºâ”œÃºo de tamanho (5MB)
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
-    alert('ÔÜá´©Å Arquivo muito grande. Tamanho m├íximo: 5MB');
+    alert('Ã”ÃœÃ¡Â´Â©Ã… Arquivo muito grande. Tamanho mâ”œÃ­ximo: 5MB');
     input.value = '';
     arquivoProdutoThumb = null;
     document.getElementById('file-name-produto-thumb').textContent = '';
@@ -2936,9 +2936,9 @@ function handleProdutoThumbSelect(input) {
   }
 
   arquivoProdutoThumb = file;
-  document.getElementById('file-name-produto-thumb').textContent = `Ô£ô ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  document.getElementById('file-name-produto-thumb').textContent = `Ã”Â£Ã´ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
   
-  // Upload autom├ítico
+  // Upload automâ”œÃ­tico
   uploadProdutoThumb();
 }
 
@@ -2969,7 +2969,7 @@ async function uploadProdutoThumb() {
         <img src="/api/catalogo/imagem/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}/thumb.${ext}?tipo=produto&t=${Date.now()}" alt="${esc(produtoAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
       </div>`;
     
-    document.getElementById('produto-thumb-btn-text').textContent = '­ƒöä Alterar Thumbnail';
+    document.getElementById('produto-thumb-btn-text').textContent = 'Â­Æ’Ã¶Ã¤ Alterar thumbnail';
     document.getElementById('btn-deletar-produto-thumb').style.display = 'block';
     
     // Limpa input
@@ -2977,13 +2977,13 @@ async function uploadProdutoThumb() {
     document.getElementById('file-name-produto-thumb').textContent = '';
     arquivoProdutoThumb = null;
 
-    showToast('Ô£ô Thumbnail atualizada', 'success');
+    showToast('Ã”Â£Ã´ thumbnail atualizada', 'success');
     
-    // Recarrega cat├ílogo
+    // Recarrega catâ”œÃ­logo
     await carregarProdutos();
   } catch (err) {
     console.error('Erro ao upload thumbnail:', err);
-    alert('ÔØî Erro ao atualizar thumbnail: ' + err.message);
+    alert('Ã”Ã˜Ã® Erro ao atualizar thumbnail: ' + err.message);
   }
 }
 
@@ -3006,29 +3006,29 @@ async function deletarProdutoThumb() {
     produtoAtual.tem_thumb = false;
     document.getElementById('modal-produto-img-wrap').innerHTML = `
       <div class="modal-no-img">
-        <span style="font-size:32px">­ƒû╝´©Å</span>
+        <span style="font-size:32px">Â­Æ’Ã»â•Â´Â©Ã…</span>
         <span>Escolha uma thumb abaixo</span>
       </div>`;
     
-    document.getElementById('produto-thumb-btn-text').textContent = 'Ô×ò Adicionar Thumbnail';
+    document.getElementById('produto-thumb-btn-text').textContent = 'Ã”Ã—Ã² Adicionar thumbnail';
     document.getElementById('btn-deletar-produto-thumb').style.display = 'none';
 
-    showToast('Ô£ô Thumbnail deletada', 'success');
+    showToast('Ã”Â£Ã´ thumbnail deletada', 'success');
     
-    // Recarrega cat├ílogo
+    // Recarrega catâ”œÃ­logo
     await carregarProdutos();
   } catch (err) {
     console.error('Erro ao deletar thumbnail:', err);
-    alert('ÔØî Erro ao deletar: ' + err.message);
+    alert('Ã”Ã˜Ã® Erro ao deletar: ' + err.message);
   }
 }
 
-// ÔöÇÔöÇ Lazy loading de imagens ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Lazy loading de imagens Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 let lazyLoadObserver = null;
 
-// ÔöÇÔöÇ Fun├º├Áes de edi├º├úo inline ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Funâ”œÂºâ”œÃes de ediâ”œÂºâ”œÃºo inline Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
-// Edi├º├úo de SKU
+// Ediâ”œÂºâ”œÃºo de SKU
 function toggleEditarSku() {
   const input = document.getElementById('modal-kit-sku');
   skuOriginal = input.value;
@@ -3076,18 +3076,18 @@ async function salvarSku() {
     document.getElementById('btn-salvar-sku').style.display = 'none';
     document.getElementById('btn-cancelar-sku').style.display = 'none';
     
-    showToast('Ô£ô SKU atualizado', 'success');
+    showToast('Ã”Â£Ã´ SKU atualizado', 'success');
     
-    // Recarrega cat├ílogo
+    // Recarrega catâ”œÃ­logo
     await carregarCatalogo();
   } catch (err) {
     console.error('Erro ao salvar SKU:', err);
-    alert('ÔØî Erro ao salvar SKU: ' + err.message);
+    alert('Ã”Ã˜Ã® Erro ao salvar SKU: ' + err.message);
     cancelarEditarSku();
   }
 }
 
-// Edi├º├úo de Pre├ºo
+// Ediâ”œÂºâ”œÃºo de Preâ”œÂºo
 function toggleEditarPreco() {
   const input = document.getElementById('modal-kit-preco');
   precoOriginal = input.value;
@@ -3114,7 +3114,7 @@ async function salvarPreco() {
   const novoPreco = input.value.trim();
   
   try {
-    // Converte pre├ºo para n├║mero
+    // Converte preâ”œÂºo para nâ”œâ•‘mero
     const marca = kitAtual.marca || 'Alphahall';
     const precoLimpo = novoPreco.replace('R$ ', '').replace(',', '.');
     const precoNumero = parseFloat(precoLimpo) || 0;
@@ -3122,7 +3122,7 @@ async function salvarPreco() {
     const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ preco: precoNumero })  // Envia como n├║mero
+      body: JSON.stringify({ preco: precoNumero })  // Envia como nâ”œâ•‘mero
     });
 
     if (!res.ok) {
@@ -3140,13 +3140,13 @@ async function salvarPreco() {
     document.getElementById('btn-salvar-preco').style.display = 'none';
     document.getElementById('btn-cancelar-preco').style.display = 'none';
     
-    showToast('Ô£ô Pre├ºo atualizado', 'success');
+    showToast('Ã”Â£Ã´ Preâ”œÂºo atualizado', 'success');
     
-    // Recarrega cat├ílogo
+    // Recarrega catâ”œÃ­logo
     await carregarCatalogo();
   } catch (err) {
-    console.error('Erro ao salvar pre├ºo:', err);
-    alert('ÔØî Erro ao salvar pre├ºo: ' + err.message);
+    console.error('Erro ao salvar preâ”œÂºo:', err);
+    alert('Ã”Ã˜Ã® Erro ao salvar preâ”œÂºo: ' + err.message);
     cancelarEditarPreco();
   }
 }
@@ -3171,20 +3171,20 @@ async function deletarThumb() {
     kitAtual.tem_thumb = false;
     document.getElementById('modal-kit-img-wrap').innerHTML = `
       <div class="modal-no-img">
-        <span style="font-size:32px">­ƒû╝´©Å</span>
+        <span style="font-size:32px">Â­Æ’Ã»â•Â´Â©Ã…</span>
         <span>Escolha uma thumb abaixo</span>
       </div>`;
     
-    document.getElementById('thumb-btn-text').textContent = 'Ô×ò Adicionar Thumbnail';
+    document.getElementById('thumb-btn-text').textContent = 'Ã”Ã—Ã² Adicionar thumbnail';
     document.getElementById('btn-deletar-thumb').style.display = 'none';
 
-    showToast('Ô£ô Thumbnail deletada', 'success');
+    showToast('Ã”Â£Ã´ thumbnail deletada', 'success');
     
-    // Recarrega cat├ílogo
+    // Recarrega catâ”œÃ­logo
     await carregarCatalogo();
   } catch (err) {
     console.error('Erro ao deletar thumbnail:', err);
-    alert('ÔØî Erro ao deletar: ' + err.message);
+    alert('Ã”Ã˜Ã® Erro ao deletar: ' + err.message);
   }
 }
 
@@ -3212,12 +3212,12 @@ function initLazyLoad() {
           
           // Fallback se der erro
           img.onerror = function() {
-            this.parentElement.innerHTML = '<span class="kit-img-placeholder">­ƒôª</span>';
+            this.parentElement.innerHTML = '<span class="kit-img-placeholder">Â­Æ’Ã´Âª</span>';
           };
         }
       });
     }, {
-      rootMargin: '50px' // Come├ºa a carregar 50px antes de entrar na tela
+      rootMargin: '50px' // Comeâ”œÂºa a carregar 50px antes de entrar na tela
     });
 
     lazyImages.forEach(img => lazyLoadObserver.observe(img));
@@ -3230,7 +3230,7 @@ function initLazyLoad() {
   }
 }
 
-// ÔöÇÔöÇ Fun├º├Áes de Produtos - Salvar e Carrossel ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// Ã”Ã¶Ã‡Ã”Ã¶Ã‡ Funâ”œÂºâ”œÃes de Produtos - Salvar e Carrossel Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡Ã”Ã¶Ã‡
 
 let arquivoProdutoCarrossel = null;
 
@@ -3246,7 +3246,7 @@ async function salvarProduto() {
   try {
     const marca = produtoAtual.marca || 'Alphahall';
     
-    // Atualiza descri├º├úo
+    // Atualiza descriâ”œÂºâ”œÃºo
     const res = await fetch(`/api/catalogo/v2/produto/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -3262,13 +3262,13 @@ async function salvarProduto() {
     produtoAtual.descricao = descricao;
 
     // Mostra sucesso
-    showToast('Ô£ô Produto salvo com sucesso', 'success');
+    showToast('Ã”Â£Ã´ Produto salvo com sucesso', 'success');
     document.getElementById('modal-produto-save-success').style.display = 'block';
     setTimeout(() => {
       document.getElementById('modal-produto-save-success').style.display = 'none';
     }, 2000);
 
-    // Recarrega cat├ílogo
+    // Recarrega catâ”œÃ­logo
     await carregarProdutos();
 
   } catch (e) {
@@ -3276,7 +3276,7 @@ async function salvarProduto() {
     alert('Erro ao salvar: ' + e.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = '­ƒÆ¥ Salvar';
+    btn.textContent = 'Â­Æ’Ã†Â¥ Salvar';
   }
 }
 
@@ -3287,26 +3287,26 @@ function handleProdutoCarrosselSelect(input) {
     return;
   }
 
-  // Valida├º├úo de tipo
+  // Validaâ”œÂºâ”œÃºo de tipo
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   if (!validTypes.includes(file.type)) {
-    alert('ÔÜá´©Å Formato inv├ílido. Use apenas: JPG, PNG ou WebP');
+    alert('Ã”ÃœÃ¡Â´Â©Ã… Formato invâ”œÃ­lido. Use apenas: JPG, PNG ou WebP');
     input.value = '';
     arquivoProdutoCarrossel = null;
     return;
   }
 
-  // Valida├º├úo de tamanho (5MB)
+  // Validaâ”œÂºâ”œÃºo de tamanho (5MB)
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) {
-    alert('ÔÜá´©Å Arquivo muito grande. Tamanho m├íximo: 5MB');
+    alert('Ã”ÃœÃ¡Â´Â©Ã… Arquivo muito grande. Tamanho mâ”œÃ­ximo: 5MB');
     input.value = '';
     arquivoProdutoCarrossel = null;
     return;
   }
 
   arquivoProdutoCarrossel = file;
-  // Upload autom├ítico ap├│s sele├º├úo
+  // Upload automâ”œÃ­tico apâ”œâ”‚s seleâ”œÂºâ”œÃºo
   uploadProdutoCarrossel();
 }
 
@@ -3337,10 +3337,10 @@ async function uploadProdutoCarrossel() {
     document.getElementById('modal-produto-file-carrossel').value = '';
     arquivoProdutoCarrossel = null;
 
-    showToast('Ô£ô Imagem adicionada ao carrossel', 'success');
+    showToast('Ã”Â£Ã´ Imagem adicionada ao carrossel', 'success');
   } catch (err) {
     console.error('Erro ao upload carrossel:', err);
-    alert('ÔØî Erro ao adicionar imagem: ' + err.message);
+    alert('Ã”Ã˜Ã® Erro ao adicionar imagem: ' + err.message);
   }
 }
 
@@ -3376,7 +3376,7 @@ function renderProdutoCarrossel(imagens) {
         onclick="deletarProdutoImagemCarrossel('${esc(img)}')"
         style="position:absolute;top:4px;right:4px;background:rgba(239,68,68,0.9);color:white;border:none;border-radius:4px;padding:.25rem .35rem;cursor:pointer;font-size:10px"
       >
-        ­ƒùæ´©Å
+        Â­Æ’Ã¹Ã¦Â´Â©Ã…
       </button>
     </div>
   `).join('');
@@ -3463,10 +3463,10 @@ async function salvarOrdemProdutoCarrossel(imagens) {
       throw new Error(data.erro || 'Erro ao salvar ordem');
     }
     
-    showToast('Ô£ô Ordem atualizada', 'success');
+    showToast('Ã”Â£Ã´ Ordem atualizada', 'success');
   } catch (err) {
     console.error('Erro ao salvar ordem:', err);
-    showToast('ÔØî Erro ao salvar ordem', 'error');
+    showToast('Ã”Ã˜Ã® Erro ao salvar ordem', 'error');
   }
 }
 
@@ -3490,10 +3490,10 @@ async function deletarProdutoImagemCarrossel(arquivo) {
     produtoAtual = produtosData.find(p => p.nome === produtoAtual.nome);
     renderProdutoCarrossel(produtoAtual.imagens_carrossel || []);
 
-    showToast('Ô£ô Imagem deletada', 'success');
+    showToast('Ã”Â£Ã´ Imagem deletada', 'success');
   } catch (err) {
     console.error('Erro ao deletar imagem:', err);
-    alert('ÔØî Erro ao deletar: ' + err.message);
+    alert('Ã”Ã˜Ã® Erro ao deletar: ' + err.message);
   }
 }
 
