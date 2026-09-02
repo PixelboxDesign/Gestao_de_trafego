@@ -15,12 +15,6 @@ pub struct RenderDeployResponse {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-struct RenderEnvVar {
-    key: String,
-    value: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 struct RenderDeployRequest {
     #[serde(rename = "clearCache")]
     clear_cache: String,
@@ -29,58 +23,70 @@ struct RenderDeployRequest {
 /// POST /api/render/deploy-com-url-nova
 /// Atualiza a URL do Cloudflare no Render e faz deploy automático
 pub async fn deploy_com_url_nova(
-    State(_state): State<Arc<Mutex<AppState>>>,
+    State(state): State<Arc<Mutex<AppState>>>,
 ) -> Result<Json<RenderDeployResponse>, (StatusCode, String)> {
     info!("🚀 Iniciando deploy automático no Render...");
 
-    // 1. Ler URL do Cloudflare do arquivo
-    let tunnel_url = match tokio::fs::read_to_string("tunnel-url.txt").await {
-        Ok(url) => url.trim().to_string(),
-        Err(e) => {
-            error!("❌ Erro ao ler tunnel-url.txt: {}", e);
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                format!("Erro ao ler URL do Cloudflare: {}", e),
-            ));
+    // 1. Ler configuração do Render do AppState
+    let (render_api_key, service_id, env_var_name) = {
+        let state_guard = state.lock().await;
+        match &state_guard.render_config {
+            Some(config) => (
+                config.api_key.clone(),
+                config.service_id.clone(),
+                config.env_var_name.clone(),
+            ),
+            None => {
+                error!("❌ Configuração do Render não encontrada");
+                return Err((
+                    StatusCode::BAD_REQUEST,
+                    "Configure o Render primeiro (API Key, Service ID e variável de ambiente)".to_string(),
+                ));
+            }
         }
     };
 
-    if tunnel_url.is_empty() {
-        return Err((
-            StatusCode::BAD_REQUEST,
-            "URL do Cloudflare está vazia".to_string(),
-        ));
-    }
+    info!("✅ Configuração do Render carregada");
+    info!("📋 Service ID: {}", service_id);
+    info!("📋 Variável: {}", env_var_name);
+
+    // 2. Ler URL do Cloudflare do AppState
+    let tunnel_url = {
+        let state_guard = state.lock().await;
+        match state_guard.get_tunnel_url() {
+            Some(url) => url,
+            None => {
+                error!("❌ URL do Cloudflare não detectada ainda");
+                return Err((
+                    StatusCode::BAD_REQUEST,
+                    "URL do Cloudflare Tunnel não foi detectada ainda. Aguarde alguns segundos e tente novamente.".to_string(),
+                ));
+            }
+        }
+    };
 
     info!("📡 URL do Cloudflare: {}", tunnel_url);
-
-    // 2. Configuração do Render (hardcoded por enquanto - depois pode vir do .env)
-    let render_api_key = std::env::var("RENDER_API_KEY")
-        .unwrap_or_else(|_| "rnd_bsQpbKjHzxS7RcLg4WpuBOCAajIf".to_string());
-    let service_id = "srv-d9roha7avr4c739pjlu0";
-    let env_var_name = "VITE_API_BASE_URL";
 
     // 3. Criar cliente HTTP
     let client = reqwest::Client::new();
 
-    // 4. Atualizar variável de ambiente no Render
+    // 4. Atualizar variável de ambiente no Render (endpoint específico para uma variável)
     info!("🔄 Atualizando variável '{}' no Render...", env_var_name);
 
-    let env_vars = vec![RenderEnvVar {
-        key: env_var_name.to_string(),
-        value: tunnel_url.clone(),
-    }];
+    let env_value = serde_json::json!({
+        "value": tunnel_url.clone()
+    });
 
     let update_url = format!(
-        "https://api.render.com/v1/services/{}/env-vars",
-        service_id
+        "https://api.render.com/v1/services/{}/env-vars/{}",
+        service_id, env_var_name
     );
 
     let update_response = client
         .put(&update_url)
         .header("Authorization", format!("Bearer {}", render_api_key))
         .header("Content-Type", "application/json")
-        .json(&env_vars)
+        .json(&env_value)
         .send()
         .await;
 
