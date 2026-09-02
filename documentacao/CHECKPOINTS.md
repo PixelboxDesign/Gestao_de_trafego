@@ -15,7 +15,7 @@
 
 | Versão | Data | Título | Commit original | Commit atual | Amends |
 |---|---|---|---|---|---|
-| [v17-render-deploy-fix-401](#checkpoint-v17-render-deploy-fix-401) | 02/09/2026 | 🔥 FIX CRÍTICO: Deploy Render 401 Unauthorized | `PENDING` | `PENDING` | — |
+| [v17-render-deploy-fix-401](#checkpoint-v17-render-deploy-fix-401) | 02/09/2026 | 🔥 FIX CRÍTICO: Deploy Render 401 Unauthorized | `207fa7f` | `207fa7f` | — |
 | [v16-whatsapp-integrado](#checkpoint-v16-whatsapp-integrado) | 15/05/2026 | WhatsApp Totalmente Integrado (Sem Janelas CMD) | `1cef5fb` | `1cef5fb` | — |
 | [v15-whatsapp-auto-start](#checkpoint-v15-whatsapp-auto-start) | 15/05/2026 | WhatsApp Sidecar Auto-Start + Sessão Persistente | `3344f15` | `3344f15` | — |
 | [v14-catalogo-database](#checkpoint-v14-catalogo-database) | 15/05/2026 | Catálogo Database-Driven com API v2 | `cb07b9e` | `cb07b9e` | — |
@@ -32,7 +32,7 @@
 
 **Título:** FIX CRÍTICO: Deploy Automático Render.com — Erro 401 Unauthorized Resolvido
 
-**Data:** 02/09/2026 | **Commit:** `PENDING` | **Status:** ✅ ESTÁVEL | **Prioridade:** 🔴 CRÍTICA
+**Data:** 02/09/2026 | **Commit:** `207fa7f` | **Status:** ✅ ESTÁVEL | **Prioridade:** 🔴 CRÍTICA
 
 ### 🚨 PROBLEMA ORIGINAL
 
@@ -565,7 +565,7 @@ documentacao/CHECKPOINTS.md
 
 **Reverter:**
 ```bash
-git checkout <COMMIT_HASH_APÓS_COMMIT>
+git checkout 207fa7f
 git checkout -b rollback-v17-render-deploy-fix
 ```
 
