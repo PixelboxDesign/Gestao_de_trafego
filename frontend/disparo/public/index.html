@@ -1716,64 +1716,71 @@ function salvarConfigDisparoManual() {
 
 async function carregarConfigDisparo() {
   try {
-    console.log('[Disparo] Carregando configuração da API...');
+    console.log('[Disparo] Carregando configuração...');
     
-    // Tenta carregar do banco de dados primeiro
-    const res = await fetch('/api/disparos/config');
-    const data = await res.json();
-    
-    if (data.ok && data.config) {
-      const config = data.config;
-      console.log('[Disparo] Configuração carregada da API:', config);
+    // Tenta carregar do banco de dados primeiro (se servidor estiver online)
+    try {
+      const res = await fetch('/api/disparos/config');
       
-      // Restaura campos
-      if (config.mensagem) {
-        const msgInput = document.getElementById('disparo-mensagem');
-        if (msgInput) msgInput.value = config.mensagem;
+      if (res.ok) {
+        const data = await res.json();
+        
+        if (data.ok && data.config) {
+          const config = data.config;
+          console.log('[Disparo] ✓ Configuração carregada da API:', config);
+          
+          // Restaura campos
+          if (config.mensagem) {
+            const msgInput = document.getElementById('disparo-mensagem');
+            if (msgInput) msgInput.value = config.mensagem;
+          }
+          if (config.quantidade) {
+            const qtdInput = document.getElementById('disparo-quantidade');
+            if (qtdInput) qtdInput.value = config.quantidade;
+          }
+          if (config.intervalo_valor) {
+            const intervaloInput = document.getElementById('disparo-intervalo-valor');
+            if (intervaloInput) intervaloInput.value = config.intervalo_valor;
+          }
+          if (config.intervalo_unidade) {
+            const unidadeSelect = document.getElementById('disparo-intervalo-unidade');
+            if (unidadeSelect) unidadeSelect.value = config.intervalo_unidade;
+          }
+          
+          // Restaura item selecionado
+          if (config.item_id && config.item_nome) {
+            itemSelecionado = {
+              id: config.item_id,
+              tipo: config.item_tipo || 'kit',
+              nome: config.item_nome,
+              thumb_url: config.item_thumb_url
+            };
+            const buscaInput = document.getElementById('disparo-busca-item');
+            if (buscaInput) buscaInput.value = itemSelecionado.nome;
+            mostrarItemSelecionado();
+          }
+          
+          // Atualiza cálculo e botão
+          atualizarCalculoIntervalo();
+          atualizarBotaoDisparo();
+          
+          return true;
+        }
       }
-      if (config.quantidade) {
-        const qtdInput = document.getElementById('disparo-quantidade');
-        if (qtdInput) qtdInput.value = config.quantidade;
-      }
-      if (config.intervalo_valor) {
-        const intervaloInput = document.getElementById('disparo-intervalo-valor');
-        if (intervaloInput) intervaloInput.value = config.intervalo_valor;
-      }
-      if (config.intervalo_unidade) {
-        const unidadeSelect = document.getElementById('disparo-intervalo-unidade');
-        if (unidadeSelect) unidadeSelect.value = config.intervalo_unidade;
-      }
-      
-      // Restaura item selecionado
-      if (config.item_id && config.item_nome) {
-        itemSelecionado = {
-          id: config.item_id,
-          tipo: config.item_tipo || 'kit',
-          nome: config.item_nome,
-          thumb_url: config.item_thumb_url
-        };
-        const buscaInput = document.getElementById('disparo-busca-item');
-        if (buscaInput) buscaInput.value = itemSelecionado.nome;
-        mostrarItemSelecionado();
-      }
-      
-      // Atualiza cálculo e botão
-      atualizarCalculoIntervalo();
-      atualizarBotaoDisparo();
-      
-      return true;
+    } catch (apiErr) {
+      console.log('[Disparo] Servidor offline, tentando localStorage...', apiErr.message);
     }
     
-    // Se não encontrou no banco, tenta localStorage como fallback
-    console.log('[Disparo] Nenhuma configuração no banco, tentando localStorage...');
+    // Se não encontrou no banco ou servidor offline, tenta localStorage como fallback
+    console.log('[Disparo] Carregando do localStorage...');
     const saved = localStorage.getItem('luna_disparo_config');
     if (!saved) {
-      console.log('[Disparo] Nenhuma configuração salva');
+      console.log('[Disparo] ℹ Nenhuma configuração salva');
       return false;
     }
     
     const config = JSON.parse(saved);
-    console.log('[Disparo] Configuração carregada do localStorage:', config);
+    console.log('[Disparo] ✓ Configuração carregada do localStorage:', config);
     
     // Restaura campos do localStorage
     if (config.mensagem) {

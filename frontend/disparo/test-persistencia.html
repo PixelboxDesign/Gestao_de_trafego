@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste de Persistência - Luna Disparo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      background: #0f1117;
+      color: #e2e8f0;
+    }
+    .section {
+      background: #1a1d27;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: 1px solid #2d3148;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background: #22263a;
+      border: 1px solid #2d3148;
+      color: #e2e8f0;
+      border-radius: 6px;
+    }
+    button {
+      padding: 12px 24px;
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 5px;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    .danger {
+      background: #ef4444;
+    }
+    .info {
+      background: #3b82f6;
+    }
+    #log {
+      background: #0f1117;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .log-entry {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 3px solid #3b82f6;
+      background: #1a1d27;
+    }
+    .success { border-left-color: #22c55e; }
+    .error { border-left-color: #ef4444; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Teste de Persistência - Luna Disparo</h1>
+  
+  <div class="section">
+    <h2>📝 Configuração do Disparo</h2>
+    
+    <label>Mensagem:</label>
+    <textarea id="mensagem" rows="4" placeholder="Digite a mensagem..."></textarea>
+    
+    <label>Kit/Produto:</label>
+    <input type="text" id="item" placeholder="Nome do kit ou produto">
+    
+    <label>Quantidade:</label>
+    <input type="number" id="quantidade" value="10">
+    
+    <label>Intervalo:</label>
+    <input type="number" id="intervalo" value="1" step="0.1">
+    
+    <label>Unidade:</label>
+    <select id="unidade">
+      <option value="horas">Horas</option>
+      <option value="minutos">Minutos</option>
+    </select>
+    
+    <button onclick="salvar()">💾 Salvar Configuração</button>
+    <button onclick="carregar()" class="info">🔄 Carregar Configuração</button>
+    <button onclick="limpar()" class="danger">🗑️ Limpar Tudo</button>
+  </div>
+  
+  <div class="section">
+    <h2>📊 Log de Operações</h2>
+    <div id="log"></div>
+  </div>
+  
+  <div class="section">
+    <h2>💾 Dados do localStorage</h2>
+    <pre id="storage-data" style="background:#0f1117;padding:15px;border-radius:6px;overflow-x:auto;"></pre>
+  </div>
+
+  <script>
+    function log(mensagem, tipo = 'info') {
+      const logDiv = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${tipo}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${mensagem}`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(`[${tipo.toUpperCase()}]`, mensagem);
+    }
+
+    function salvar() {
+      const config = {
+        mensagem: document.getElementById('mensagem').value,
+        item: document.getElementById('item').value,
+        quantidade: document.getElementById('quantidade').value,
+        intervalo: document.getElementById('intervalo').value,
+        unidade: document.getElementById('unidade').value,
+        dataHoraSalvo: new Date().toISOString()
+      };
+      
+      try {
+        localStorage.setItem('luna_disparo_config', JSON.stringify(config));
+        log('✓ Configuração salva no localStorage', 'success');
+        mostrarStorage();
+      } catch (err) {
+        log('❌ Erro ao salvar: ' + err.message, 'error');
+      }
+    }
+
+    function carregar() {
+      try {
+        const saved = localStorage.getItem('luna_disparo_config');
+        
+        if (!saved) {
+          log('ℹ Nenhuma configuração encontrada', 'info');
+          return;
+        }
+        
+        const config = JSON.parse(saved);
+        log('✓ Configuração carregada do localStorage', 'success');
+        
+        // Preenche os campos
+        document.getElementById('mensagem').value = config.mensagem || '';
+        document.getElementById('item').value = config.item || '';
+        document.getElementById('quantidade').value = config.quantidade || '10';
+        document.getElementById('intervalo').value = config.intervalo || '1';
+        document.getElementById('unidade').value = config.unidade || 'horas';
+        
+        log(`📋 Mensagem: "${config.mensagem}"`, 'info');
+        log(`📦 Item: "${config.item}"`, 'info');
+        log(`🔢 Quantidade: ${config.quantidade}`, 'info');
+        log(`⏱️ Intervalo: ${config.intervalo} ${config.unidade}`, 'info');
+        log(`📅 Salvo em: ${new Date(config.dataHoraSalvo).toLocaleString()}`, 'info');
+        
+      } catch (err) {
+        log('❌ Erro ao carregar: ' + err.message, 'error');
+      }
+    }
+
+    function limpar() {
+      if (confirm('⚠️ Tem certeza que deseja limpar TUDO?')) {
+        localStorage.removeItem('luna_disparo_config');
+        document.getElementById('mensagem').value = '';
+        document.getElementById('item').value = '';
+        document.getElementById('quantidade').value = '10';
+        document.getElementById('intervalo').value = '1';
+        document.getElementById('unidade').value = 'horas';
+        log('🗑️ Tudo limpo', 'info');
+        mostrarStorage();
+      }
+    }
+
+    function mostrarStorage() {
+      const storageDiv = document.getElementById('storage-data');
+      const saved = localStorage.getItem('luna_disparo_config');
+      
+      if (saved) {
+        try {
+          const config = JSON.parse(saved);
+          storageDiv.textContent = JSON.stringify(config, null, 2);
+        } catch {
+          storageDiv.textContent = saved;
+        }
+      } else {
+        storageDiv.textContent = '(vazio)';
+      }
+    }
+
+    // Auto-carregar ao iniciar
+    window.addEventListener('DOMContentLoaded', () => {
+      log('🚀 Página carregada', 'info');
+      mostrarStorage();
+      
+      // Tenta carregar config automaticamente
+      setTimeout(() => {
+        log('🔄 Tentando carregar configuração salva...', 'info');
+        carregar();
+      }, 500);
+    });
+  </script>
+</body>
+</html>
