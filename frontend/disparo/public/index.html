@@ -1882,55 +1882,6 @@ async function carregarConfigDisparo() {
     return false;
   }
 }
-    if (config.mensagem) {
-      const msgInput = document.getElementById('disparo-mensagem');
-      if (msgInput) msgInput.value = config.mensagem;
-    }
-    if (config.quantidade) {
-      const qtdInput = document.getElementById('disparo-quantidade');
-      if (qtdInput) qtdInput.value = config.quantidade;
-    }
-    if (config.intervaloValor) {
-      const intervaloInput = document.getElementById('disparo-intervalo-valor');
-      if (intervaloInput) intervaloInput.value = config.intervaloValor;
-    }
-    if (config.intervaloUnidade) {
-      const unidadeSelect = document.getElementById('disparo-intervalo-unidade');
-      if (unidadeSelect) unidadeSelect.value = config.intervaloUnidade;
-    }
-    
-    // Restaura item selecionado
-    if (config.itemSelecionado) {
-      itemSelecionado = config.itemSelecionado;
-      const buscaInput = document.getElementById('disparo-busca-item');
-      if (buscaInput) buscaInput.value = itemSelecionado.nome;
-      mostrarItemSelecionado();
-    }
-    
-    // Atualiza cálculo e botão
-    atualizarCalculoIntervalo();
-    atualizarBotaoDisparo();
-    
-    return true;
-    
-  } catch (err) {
-    console.error('[Disparo] Erro ao carregar configuração:', err);
-    return false;
-  }
-}
-
-async function carregarItensDisparo() {
-  try {
-    const data = await api('/api/catalogo/v2/kits-e-produtos');
-    itensDisponiveis = data || [];
-    console.log('[Disparo] Itens carregados:', itensDisponiveis.length);
-    
-    // Carrega configuração salva após carregar itens
-    carregarConfigDisparo();
-  } catch (err) {
-    console.error('[Disparo] Erro ao carregar itens:', err);
-  }
-}
 
 async function carregarItensDisparo() {
   try {
