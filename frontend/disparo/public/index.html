@@ -380,6 +380,16 @@
     #page-catalogo {
       padding: 1.5rem;
       gap: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ━━ Produtos page ━━ */
+    #page-produtos {
+      padding: 1.5rem;
+      gap: 1.5rem;
+      display: flex;
+      flex-direction: column;
     }
 
     .catalogo-toolbar {
@@ -534,6 +544,210 @@
       font-size: 20px;
       line-height: 1;
       padding: 0;
+    }
+    
+    .modal-close:hover {
+      color: var(--text);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .form-input,
+    .form-textarea {
+      padding: .75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color .2s;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .form-input:disabled,
+    .form-textarea:disabled {
+      background: var(--bg2);
+      color: var(--text2);
+      cursor: not-allowed;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-file {
+      display: none;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: .75rem;
+    }
+
+    .modal-img-preview {
+      padding: 1rem;
+      background: var(--bg3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-no-img {
+      padding: 2rem;
+      background: var(--bg3);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      color: var(--text2);
+      font-size: 13px;
+    }
+
+    .save-success {
+      color: var(--success);
+      font-size: 13px;
+      font-weight: 600;
+      margin-right: auto;
+    }
+
+    /* Botões de ação inline */
+    .inline-action-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 4px;
+      padding: .4rem .6rem;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all .2s;
+    }
+
+    .inline-action-btn:hover {
+      background: var(--bg3);
+    }
+
+    .inline-action-btn.save {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .inline-action-btn.save:hover {
+      background: #16a34a;
+    }
+
+    .inline-action-btn.cancel {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+    }
+
+    .inline-action-btn.cancel:hover {
+      background: #dc2626;
+    }
+
+    /* Separador visual de seções no modal */
+    .form-group.section-separator {
+      border-top: 2px solid var(--border);
+      padding-top: 1.25rem;
+      margin-top: .75rem;
+    }
+
+    /* Container de componentes/SKUs */
+    .component-list {
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+
+    .component-item {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .875rem;
+      display: flex;
+      align-items: center;
+      gap: .875rem;
+      transition: border-color .2s;
+    }
+
+    .component-item:hover {
+      border-color: var(--primary);
+    }
+
+    .component-badge {
+      background: var(--primary);
+      color: white;
+      border-radius: 6px;
+      padding: .4rem .7rem;
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 50px;
+      text-align: center;
+    }
+
+    .component-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+    }
+
+    .component-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .component-sku {
+      font-size: 11px;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .component-sku code {
+      background: var(--bg);
+      padding: .15rem .4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
     }
   </style>
 </head>
@@ -849,10 +1063,10 @@
     <div id="modal-kit-img-wrap"></div>
 
     <!-- Body -->
-    <div class="modal-body" style="max-height:400px;overflow-y:auto">
+    <div class="modal-body">
       
       <div class="form-group">
-        <label class="form-label">Preço</label>
+        <label class="form-label">💰 Preço</label>
         <div style="display:flex;gap:.5rem;align-items:center">
           <input
             type="text"
@@ -865,7 +1079,7 @@
           <button 
             id="btn-editar-preco"
             onclick="toggleEditarPreco()" 
-            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn"
             title="Editar preço"
           >
             ✏️
@@ -873,7 +1087,8 @@
           <button 
             id="btn-salvar-preco"
             onclick="salvarPreco()" 
-            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn save"
+            style="display:none"
             title="Salvar"
           >
             ✓
@@ -881,7 +1096,8 @@
           <button 
             id="btn-cancelar-preco"
             onclick="cancelarEditarPreco()" 
-            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn cancel"
+            style="display:none"
             title="Cancelar"
           >
             ✕
@@ -890,7 +1106,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Descrição do Produto</label>
+        <label class="form-label">📝 Descrição do Produto</label>
         <textarea
           id="modal-kit-descricao"
           class="form-textarea"
@@ -900,7 +1116,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">SKU do Kit</label>
+        <label class="form-label">🏷️ SKU do Kit</label>
         <div style="display:flex;gap:.5rem;align-items:center">
           <input
             type="text"
@@ -913,7 +1129,7 @@
           <button 
             id="btn-editar-sku"
             onclick="toggleEditarSku()" 
-            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn"
             title="Editar SKU"
           >
             ✏️
@@ -921,7 +1137,8 @@
           <button 
             id="btn-salvar-sku"
             onclick="salvarSku()" 
-            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn save"
+            style="display:none"
             title="Salvar"
           >
             ✓
@@ -929,7 +1146,8 @@
           <button 
             id="btn-cancelar-sku"
             onclick="cancelarEditarSku()" 
-            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn cancel"
+            style="display:none"
             title="Cancelar"
           >
             ✕
@@ -938,13 +1156,11 @@
       </div>
 
       <div class="form-group">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
-          <label class="form-label" style="margin:0" id="componentes-label">Produtos que compõem este kit</label>
-        </div>
-        <div id="skus-itens-container" style="display:flex;flex-direction:column;gap:.5rem"></div>
+        <label class="form-label" id="componentes-label">📦 Produtos que compõem este kit</label>
+        <div id="skus-itens-container"></div>
       </div>
 
-      <div class="form-group" style="border-top:1px solid var(--border);padding-top:1rem">
+      <div class="form-group section-separator">
         <label class="form-label">📷 Imagem Thumbnail (Capa)</label>
         <input
           type="file"
@@ -1007,10 +1223,10 @@
     <div id="modal-produto-img-wrap"></div>
 
     <!-- Body -->
-    <div class="modal-body" style="max-height:400px;overflow-y:auto">
+    <div class="modal-body">
       
       <div class="form-group">
-        <label class="form-label">SKU</label>
+        <label class="form-label">🏷️ SKU</label>
         <div style="display:flex;gap:.5rem;align-items:center">
           <input
             type="text"
@@ -1023,7 +1239,7 @@
           <button 
             id="btn-editar-produto-sku"
             onclick="toggleEditarCampo('sku')" 
-            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn"
             title="Editar SKU"
           >
             ✏️
@@ -1031,7 +1247,8 @@
           <button 
             id="btn-salvar-produto-sku"
             onclick="salvarCampoProduto('sku')" 
-            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn save"
+            style="display:none"
             title="Salvar"
           >
             ✓
@@ -1039,7 +1256,8 @@
           <button 
             id="btn-cancelar-produto-sku"
             onclick="cancelarEditarCampo('sku')" 
-            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn cancel"
+            style="display:none"
             title="Cancelar"
           >
             ✕
@@ -1048,7 +1266,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Preço</label>
+        <label class="form-label">💰 Preço</label>
         <div style="display:flex;gap:.5rem;align-items:center">
           <input
             type="text"
@@ -1061,7 +1279,7 @@
           <button 
             id="btn-editar-produto-preco"
             onclick="toggleEditarCampo('preco')" 
-            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn"
             title="Editar preço"
           >
             ✏️
@@ -1069,7 +1287,8 @@
           <button 
             id="btn-salvar-produto-preco"
             onclick="salvarCampoProduto('preco')" 
-            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn save"
+            style="display:none"
             title="Salvar"
           >
             ✓
@@ -1077,7 +1296,8 @@
           <button 
             id="btn-cancelar-produto-preco"
             onclick="cancelarEditarCampo('preco')" 
-            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn cancel"
+            style="display:none"
             title="Cancelar"
           >
             ✕
@@ -1086,7 +1306,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Descrição (Contra Rótulo)</label>
+        <label class="form-label">📝 Descrição (Contra Rótulo)</label>
         <div style="display:flex;gap:.5rem;align-items:flex-start">
           <textarea
             id="modal-produto-descricao"
@@ -1100,7 +1320,7 @@
             <button 
               id="btn-editar-produto-descricao"
               onclick="toggleEditarCampo('descricao')" 
-              style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              class="inline-action-btn"
               title="Editar descrição"
             >
               ✏️
@@ -1108,7 +1328,8 @@
             <button 
               id="btn-salvar-produto-descricao"
               onclick="salvarCampoProduto('descricao')" 
-              style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              class="inline-action-btn save"
+              style="display:none"
               title="Salvar"
             >
               ✓
@@ -1116,7 +1337,8 @@
             <button 
               id="btn-cancelar-produto-descricao"
               onclick="cancelarEditarCampo('descricao')" 
-              style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              class="inline-action-btn cancel"
+              style="display:none"
               title="Cancelar"
             >
               ✕
@@ -1126,7 +1348,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Peso</label>
+        <label class="form-label">⚖️ Peso</label>
         <div style="display:flex;gap:.5rem;align-items:center">
           <input
             type="text"
@@ -1139,7 +1361,7 @@
           <button 
             id="btn-editar-produto-peso"
             onclick="toggleEditarCampo('peso')" 
-            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn"
             title="Editar peso"
           >
             ✏️
@@ -1147,7 +1369,8 @@
           <button 
             id="btn-salvar-produto-peso"
             onclick="salvarCampoProduto('peso')" 
-            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn save"
+            style="display:none"
             title="Salvar"
           >
             ✓
@@ -1155,7 +1378,8 @@
           <button 
             id="btn-cancelar-produto-peso"
             onclick="cancelarEditarCampo('peso')" 
-            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn cancel"
+            style="display:none"
             title="Cancelar"
           >
             ✕
@@ -1164,7 +1388,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Tamanho</label>
+        <label class="form-label">📏 Tamanho</label>
         <div style="display:flex;gap:.5rem;align-items:center">
           <input
             type="text"
@@ -1177,7 +1401,7 @@
           <button 
             id="btn-editar-produto-tamanho"
             onclick="toggleEditarCampo('tamanho')" 
-            style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn"
             title="Editar tamanho"
           >
             ✏️
@@ -1185,7 +1409,8 @@
           <button 
             id="btn-salvar-produto-tamanho"
             onclick="salvarCampoProduto('tamanho')" 
-            style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn save"
+            style="display:none"
             title="Salvar"
           >
             ✓
@@ -1193,7 +1418,8 @@
           <button 
             id="btn-cancelar-produto-tamanho"
             onclick="cancelarEditarCampo('tamanho')" 
-            style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+            class="inline-action-btn cancel"
+            style="display:none"
             title="Cancelar"
           >
             ✕
@@ -1202,7 +1428,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Composição</label>
+        <label class="form-label">🧪 Composição</label>
         <div style="display:flex;gap:.5rem;align-items:flex-start">
           <textarea
             id="modal-produto-composicao"
@@ -1216,7 +1442,7 @@
             <button 
               id="btn-editar-produto-composicao"
               onclick="toggleEditarCampo('composicao')" 
-              style="background:none;border:1px solid var(--border);color:var(--text);border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              class="inline-action-btn"
               title="Editar composição"
             >
               ✏️
@@ -1224,7 +1450,8 @@
             <button 
               id="btn-salvar-produto-composicao"
               onclick="salvarCampoProduto('composicao')" 
-              style="display:none;background:var(--success);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              class="inline-action-btn save"
+              style="display:none"
               title="Salvar"
             >
               ✓
@@ -1232,7 +1459,8 @@
             <button 
               id="btn-cancelar-produto-composicao"
               onclick="cancelarEditarCampo('composicao')" 
-              style="display:none;background:var(--danger);border:none;color:white;border-radius:4px;padding:.4rem .6rem;cursor:pointer;font-size:14px"
+              class="inline-action-btn cancel"
+              style="display:none"
               title="Cancelar"
             >
               ✕
@@ -1241,7 +1469,7 @@
         </div>
       </div>
 
-      <div class="form-group" style="border-top:1px solid var(--border);padding-top:1rem">
+      <div class="form-group section-separator">
         <label class="form-label">📷 Imagem Thumbnail (Capa)</label>
         <input
           type="file"
@@ -1267,7 +1495,7 @@
       </div>
 
       <div class="form-group">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
           <label class="form-label" style="margin:0">🖼️ Imagens do Carrossel</label>
           <input
             type="file"
@@ -1276,7 +1504,7 @@
             accept="image/jpeg,image/jpg,image/png,image/webp"
             onchange="handleProdutoCarrosselSelect(this)"
           />
-          <button class="btn btn-secondary" onclick="document.getElementById('modal-produto-file-carrossel').click()" style="padding:.25rem .5rem;font-size:12px">
+          <button class="btn btn-secondary" onclick="document.getElementById('modal-produto-file-carrossel').click()" style="padding:.35rem .65rem;font-size:12px">
             ➕ Adicionar Imagem
           </button>
         </div>
@@ -2900,28 +3128,30 @@ function renderComponentesKit(componentes) {
     return;
   }
   
-  container.innerHTML = componentes.map((comp, idx) => `
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.75rem;display:flex;align-items:center;gap:.75rem">
-      <div style="background:var(--primary);color:white;border-radius:6px;padding:.35rem .6rem;font-size:13px;font-weight:700;min-width:40px;text-align:center">
+  container.innerHTML = `<div class="component-list">` + componentes.map((comp, idx) => `
+    <div class="component-item">
+      <div class="component-badge">
         ${comp.quantidade}x
       </div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:.25rem">
+      <div class="component-info">
+        <div class="component-name">
           ${esc(comp.nome)}
         </div>
-        ${comp.sku ? `<div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:.35rem">
-          <span style="background:var(--bg);padding:.15rem .4rem;border-radius:4px;font-family:monospace">${esc(comp.sku)}</span>
-        </div>` : ''}
+        ${comp.sku ? `<div class="component-sku">
+          <span style="color:var(--text2)">SKU:</span>
+          <code>${esc(comp.sku)}</code>
+        </div>` : '<div class="component-sku"><span style="color:var(--text2);font-style:italic">Sem SKU</span></div>'}
       </div>
       <button
         onclick="verDetalhesComponente('${escAttr(comp.sku || '')}')"
-        style="background:var(--info);color:white;border:none;border-radius:6px;padding:.4rem .7rem;cursor:pointer;font-size:11px;font-weight:600"
+        class="inline-action-btn"
         title="Ver detalhes"
+        ${!comp.sku ? 'disabled style="opacity:.4;cursor:not-allowed"' : ''}
       >
         👁️ Ver
       </button>
     </div>
-  `).join('');
+  `).join('') + `</div>`;
 }
 
 function adicionarSkuItem() {
