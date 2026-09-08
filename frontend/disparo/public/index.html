@@ -1722,8 +1722,11 @@ async function carregarConfigDisparo() {
     try {
       const res = await fetch('/api/disparos/config');
       
+      console.log('[Disparo] GET /api/disparos/config - Status:', res.status);
+      
       if (res.ok) {
         const data = await res.json();
+        console.log('[Disparo] Resposta completa da API:', data);
         
         if (data.ok && data.config) {
           const config = data.config;
@@ -1732,19 +1735,31 @@ async function carregarConfigDisparo() {
           // Restaura campos
           if (config.mensagem) {
             const msgInput = document.getElementById('disparo-mensagem');
-            if (msgInput) msgInput.value = config.mensagem;
+            if (msgInput) {
+              msgInput.value = config.mensagem;
+              console.log('[Disparo] → Mensagem restaurada:', config.mensagem);
+            }
           }
           if (config.quantidade) {
             const qtdInput = document.getElementById('disparo-quantidade');
-            if (qtdInput) qtdInput.value = config.quantidade;
+            if (qtdInput) {
+              qtdInput.value = config.quantidade;
+              console.log('[Disparo] → Quantidade restaurada:', config.quantidade);
+            }
           }
           if (config.intervalo_valor) {
             const intervaloInput = document.getElementById('disparo-intervalo-valor');
-            if (intervaloInput) intervaloInput.value = config.intervalo_valor;
+            if (intervaloInput) {
+              intervaloInput.value = config.intervalo_valor;
+              console.log('[Disparo] → Intervalo valor restaurado:', config.intervalo_valor);
+            }
           }
           if (config.intervalo_unidade) {
             const unidadeSelect = document.getElementById('disparo-intervalo-unidade');
-            if (unidadeSelect) unidadeSelect.value = config.intervalo_unidade;
+            if (unidadeSelect) {
+              unidadeSelect.value = config.intervalo_unidade;
+              console.log('[Disparo] → Intervalo unidade restaurada:', config.intervalo_unidade);
+            }
           }
           
           // Restaura item selecionado
@@ -1758,6 +1773,7 @@ async function carregarConfigDisparo() {
             const buscaInput = document.getElementById('disparo-busca-item');
             if (buscaInput) buscaInput.value = itemSelecionado.nome;
             mostrarItemSelecionado();
+            console.log('[Disparo] → Item selecionado restaurado:', itemSelecionado);
           }
           
           // Atualiza cálculo e botão
@@ -1765,10 +1781,12 @@ async function carregarConfigDisparo() {
           atualizarBotaoDisparo();
           
           return true;
+        } else {
+          console.log('[Disparo] ℹ API retornou ok mas config é null/undefined');
         }
       }
     } catch (apiErr) {
-      console.log('[Disparo] Servidor offline, tentando localStorage...', apiErr.message);
+      console.log('[Disparo] Servidor offline ou erro na API:', apiErr.message);
     }
     
     // Se não encontrou no banco ou servidor offline, tenta localStorage como fallback
