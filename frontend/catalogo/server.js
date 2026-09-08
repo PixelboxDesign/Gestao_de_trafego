@@ -32,7 +32,7 @@ app.use('/api', async (req, res) => {
       method: req.method,
       headers: {
         'Content-Type': 'application/json',
-        ...req.headers,
+        'User-Agent': 'Luna-Catalogo-Proxy/1.0',
       },
       body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body) : undefined,
       timeout: 30000, // 30 segundos de timeout
