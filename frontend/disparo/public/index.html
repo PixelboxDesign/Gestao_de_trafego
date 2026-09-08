@@ -1833,6 +1833,29 @@ async function carregarItensDisparo() {
   }
 }
 
+async function carregarItensDisparo() {
+  try {
+    console.log('[Disparo] Carregando lista de itens...');
+    const data = await api('/api/catalogo/v2/kits-e-produtos');
+    itensDisponiveis = data || [];
+    console.log(`[Disparo] ✓ ${itensDisponiveis.length} itens carregados`);
+    
+    // Após carregar itens, tenta carregar configuração salva
+    setTimeout(() => {
+      console.log('[Disparo] Itens carregados, tentando carregar configuração...');
+      carregarConfigDisparo().then(loaded => {
+        if (loaded) {
+          console.log('[Disparo] ✓ Configuração restaurada com itens');
+        }
+      });
+    }, 300);
+  } catch (err) {
+    console.error('[Disparo] Erro ao carregar itens:', err);
+    // Mesmo se falhar, tenta carregar config (para campos sem item)
+    setTimeout(() => carregarConfigDisparo(), 300);
+  }
+}
+
 function filtrarItensDisparo(busca) {
   const termo = busca.toLowerCase().trim();
   const dropdown = document.getElementById('disparo-dropdown');
@@ -2377,18 +2400,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // IMPORTANTE: Carrega configuração após DOM estar pronto
-  console.log('[Disparo] DOM carregado, aguardando 500ms antes de carregar config...');
-  setTimeout(() => {
-    console.log('[Disparo] Tentando carregar configuração salva...');
-    carregarConfigDisparo().then(loaded => {
-      if (loaded) {
-        console.log('[Disparo] ✓ Configuração carregada com sucesso');
-      } else {
-        console.log('[Disparo] ℹ Nenhuma configuração anterior encontrada');
-      }
-    });
-  }, 500);
+  console.log('[Disparo] ✓ Event listeners configurados');
 });
 
 // ━━ Loop principal ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
