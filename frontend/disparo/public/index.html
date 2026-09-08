@@ -10,21 +10,34 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <script>
+    // ━━━ TESTE CRÍTICO DE PERSISTÊNCIA ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    console.log('═══════════════════════════════════════════════════════════');
+    console.log('🔬 TESTE IMEDIATO DE localStorage');
+    console.log('Momento: ANTES de qualquer código executar');
+    console.log('localStorage.length:', localStorage.length);
+    console.log('Todas as chaves:', Object.keys(localStorage));
+    console.log('luna_disparo_config existe?', localStorage.getItem('luna_disparo_config') !== null);
+    if (localStorage.getItem('luna_disparo_config')) {
+      console.log('✅ CONFIG ENCONTRADA:', localStorage.getItem('luna_disparo_config').substring(0, 200));
+    } else {
+      console.log('❌ CONFIG NÃO EXISTE');
+    }
+    console.log('═══════════════════════════════════════════════════════════');
+    
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 31;
+    const CURRENT_VERSION = 32;
     const stored = localStorage.getItem('luna_version');
     const isReloading = sessionStorage.getItem('luna_reloading');
     
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
-      
-      // Só recarrega UMA VEZ por sessão
-      if (stored && !isReloading) {
-        sessionStorage.setItem('luna_reloading', '1');
-        location.replace(location.href + '?v=' + Date.now());
-      }
+      console.log('⚠️ Versão desatualizada, mas NÃO vou recarregar para preservar localStorage');
+      // DESABILITA RELOAD COMPLETAMENTE
+      // if (stored && !isReloading) {
+      //   sessionStorage.setItem('luna_reloading', '1');
+      //   location.replace(location.href + '?v=' + Date.now());
+      // }
     } else {
-      // Limpa flag de reload se versão está OK
       sessionStorage.removeItem('luna_reloading');
     }
   </script>
@@ -1615,8 +1628,15 @@ let itemSelecionado = null;
 
 // ━━ Persistência de dados do disparo ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function salvarConfigDisparo() {
+  // ⚠️ VALIDAÇÃO CRÍTICA: NUNCA salva se mensagem estiver vazia
+  const mensagem = document.getElementById('disparo-mensagem')?.value || '';
+  if (!mensagem || !mensagem.trim()) {
+    console.log('[Disparo] ⚠️ SKIP: Mensagem vazia, NÃO vou salvar');
+    return;
+  }
+  
   const config = {
-    mensagem: document.getElementById('disparo-mensagem')?.value || '',
+    mensagem: mensagem,
     quantidade: document.getElementById('disparo-quantidade')?.value || '10',
     intervaloValor: document.getElementById('disparo-intervalo-valor')?.value || '1',
     intervaloUnidade: document.getElementById('disparo-intervalo-unidade')?.value || 'horas',
