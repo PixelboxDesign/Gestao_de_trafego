@@ -103,8 +103,8 @@
 
     /* ━━ Content ━━ */
     .content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-    .page    { display: none; flex: 1; flex-direction: column; overflow: auto; }
-    .page.active { display: flex; }
+    .page    { display: none !important; flex: 1; flex-direction: column; overflow: auto; }
+    .page.active { display: flex !important; }
 
     /* ━━ Dot ━━ */
     .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
@@ -1605,10 +1605,32 @@ if ('serviceWorker' in navigator) {
 
 // ━━ Troca de aba ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
 function trocarAba(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  console.log('[trocarAba] Trocando para:', id);
+  
+  // Remove active de todas as pages e tabs
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    console.log('[trocarAba] Removeu active de:', p.id);
+  });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
+  
+  // Adiciona active na page e tab corretas
+  const targetPage = document.getElementById('page-' + id);
+  if (targetPage) {
+    targetPage.classList.add('active');
+    console.log('[trocarAba] Adicionou active em:', targetPage.id);
+  } else {
+    console.error('[trocarAba] Página não encontrada:', 'page-' + id);
+  }
+  
   btn.classList.add('active');
+  
+  // Debug: verifica estado final
+  console.log('[trocarAba] Estado final:');
+  document.querySelectorAll('.page').forEach(p => {
+    const display = window.getComputedStyle(p).display;
+    console.log(`  ${p.id}: active=${p.classList.contains('active')}, display=${display}`);
+  });
 }
 
 // ━━ Troca de sub-aba (WhatsApp) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1616,14 +1638,6 @@ function trocarSubAba(id, btn) {
   document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('sub-page-' + id).classList.add('active');
-  btn.classList.add('active');
-}
-
-// ━━ Troca de aba ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━—
-function trocarAba(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
   btn.classList.add('active');
 }
 
