@@ -1,5 +1,5 @@
 # LUNA COSMÉTICOS — DOCUMENTAÇÃO OFICIAL DO SISTEMA
-**Fonte Única de Verdade | Última Atualização: 25/08/2026**
+**Fonte Única de Verdade | Última Atualização: 08/09/2026**
 
 ---
 
@@ -36,14 +36,15 @@
 8. [Integração Cloudflare Tunnel](#8-integração-cloudflare-tunnel)
 9. [Frontend Proxy (Render.com)](#9-frontend-proxy-rendercom)
 10. [Painel Desktop (Tauri)](#10-painel-desktop-tauri)
-11. [Fluxos de Dados](#11-fluxos-de-dados)
-12. [Procedimentos Git e Deploy](#12-procedimentos-git-e-deploy)
-13. [Segurança e CORS](#13-segurança-e-cors)
-14. [Performance e Cache](#14-performance-e-cache)
-15. [Troubleshooting](#15-troubleshooting)
-16. [Variáveis de Ambiente](#16-variáveis-de-ambiente)
-17. [Arquivos Essenciais](#17-arquivos-essenciais)
-18. [Changelog](#18-changelog)
+11. [Frontend Catálogo Web](#11-frontend-catálogo-web)
+12. [Fluxos de Dados](#12-fluxos-de-dados)
+13. [Procedimentos Git e Deploy](#13-procedimentos-git-e-deploy)
+14. [Segurança e CORS](#14-segurança-e-cors)
+15. [Performance e Cache](#15-performance-e-cache)
+16. [Troubleshooting](#16-troubleshooting)
+17. [Variáveis de Ambiente](#17-variáveis-de-ambiente)
+18. [Arquivos Essenciais](#18-arquivos-essenciais)
+19. [Changelog](#19-changelog)
 
 ---
 
@@ -670,13 +671,418 @@ fn listar_kits(marca: String) -> Result<Vec<Kit>, String> {
 
 ---
 
-## 11. FLUXOS DE DADOS
+## 11. FRONTEND CATÁLOGO WEB
 
-### 11.1 Listar Kits de uma Marca
+### 11.1 Visão Geral
+
+**Novo site de catálogo estático** hospedado no Render.com que exibe marcas, kits e produtos com design premium inspirado no catalogo-capilar.
+
+**URL Produção:** `https://luna-catalogo.onrender.com` (após deploy)
+
+**Tecnologia:** React 18 + TypeScript + Vite 5 + Tailwind CSS
+
+### 11.2 Arquitetura
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    RENDER.COM (Oregon)                       │
+│                                                              │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │  Express Server (server.js)                            │ │
+│  │  - Serve dist/ estático                                │ │
+│  │  - Proxy /api/* → Cloudflare Tunnel                    │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │  React SPA (dist/)                                     │ │
+│  │  - BrandsIntro (lista marcas)                          │ │
+│  │  - CatalogViewport (tabs Kits/Produtos)                │ │
+│  │  - ProductCard (thumbnail + carrossel)                 │ │
+│  └────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────┘
+                             ↓ API calls
+                    ┌────────────────────┐
+                    │ Cloudflare Tunnel  │
+                    │  (Backend Local)   │
+                    └────────────────────┘
+```
+
+### 11.3 Estrutura de Pastas
+
+```
+frontend/catalogo/
+├── public/
+│   └── favicon.ico                 # Ícone do site
+├── src/
+│   ├── api/
+│   │   └── client.ts               # Funções fetchMarcas, fetchKits, fetchProdutos
+│   ├── components/
+│   │   ├── BrandsIntro.tsx         # Tela de seleção de marcas
+│   │   ├── CatalogViewport.tsx     # Tela de catálogo com tabs
+│   │   └── ProductCard.tsx         # Card de kit/produto com carrossel
+│   ├── lib/
+│   │   └── utils.ts                # Utilidades (cn)
+│   ├── styles.css                  # Design system (cores oklch, animações)
+│   ├── types.ts                    # Interfaces TypeScript
+│   ├── App.tsx                     # Componente raiz (navegação brands/catalog)
+│   └── main.tsx                    # Entry point React
+├── index.html                      # Template HTML
+├── package.json                    # Dependências
+├── server.js                       # Proxy Express para produção
+├── vite.config.ts                  # Configuração Vite
+├── tailwind.config.js              # Configuração Tailwind (cores customizadas)
+├── postcss.config.js               # Configuração PostCSS
+├── tsconfig.json                   # Configuração TypeScript
+└── .env                            # Variáveis de ambiente (local)
+```
+
+### 11.4 Fluxo de Navegação
+
+```
+1. Usuário acessa → BrandsIntro
+   └─ Grid de marcas (ex: Alphahall, OutraMarca)
+   └─ Clica em uma marca
+
+2. Transição → CatalogViewport
+   └─ Header com nome da marca + botão "← Voltar"
+   └─ Tabs: [Kits] [Produtos]
+   
+3. Aba Kits selecionada
+   └─ Grid de ProductCards
+   └─ Cada card mostra:
+      - Thumbnail do kit
+      - Nome do kit
+      - Contador de produtos (ex: "3 produtos neste kit")
+      - Carrossel navegável (se houver múltiplas imagens)
+      
+4. Aba Produtos selecionada
+   └─ Grid de ProductCards
+   └─ Cada card mostra:
+      - Thumbnail do produto
+      - Nome do produto
+      - Badge de categoria (ex: "Shampoo", "Condicionador")
+      - Carrossel navegável
+```
+
+### 11.5 API Client
+
+**Arquivo:** `src/api/client.ts`
+
+```typescript
+// Busca lista de marcas (pastas em catalogos/)
+export async function fetchMarcas(): Promise<Marca[]>
+
+// Busca kits de uma marca
+export async function fetchKits(marca: string): Promise<Kit[]>
+
+// Busca produtos individuais de uma marca
+export async function fetchProdutos(marca: string): Promise<Produto[]>
+
+// Constrói URL de imagem
+export function getImageUrl(
+  marca: string, 
+  tipo: 'kits' | 'produtos',
+  produtoSlug: string,
+  filename: string
+): string
+```
+
+**Base URL:** Configurada via `VITE_API_BASE_URL` no `.env`
+
+### 11.6 Design System
+
+**Inspiração:** catalogo-capilar (design premium com gradientes metálicos)
+
+**Cores (oklch):**
+- Background: `oklch(0.17 0.055 265)` — Azul escuro profundo
+- Primary: `oklch(0.72 0.16 355)` — Rosa metálico
+- Accent: `oklch(0.8 0.12 350)` — Rosa claro
+- Muted: `oklch(0.26 0.06 266)` — Cinza azulado
+
+**Gradientes:**
+- `rose-metal`: Gradiente rosa→prateado→dourado (120deg)
+- `deep-blue`: Gradiente azul profundo (180deg)
+
+**Animações:**
+- `metal-shift`: Background animado do gradiente metálico (8s loop)
+- `float-slow`: Flutuação suave de elementos decorativos (7s loop)
+- `sheen`: Efeito brilho ao hover em cards (0.9s)
+- `reveal`: Fade-in + translateY ao entrar no viewport
+
+**Utilities Tailwind:**
+- `text-metal`: Texto com gradiente metálico animado
+- `surface-glass`: Card com glass morphism (blur + transparência)
+- `rose-line`: Linha/borda com gradiente rosa-metal
+- `sheen-on-hover`: Aplica efeito sheen ao passar mouse
+
+### 11.7 Componentes
+
+#### BrandsIntro
+
+**Arquivo:** `src/components/BrandsIntro.tsx`
+
+**Props:**
+```typescript
+interface BrandsIntroProps {
+  onSelectBrand: (brandName: string) => void;
+}
+```
+
+**Funcionalidades:**
+- Busca marcas via `fetchMarcas()`
+- Grid responsivo: 1 coluna (mobile) → 2 (tablet) → 3 (desktop)
+- Cards com inicial da marca em círculo
+- Animações reveal escalonadas (delay incremental)
+- Estados: loading, empty, success
+- Elementos decorativos flutuantes (blobs)
+
+#### CatalogViewport
+
+**Arquivo:** `src/components/CatalogViewport.tsx`
+
+**Props:**
+```typescript
+interface CatalogViewportProps {
+  brandName: string;
+  onBack: () => void;
+}
+```
+
+**Funcionalidades:**
+- Header com botão "← Voltar" e nome da marca
+- Sistema de tabs (Kits / Produtos) com contadores
+- Busca paralela: `Promise.all([fetchKits, fetchProdutos])`
+- Grid responsivo: 1 → 2 → 3 → 4 colunas
+- Estados: loading, empty (por tab), success
+- Transição suave ao trocar de tab
+
+#### ProductCard
+
+**Arquivo:** `src/components/ProductCard.tsx`
+
+**Props:**
+```typescript
+interface ProductCardProps {
+  item: Kit | Produto;
+  brandName: string;
+  tipo: 'kits' | 'produtos';
+  revealed: boolean;
+  index: number;
+}
+```
+
+**Funcionalidades:**
+- Thumbnail com aspect-square (1:1)
+- Carrossel navegável:
+  - Botões ← / → aparecem no hover
+  - Dots indicadores (bullets clicáveis)
+  - Badge contador (ex: "2/5")
+- Zoom suave na imagem ao hover (`scale-110`)
+- Nome do produto/kit (line-clamp-2)
+- Badge de categoria (produtos)
+- Contador de produtos (kits)
+- Fallback para emoji se imagem falhar (📦 ou ✨)
+- Animações reveal escalonadas
+
+### 11.8 Server.js (Proxy de Produção)
+
+**Arquivo:** `server.js`
+
+**Função:** Servir dist/ estático + proxy /api/* para backend
+
+```javascript
+import express from 'express';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+const API_BASE_URL = process.env.VITE_API_BASE_URL;
+
+// Proxy /api/* → Backend
+app.use('/api', async (req, res) => {
+  const targetUrl = `${API_BASE_URL}${req.url}`;
+  const fetch = (await import('node-fetch')).default;
+  const response = await fetch(targetUrl, {
+    method: req.method,
+    headers: { 'Content-Type': 'application/json', ...req.headers },
+    body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
+  });
+  
+  const contentType = response.headers.get('content-type');
+  res.status(response.status);
+  
+  if (contentType?.includes('application/json')) {
+    res.json(await response.json());
+  } else if (contentType?.includes('image/')) {
+    const buffer = await response.arrayBuffer();
+    res.set('Content-Type', contentType);
+    res.send(Buffer.from(buffer));
+  } else {
+    res.send(await response.text());
+  }
+});
+
+// Serve dist/ estático
+app.use(express.static(join(__dirname, 'dist')));
+
+// SPA fallback (todas rotas → index.html)
+app.get('*', (req, res) => {
+  res.sendFile(join(__dirname, 'dist', 'index.html'));
+});
+
+app.listen(PORT, '0.0.0.0');
+```
+
+**Características:**
+- Logging de todas requisições
+- Suporta JSON e imagens (binary)
+- Tratamento de erros com status 502
+- Escuta em `0.0.0.0` (compatível Render.com)
+
+### 11.9 Deploy no Render.com
+
+**Arquivo:** `render.yaml` (raiz do repositório)
+
+```yaml
+services:
+  - type: web
+    name: luna-catalogo
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    rootDir: frontend/catalogo
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://shield-required-enjoy-trained.trycloudflare.com
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true
+    healthCheckPath: /
+```
+
+**Processo de deploy:**
+1. Push para `main` → Render detecta mudanças
+2. Executa `npm install` + `npm run build`
+3. Gera pasta `dist/` com React compilado
+4. Inicia `npm start` (server.js)
+5. Serviço fica disponível em ~5 minutos
+
+**Atualização da URL do backend:**
+Quando a URL do Cloudflare Tunnel mudar:
+1. Dashboard Render → Service → Environment
+2. Atualizar `VITE_API_BASE_URL`
+3. Save → Redeploy automático
+
+### 11.10 Variáveis de Ambiente
+
+**Desenvolvimento (`.env`):**
+```env
+VITE_API_BASE_URL=https://shield-required-enjoy-trained.trycloudflare.com
+PORT=3000
+```
+
+**Produção (Render.com):**
+- Configuradas no Dashboard → Environment
+- `VITE_API_BASE_URL` — URL do backend (Cloudflare Tunnel)
+- `PORT` — Fornecido automaticamente pelo Render
+- `NODE_ENV=production`
+
+### 11.11 Scripts npm
+
+```json
+{
+  "scripts": {
+    "start": "node server.js",        // Produção (Render)
+    "dev": "vite",                     // Dev local (hot reload)
+    "build": "vite build",             // Build para produção
+    "preview": "vite preview"          // Preview do build local
+  }
+}
+```
+
+### 11.12 Dependências
+
+**Produção:**
+```json
+{
+  "express": "^4.18.2",
+  "node-fetch": "^3.3.2",
+  "dotenv": "^16.3.1",
+  "clsx": "^2.0.0",
+  "tailwind-merge": "^2.2.0"
+}
+```
+
+**Desenvolvimento:**
+```json
+{
+  "@types/react": "^18.2.43",
+  "@types/react-dom": "^18.2.17",
+  "@vitejs/plugin-react": "^4.2.1",
+  "autoprefixer": "^10.4.16",
+  "postcss": "^8.4.32",
+  "react": "^18.2.0",
+  "react-dom": "^18.2.0",
+  "tailwindcss": "^3.4.0",
+  "typescript": "^5.3.3",
+  "vite": "^5.0.8"
+}
+```
+
+### 11.13 Limitações Conhecidas
+
+1. **API do backend ainda não implementada:**
+   - `/api/catalogo/marcas` — Precisa retornar lista de pastas em `catalogos/`
+   - `/api/catalogo/kits/:marca` — Já existe
+   - `/api/catalogo/produtos/:marca` — Precisa ser criada
+
+2. **Cloudflare Tunnel URL dinâmica:**
+   - A cada restart, a URL muda
+   - Necessário atualizar `VITE_API_BASE_URL` no Render
+   - Solução futura: Named Tunnel com URL fixa
+
+3. **Free tier do Render:**
+   - Serviço dorme após 15min de inatividade
+   - Primeira requisição leva ~30s (cold start)
+   - Solução: upgrade para paid tier ou keep-alive ping
+
+### 11.14 Roadmap
+
+- [ ] Implementar rota `/api/catalogo/marcas` no backend
+- [ ] Implementar rota `/api/catalogo/produtos/:marca` no backend
+- [ ] Adicionar modal de zoom ao clicar em imagem
+- [ ] Adicionar busca/filtro de produtos por categoria
+- [ ] Adicionar compartilhamento de kit via link
+- [ ] PWA (Progressive Web App) com cache offline
+- [ ] SEO otimizado (meta tags dinâmicas)
+
+---
+
+## 12. FLUXOS DE DADOS
+
+### 12.1 Listar Marcas (Novo Fluxo)
+
+```
+1. Browser → GET https://luna-catalogo.onrender.com/api/catalogo/marcas
+2. Express Proxy → GET https://*.trycloudflare.com/api/catalogo/marcas
+3. Backend Tauri:
+   a) Lista diretórios em F:\luna_cosmeticos\catalogos\
+   b) Para cada pasta:
+      - Extrai nome da marca
+      - Gera slug (lowercase, sem espaços)
+   c) Retorna: { "marcas": [{ "nome": "Alphahall", "slug": "alphahall" }] }
+4. React BrandsIntro renderiza grid de marcas
+```
+
+### 12.2 Listar Kits de uma Marca
 
 ```
 1. Browser → GET /api/catalogo/kits/Alphahall
-2. Render Proxy → GET https://*.trycloudflare.com/api/catalogo/kits/Alphahall
+2. Express Proxy → GET https://*.trycloudflare.com/api/catalogo/kits/Alphahall
 3. Cloudflare Tunnel → http://localhost:3001/api/catalogo/kits/Alphahall
 4. Backend Tauri:
    a) Lista diretórios em F:\luna_cosmeticos\catalogos\Alphahall\
@@ -685,14 +1091,15 @@ fn listar_kits(marca: String) -> Result<Vec<Kit>, String> {
       - Detecta imagens (1.jpg, 2.jpg...)
       - Monta objeto JSON
    c) Retorna array de kits
-5. Resposta JSON volta ao browser
+5. React CatalogViewport renderiza grid de ProductCards
+6. ProductCard requisita imagens via getImageUrl()
 ```
 
-### 11.2 Servir Imagem do Carrossel
+### 12.3 Servir Imagem do Carrossel
 
 ```
 1. Browser → GET /api/catalogo/imagem/Alphahall/Kit%20Banho%20de%20Seda/1.jpg
-2. Render Proxy → repassa via Cloudflare
+2. Express Proxy → repassa via Cloudflare
 3. Backend Tauri:
    a) Sanitiza path (remove ../)
    b) Monta: F:\luna_cosmeticos\catalogos\Alphahall\Kit Banho de Seda\1.jpg
@@ -703,9 +1110,10 @@ fn listar_kits(marca: String) -> Result<Vec<Kit>, String> {
       Access-Control-Allow-Origin: *
 4. Imagem retorna ao browser
 5. Browser cacheia por 24h
+6. React ProductCard exibe imagem no carrossel
 ```
 
-### 11.3 Otimização de Thumbnails
+### 12.4 Otimização de Thumbnails
 
 ```
 1. Admin executa: node otimizar_thumbnails.js
@@ -722,9 +1130,9 @@ fn listar_kits(marca: String) -> Result<Vec<Kit>, String> {
 
 ---
 
-## 12. PROCEDIMENTOS GIT E DEPLOY
+## 13. PROCEDIMENTOS GIT E DEPLOY
 
-### 12.1 Convenções de Commit
+### 13.1 Convenções de Commit
 
 ```bash
 # Formato
@@ -744,7 +1152,7 @@ fix: corrige CORS no backend Tauri
 docs: atualiza ARQUITETURA_SISTEMA.md com thumbnails
 ```
 
-### 12.2 Fluxo de Deploy Frontend
+### 13.2 Fluxo de Deploy Frontend
 
 ```bash
 # 1. Fazer alterações no código
@@ -762,7 +1170,7 @@ git push origin main
 # Tempo médio: 5 minutos
 ```
 
-### 12.3 Fluxo de Deploy Backend
+### 13.3 Fluxo de Deploy Backend
 
 **O backend NÃO é deployado** — ele roda localmente.
 
@@ -779,7 +1187,7 @@ npm run tauri build
 npm run tauri dev
 ```
 
-### 12.4 Atualização da URL do Cloudflare
+### 13.4 Atualização da URL do Cloudflare
 
 **Quando o túnel é reiniciado, a URL muda:**
 
@@ -797,9 +1205,9 @@ cloudflared tunnel --url http://localhost:3001
 
 ---
 
-## 13. SEGURANÇA E CORS
+## 14. SEGURANÇA E CORS
 
-### 13.1 CORS (Cross-Origin Resource Sharing)
+### 14.1 CORS (Cross-Origin Resource Sharing)
 
 **Configurado no backend Tauri (Rust):**
 
@@ -818,7 +1226,7 @@ let cors = CorsLayer::new()
 - Backend no domínio `*.trycloudflare.com`
 - Sem CORS, browser bloqueia as requisições
 
-### 13.2 Path Traversal Protection
+### 14.2 Path Traversal Protection
 
 **Problema:** Requisição maliciosa pode tentar acessar arquivos fora da pasta de catálogos.
 
@@ -842,7 +1250,7 @@ if !final_path.starts_with(&CATALOGOS_BASE_PATH) {
 }
 ```
 
-### 13.3 Validação de Extensões
+### 14.3 Validação de Extensões
 
 **Apenas extensões permitidas:**
 - `.jpg`, `.jpeg` — Imagens JPEG
@@ -853,7 +1261,7 @@ if !final_path.starts_with(&CATALOGOS_BASE_PATH) {
 - `.json` — Metadados não devem ser servidos como imagem
 - Qualquer outra extensão
 
-### 13.4 Rate Limiting (Futuro)
+### 14.4 Rate Limiting (Futuro)
 
 **Não implementado atualmente.**
 
@@ -864,9 +1272,9 @@ if !final_path.starts_with(&CATALOGOS_BASE_PATH) {
 
 ---
 
-## 14. PERFORMANCE E CACHE
+## 15. PERFORMANCE E CACHE
 
-### 14.1 Cache de Imagens no Browser
+### 15.1 Cache de Imagens no Browser
 
 **Headers enviados pelo backend:**
 
@@ -879,7 +1287,7 @@ Cache-Control: public, max-age=86400
 - Requisições subsequentes não chegam ao servidor
 - Economia de banda: ~95% após primeira visita
 
-### 14.2 Cache do Proxy (Render)
+### 15.2 Cache do Proxy (Render)
 
 **Atualmente:** Sem cache — todas as requisições passam pelo Cloudflare.
 
@@ -897,7 +1305,7 @@ app.get('/api/catalogo/imagem/*', (req, res, next) => {
 });
 ```
 
-### 14.3 Lazy Loading de Imagens (Frontend)
+### 15.3 Lazy Loading de Imagens (Frontend)
 
 **Implementação recomendada:**
 
@@ -928,7 +1336,7 @@ useEffect(() => {
 }, []);
 ```
 
-### 14.4 Compressão Gzip (Render)
+### 15.4 Compressão Gzip (Render)
 
 **Habilitado automaticamente no Render** para respostas JSON.
 
@@ -936,7 +1344,7 @@ useEffect(() => {
 
 ---
 
-## 15. TROUBLESHOOTING
+## 16. TROUBLESHOOTING
 
 ### Proxy retorna 502 Bad Gateway
 **Causa:** Backend local ou Cloudflare Tunnel estão offline.
@@ -989,9 +1397,9 @@ node otimizar_thumbnails.js
 
 ---
 
-## 16. VARIÁVEIS DE AMBIENTE
+## 17. VARIÁVEIS DE AMBIENTE
 
-### 16.1 Backend Tauri (`.env` local)
+### 17.1 Backend Tauri (`.env` local)
 
 ```env
 # Porta do servidor HTTP
@@ -1008,7 +1416,7 @@ DB_NAME=luna_cosmeticos
 CATALOGOS_PATH=F:\luna_cosmeticos\catalogos
 ```
 
-### 16.2 Frontend Proxy (Render.com)
+### 17.2 Frontend Proxy (Render.com)
 
 **Configurar em:** Dashboard → Service → Environment
 
@@ -1018,23 +1426,40 @@ NODE_ENV=production
 PORT=3000  # Fornecido automaticamente pelo Render
 ```
 
-### 16.3 Scripts (Node.js local)
+### 17.3 Frontend Catálogo (Render.com)
+
+**Configurar em:** Dashboard → luna-catalogo → Environment
+
+```env
+VITE_API_BASE_URL=https://shield-required-enjoy-trained.trycloudflare.com
+NODE_ENV=production
+PORT=3000  # Fornecido automaticamente pelo Render
+```
+
+### 17.4 Scripts (Node.js local)
 
 Nenhuma variável de ambiente necessária — caminhos hardcoded nos scripts.
 
 ---
 
-## 17. ARQUIVOS ESSENCIAIS
+## 18. ARQUIVOS ESSENCIAIS
 
 | Arquivo | Função |
 |---|---|
-| `frontend/disparo/server.js` | Proxy Express.js no Render |
-| `frontend/disparo/package.json` | Dependências do proxy |
+| `frontend/disparo/server.js` | Proxy Express.js no Render (disparo) |
+| `frontend/disparo/package.json` | Dependências do proxy (disparo) |
+| `frontend/catalogo/server.js` | Proxy Express.js no Render (catálogo) |
+| `frontend/catalogo/package.json` | Dependências do catálogo |
+| `frontend/catalogo/src/App.tsx` | Componente raiz do catálogo |
+| `frontend/catalogo/src/components/BrandsIntro.tsx` | Tela de seleção de marcas |
+| `frontend/catalogo/src/components/CatalogViewport.tsx` | Tela de catálogo (tabs) |
+| `frontend/catalogo/src/components/ProductCard.tsx` | Card de produto/kit com carrossel |
 | `backend/src-tauri/src/main.rs` | Entry point Rust |
 | `backend/src-tauri/src/routes.rs` | Definição de rotas HTTP |
 | `backend/src-tauri/Cargo.toml` | Dependências Rust |
 | `scripts/otimizar_thumbnails.js` | Script de otimização de imagens |
 | `catalogos/Alphahall/*/info.json` | Metadados de cada kit (41 arquivos) |
+| `render.yaml` | Configuração IaC para deploy no Render |
 | `.gitignore` | Ignora node_modules, .env, etc. |
 | `documentacao/README.md` | Visão geral do sistema |
 | `documentacao/CHECKPOINTS.md` | Histórico de versões estáveis |
@@ -1043,7 +1468,61 @@ Nenhuma variável de ambiente necessária — caminhos hardcoded nos scripts.
 
 ---
 
-## 18. CHANGELOG
+## 19. CHANGELOG
+
+### 08/09/2026 — v11-frontend-catalogo
+
+#### Novo Frontend de Catálogo Web
+
+**Aplicação:** Site estático React hospedado no Render.com
+
+**Estrutura criada:**
+- `frontend/catalogo/` — Nova pasta completa
+- `render.yaml` — Configuração IaC para deploy automático
+
+**Componentes implementados:**
+- `BrandsIntro.tsx` — Tela de seleção de marcas (grid 1→2→3 colunas)
+- `CatalogViewport.tsx` — Tela de catálogo com tabs Kits/Produtos
+- `ProductCard.tsx` — Card com thumbnail + carrossel navegável
+
+**API Client:**
+- `fetchMarcas()` — Lista marcas disponíveis
+- `fetchKits(marca)` — Lista kits de uma marca
+- `fetchProdutos(marca)` — Lista produtos individuais
+- `getImageUrl()` — Constrói URLs de imagens
+
+**Design System:**
+- Copiado do catalogo-capilar (design premium)
+- Cores oklch (rose-metal, deep-blue)
+- Animações (metal-shift, float-slow, sheen, reveal)
+- Utilities Tailwind (text-metal, surface-glass, rose-line)
+
+**Server.js Proxy:**
+- Serve `dist/` estático
+- Proxy `/api/*` → Backend Cloudflare Tunnel
+- Suporta JSON e imagens (binary)
+- SPA fallback (todas rotas → index.html)
+
+**Deploy:**
+- Render.com free tier (Oregon)
+- Build: `npm install && npm run build`
+- Start: `npm start`
+- Auto-deploy via push no GitHub
+
+**Build testado:**
+- ✓ 35 modules transformados
+- ✓ dist/ gerado com sucesso
+- ✓ Tailwind config estendido com cores customizadas
+- ✓ Dependências instaladas (clsx, tailwind-merge)
+
+**Limitações conhecidas:**
+- Rotas `/api/catalogo/marcas` e `/api/catalogo/produtos/:marca` ainda não existem no backend
+- Requerem implementação no Tauri/Rust
+
+**Próximos passos:**
+- Implementar rotas faltantes no backend
+- Testar integração end-to-end
+- Deploy em produção
 
 ### 25/08/2026 — v10-thumb-carrossel
 

@@ -1,0 +1,18 @@
+services:
+  # Luna Catálogo — Frontend Web Service
+  - type: web
+    name: luna-catalogo
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    rootDir: frontend/catalogo
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://shield-required-enjoy-trained.trycloudflare.com
+      - key: NODE_ENV
+        value: production
+    autoDeploy: true
+    healthCheckPath: /
