@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const fetch   = require('node-fetch');
 const path    = require('path');
+const FormData = require('form-data');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -11,7 +12,13 @@ const PORT = process.env.PORT || 3000;
 // Variável de ambiente: VITE_API_BASE_URL (configurada no Render.com)
 const LUNA_API = process.env.VITE_API_BASE_URL || process.env.LUNA_API_URL || 'https://hundred-typical-physically-alpine.trycloudflare.com';
 
-app.use(express.json());
+// Middleware para JSON (exceto rotas de upload)
+app.use((req, res, next) => {
+  if (req.path.includes('/upload-') || req.headers['content-type']?.includes('multipart/form-data')) {
+    return next(); // Skip JSON parser for uploads
+  }
+  express.json()(req, res, next);
+});
 
 // CORS headers para permitir requests do browser
 app.use((req, res, next) => {
@@ -74,18 +81,31 @@ app.get('/health-check', async (req, res) => {
 
 app.all('/api/*', async (req, res) => {
   const destino = `${LUNA_API}${req.originalUrl}`;
+  
   try {
     const opcoes = {
       method: req.method,
       headers: {
-        'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true',
       },
       timeout: 30000, // 30s para imagens grandes
     };
-    if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
-      opcoes.body = JSON.stringify(req.body);
+    
+    // Detecta se é upload multipart/form-data
+    const isMultipart = req.headers['content-type']?.includes('multipart/form-data');
+    
+    if (isMultipart) {
+      // Para uploads, precisamos repassar o stream do body
+      opcoes.body = req;
+      opcoes.headers['Content-Type'] = req.headers['content-type'];
+    } else {
+      // Para JSON normal
+      opcoes.headers['Content-Type'] = 'application/json';
+      if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
+        opcoes.body = JSON.stringify(req.body);
+      }
     }
+    
     const resposta = await fetch(destino, opcoes);
 
     // Repassa Content-Type da resposta

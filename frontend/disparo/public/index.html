@@ -1185,6 +1185,24 @@
         <span id="file-name-thumb" style="font-size:11px;color:var(--text2);margin-top:.25rem"></span>
       </div>
 
+      <div class="form-group">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+          <label class="form-label" style="margin:0">🖼️ Imagens do Carrossel</label>
+          <input
+            type="file"
+            id="modal-kit-file-carrossel"
+            class="form-file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            onchange="handleCarrosselSelect(this)"
+            multiple
+          />
+          <button class="btn btn-secondary" onclick="document.getElementById('modal-kit-file-carrossel').click()" style="padding:.35rem .65rem;font-size:12px">
+            ➕ Adicionar Imagens
+          </button>
+        </div>
+        <div id="carrossel-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem"></div>
+      </div>
+
     </div>
 
     <!-- Footer -->
@@ -1503,9 +1521,10 @@
             class="form-file"
             accept="image/jpeg,image/jpg,image/png,image/webp"
             onchange="handleProdutoCarrosselSelect(this)"
+            multiple
           />
           <button class="btn btn-secondary" onclick="document.getElementById('modal-produto-file-carrossel').click()" style="padding:.35rem .65rem;font-size:12px">
-            ➕ Adicionar Imagem
+            ➕ Adicionar Imagens
           </button>
         </div>
         <div id="produto-carrossel-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:.5rem"></div>
@@ -2770,7 +2789,7 @@ setInterval(tick, 4000); // atualiza a cada 4s
 let kitsData = [];
 let kitAtual = null;
 let arquivoThumb = null;
-let arquivoCarrossel = null;
+let arquivosCarrossel = []; // Array para múltiplas imagens
 const MARCA_PADRAO = 'Alphahall'; // Marca padrão por enquanto
 
 // Estados de edição inline (Kits)
@@ -2781,6 +2800,7 @@ let precoOriginal = '';
 let produtosData = [];
 let produtoAtual = null;
 let arquivoProdutoThumb = null;
+let arquivosProdutoCarrossel = []; // Array para múltiplas imagens
 
 // Estados de edição inline (Produtos)
 let camposOriginais = {
@@ -2920,7 +2940,7 @@ function abrirModalKit(nomeKit, marca) {
     console.log('[DEBUG] Inicializando modal...');
     console.log('[DEBUG] 1. Limpando variáveis...');
     arquivoThumb = null;
-    arquivoCarrossel = null;
+    arquivosCarrossel = [];
     
     console.log('[DEBUG] 2. Acessando file-name-thumb...');
     document.getElementById('file-name-thumb').textContent = '';
@@ -2963,7 +2983,11 @@ function abrirModalKit(nomeKit, marca) {
     const componentes = kitAtual.componentes || [];
     renderComponentesKit(componentes);
     
-    console.log('[DEBUG] 12. Mostrando modal...');
+    console.log('[DEBUG] 12. Renderizando carrossel...');
+    const imagensCarrossel = kitAtual.imagens_carrossel || [];
+    renderCarrossel(imagensCarrossel);
+    
+    console.log('[DEBUG] 13. Mostrando modal...');
     document.getElementById('modal-kit').style.display = 'flex';
     console.log('[DEBUG] ✓ Modal ABERTO com sucesso!');
   } catch (error) {
@@ -3232,66 +3256,72 @@ function handleThumbSelect(input) {
 }
 
 function handleCarrosselSelect(input) {
-  const file = input.files?.[0];
-  if (!file) {
-    arquivoCarrossel = null;
+  const files = Array.from(input.files || []);
+  if (files.length === 0) {
+    arquivosCarrossel = [];
     return;
   }
 
-  // Validação de tipo
+  // Validação de tipo e tamanho
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-  if (!validTypes.includes(file.type)) {
-    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
-    input.value = '';
-    arquivoCarrossel = null;
-    return;
-  }
-
-  // Validação de tamanho (5MB)
   const maxSize = 5 * 1024 * 1024;
-  if (file.size > maxSize) {
-    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
+  
+  const arquivosValidos = [];
+  for (const file of files) {
+    if (!validTypes.includes(file.type)) {
+      alert(`⚠️ Arquivo "${file.name}" tem formato inválido. Use apenas: JPG, PNG ou WebP`);
+      continue;
+    }
+    if (file.size > maxSize) {
+      alert(`⚠️ Arquivo "${file.name}" é muito grande. Tamanho máximo: 5MB`);
+      continue;
+    }
+    arquivosValidos.push(file);
+  }
+
+  if (arquivosValidos.length === 0) {
     input.value = '';
-    arquivoCarrossel = null;
     return;
   }
 
-  arquivoCarrossel = file;
+  arquivosCarrossel = arquivosValidos;
   // Upload automático após seleção
   uploadCarrossel();
 }
 
 async function uploadCarrossel() {
-  if (!arquivoCarrossel || !kitAtual) return;
+  if (!arquivosCarrossel || arquivosCarrossel.length === 0 || !kitAtual) return;
 
-  const formData = new FormData();
-  formData.append('imagem', arquivoCarrossel);
+  for (const arquivo of arquivosCarrossel) {
+    const formData = new FormData();
+    formData.append('imagem', arquivo);
 
-  try {
-    const res = await fetch(`/api/catalogo/upload-carrossel/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}`, {
-      method: 'POST',
-      body: formData
-    });
+    try {
+      const res = await fetch(`/api/catalogo/upload-carrossel/${encodeURIComponent(kitAtual.marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+        method: 'POST',
+        body: formData
+      });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
+      }
+
+      showToast(`✔️ ${arquivo.name} adicionada`, 'success');
+    } catch (err) {
+      console.error(`Erro ao upload ${arquivo.name}:`, err);
+      alert(`❌ Erro ao adicionar ${arquivo.name}: ` + err.message);
     }
-
-    // Recarrega dados do kit
-    await carregarCatalogo();
-    kitAtual = kitsData.find(k => k.nome === kitAtual.nome);
-    renderCarrossel(kitAtual.imagens_carrossel || []);
-    
-    // Limpa input
-    document.getElementById('modal-kit-file-carrossel').value = '';
-    arquivoCarrossel = null;
-
-    showToast('✔️ Imagem adicionada ao carrossel', 'success');
-  } catch (err) {
-    console.error('Erro ao upload carrossel:', err);
-    alert('❌ Erro ao adicionar imagem: ' + err.message);
   }
+
+  // Recarrega dados do kit após todos os uploads
+  await carregarCatalogo();
+  kitAtual = kitsData.find(k => k.nome === kitAtual.nome);
+  renderCarrossel(kitAtual.imagens_carrossel || []);
+  
+  // Limpa input
+  document.getElementById('modal-kit-file-carrossel').value = '';
+  arquivosCarrossel = [];
 }
 
 async function deletarImagemCarrossel(arquivo) {
@@ -4009,8 +4039,6 @@ function initLazyLoad() {
 
 // ━━ Funções de Produtos - Salvar e Carrossel ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-let arquivoProdutoCarrossel = null;
-
 async function salvarProduto() {
   if (!produtoAtual) return;
 
@@ -4058,67 +4086,73 @@ async function salvarProduto() {
 }
 
 function handleProdutoCarrosselSelect(input) {
-  const file = input.files?.[0];
-  if (!file) {
-    arquivoProdutoCarrossel = null;
+  const files = Array.from(input.files || []);
+  if (files.length === 0) {
+    arquivosProdutoCarrossel = [];
     return;
   }
 
-  // Validação de tipo
+  // Validação de tipo e tamanho
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-  if (!validTypes.includes(file.type)) {
-    alert('⚠️ Formato inválido. Use apenas: JPG, PNG ou WebP');
-    input.value = '';
-    arquivoProdutoCarrossel = null;
-    return;
-  }
-
-  // Validação de tamanho (5MB)
   const maxSize = 5 * 1024 * 1024;
-  if (file.size > maxSize) {
-    alert('⚠️ Arquivo muito grande. Tamanho máximo: 5MB');
+  
+  const arquivosValidos = [];
+  for (const file of files) {
+    if (!validTypes.includes(file.type)) {
+      alert(`⚠️ Arquivo "${file.name}" tem formato inválido. Use apenas: JPG, PNG ou WebP`);
+      continue;
+    }
+    if (file.size > maxSize) {
+      alert(`⚠️ Arquivo "${file.name}" é muito grande. Tamanho máximo: 5MB`);
+      continue;
+    }
+    arquivosValidos.push(file);
+  }
+
+  if (arquivosValidos.length === 0) {
     input.value = '';
-    arquivoProdutoCarrossel = null;
     return;
   }
 
-  arquivoProdutoCarrossel = file;
+  arquivosProdutoCarrossel = arquivosValidos;
   // Upload automático após seleção
   uploadProdutoCarrossel();
 }
 
 async function uploadProdutoCarrossel() {
-  if (!arquivoProdutoCarrossel || !produtoAtual) return;
+  if (!arquivosProdutoCarrossel || arquivosProdutoCarrossel.length === 0 || !produtoAtual) return;
 
-  const formData = new FormData();
-  formData.append('imagem', arquivoProdutoCarrossel);
+  for (const arquivo of arquivosProdutoCarrossel) {
+    const formData = new FormData();
+    formData.append('imagem', arquivo);
 
-  try {
-    const marca = produtoAtual.marca || 'Alphahall';
-    const res = await fetch(`/api/catalogo/upload-carrossel/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}?tipo=produto`, {
-      method: 'POST',
-      body: formData
-    });
+    try {
+      const marca = produtoAtual.marca || 'Alphahall';
+      const res = await fetch(`/api/catalogo/upload-carrossel/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}?tipo=produto`, {
+        method: 'POST',
+        body: formData
+      });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err);
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
+      }
+
+      showToast(`✔️ ${arquivo.name} adicionada`, 'success');
+    } catch (err) {
+      console.error(`Erro ao upload ${arquivo.name}:`, err);
+      alert(`❌ Erro ao adicionar ${arquivo.name}: ` + err.message);
     }
-
-    // Recarrega dados do produto
-    await carregarProdutos();
-    produtoAtual = produtosData.find(p => p.nome === produtoAtual.nome);
-    renderProdutoCarrossel(produtoAtual.imagens_carrossel || []);
-    
-    // Limpa input
-    document.getElementById('modal-produto-file-carrossel').value = '';
-    arquivoProdutoCarrossel = null;
-
-    showToast('✔️ Imagem adicionada ao carrossel', 'success');
-  } catch (err) {
-    console.error('Erro ao upload carrossel:', err);
-    alert('❌ Erro ao adicionar imagem: ' + err.message);
   }
+
+  // Recarrega dados do produto após todos os uploads
+  await carregarProdutos();
+  produtoAtual = produtosData.find(p => p.nome === produtoAtual.nome);
+  renderProdutoCarrossel(produtoAtual.imagens_carrossel || []);
+  
+  // Limpa input
+  document.getElementById('modal-produto-file-carrossel').value = '';
+  arquivosProdutoCarrossel = [];
 }
 
 function renderProdutoCarrossel(imagens) {
