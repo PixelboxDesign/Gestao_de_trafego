@@ -128,6 +128,7 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         // Rotas de catálogo (v1 - arquivos)
         .route("/api/catalogo/marcas", get(catalogo::listar_marcas))
         .route("/api/catalogo/kits/:marca", get(catalogo::listar_kits))
+        .route("/api/catalogo/produtos/:marca", get(catalogo::listar_produtos))
         .route("/api/catalogo/imagem/:marca/:kit/:nome", get(catalogo::servir_imagem))
         .route("/api/catalogo/salvar", axum::routing::post(catalogo::salvar_info))
         .route("/api/catalogo/upload-thumb/:marca/:kit", axum::routing::post(catalogo::upload_thumb))
@@ -164,7 +165,7 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .layer(cors)
         .with_state(state);
     
-    info!("✅ [HTTP] {} rotas registradas", 33);
+    info!("✅ [HTTP] {} rotas registradas", 34);
 
     info!("🔌 [HTTP] Vinculando à porta...");
     let (listener, port) = bind_available_port(3001).await;

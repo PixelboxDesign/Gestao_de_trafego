@@ -167,14 +167,15 @@ pub async fn listar_kits(
 ) -> Json<Vec<Kit>> {
     let base = catalogo_path();
     let marca_path = base.join(&marca_nome);
+    let kits_path = marca_path.join("kits"); // ← SUBPASTA KITS
     let mut kits = Vec::new();
 
-    // Valida que a marca existe
-    if !marca_path.exists() {
+    // Valida que a pasta kits existe
+    if !kits_path.exists() {
         return Json(kits);
     }
 
-    if let Ok(mut entries) = fs::read_dir(&marca_path).await {
+    if let Ok(mut entries) = fs::read_dir(&kits_path).await {
         while let Ok(Some(entry)) = entries.next_entry().await {
             if let Ok(meta) = entry.metadata().await {
                 if !meta.is_dir() {
@@ -183,7 +184,7 @@ pub async fn listar_kits(
             }
 
             let nome = entry.file_name().to_string_lossy().to_string();
-            let kit_path = marca_path.join(&nome);
+            let kit_path = kits_path.join(&nome);
 
             let thumb_arquivo = encontrar_thumb(&kit_path).await;
             let thumb_ext = thumb_arquivo.clone().and_then(|f| {
@@ -208,6 +209,57 @@ pub async fn listar_kits(
 
     kits.sort_by(|a, b| a.nome.cmp(&b.nome));
     Json(kits)
+}
+
+/// GET /api/catalogo/produtos/:marca — lista produtos individuais de uma marca específica
+pub async fn listar_produtos(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Path(marca_nome): Path<String>,
+) -> Json<Vec<Kit>> {
+    let base = catalogo_path();
+    let marca_path = base.join(&marca_nome);
+    let produtos_path = marca_path.join("produtos"); // ← SUBPASTA PRODUTOS
+    let mut produtos = Vec::new();
+
+    // Valida que a pasta produtos existe
+    if !produtos_path.exists() {
+        return Json(produtos);
+    }
+
+    if let Ok(mut entries) = fs::read_dir(&produtos_path).await {
+        while let Ok(Some(entry)) = entries.next_entry().await {
+            if let Ok(meta) = entry.metadata().await {
+                if !meta.is_dir() {
+                    continue;
+                }
+            }
+
+            let nome = entry.file_name().to_string_lossy().to_string();
+            let produto_path = produtos_path.join(&nome);
+
+            let thumb_arquivo = encontrar_thumb(&produto_path).await;
+            let thumb_ext = thumb_arquivo.clone().and_then(|f| {
+                std::path::Path::new(&f)
+                    .extension()
+                    .map(|e| e.to_string_lossy().to_string())
+            });
+
+            let imagens_carrossel = listar_imagens_carrossel(&produto_path).await;
+            let info = ler_info(&produto_path).await;
+
+            produtos.push(Kit {
+                nome,
+                marca: marca_nome.clone(),
+                tem_thumb: thumb_arquivo.is_some(),
+                thumb_ext,
+                imagens_carrossel,
+                info,
+            });
+        }
+    }
+
+    produtos.sort_by(|a, b| a.nome.cmp(&b.nome));
+    Json(produtos)
 }
 
 /// GET /api/catalogo/imagem/:marca/:kit/:nome?tipo=produto — serve imagem específica do kit/produto

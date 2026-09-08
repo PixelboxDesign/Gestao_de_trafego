@@ -57,5 +57,7 @@ export async function fetchProdutos(marca: string): Promise<Produto[]> {
  * Retorna URL completa para uma imagem do catálogo
  */
 export function getImageUrl(marca: string, tipo: 'kits' | 'produtos', produtoSlug: string, filename: string): string {
-  return `${API_BASE}/catalogos/${encodeURIComponent(marca)}/${tipo}/${encodeURIComponent(produtoSlug)}/${encodeURIComponent(filename)}`;
+  // Adiciona query parameter ?tipo=produto ou ?tipo=kit
+  const tipoParam = tipo === 'produtos' ? 'produto' : 'kit';
+  return `${API_BASE}/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(produtoSlug)}/${encodeURIComponent(filename)}?tipo=${tipoParam}`;
 }
