@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "identifier": "com.luna.server",
   "build": {
-    "devUrl": "http://localhost:3001",
-    "beforeDevCommand": "",
-    "beforeBuildCommand": ""
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
   },
   "app": {
     "windows": [

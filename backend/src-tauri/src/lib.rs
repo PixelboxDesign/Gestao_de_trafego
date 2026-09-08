@@ -27,8 +27,8 @@ fn spawn_oculto(programa: &str, args: &[&str], envs: &[(&str, &str)]) -> Option<
     }
     cmd.creation_flags(CREATE_NO_WINDOW);
     cmd.stdin(std::process::Stdio::null());
-    cmd.stdout(std::process::Stdio::piped());
-    cmd.stderr(std::process::Stdio::piped());
+    cmd.stdout(std::process::Stdio::null());
+    cmd.stderr(std::process::Stdio::null());
 
     match cmd.spawn() {
         Ok(child) => {
@@ -63,8 +63,20 @@ pub fn iniciar_cloudflare_tunnel(app_handle: tauri::AppHandle) {
     
     std::thread::sleep(std::time::Duration::from_millis(1000)); // Aguarda 1s
     
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x08000000;
+    
+    let mut cmd = std::process::Command::new("cloudflared");
+    cmd.args(&["tunnel", "--url", "http://localhost:3001"]);
+    cmd.creation_flags(CREATE_NO_WINDOW);
+    cmd.stdin(std::process::Stdio::null());
+    cmd.stdout(std::process::Stdio::piped()); // Precisa ler stdout para capturar URL
+    cmd.stderr(std::process::Stdio::piped()); // Precisa ler stderr para capturar URL
+    
     // Quick Tunnel: URL temporária, sem configuração, inicia instantaneamente
-    if let Some(mut child) = spawn_oculto("cloudflared", &["tunnel", "--url", "http://localhost:3001"], &[]) {
+    if let Ok(mut child) = cmd.spawn() {
+        info!("✅ Cloudflared iniciado (PID: {:?})", child.id());
+        
         // Spawna thread para ler stdout E stderr
         if let Some(stdout) = child.stdout.take() {
             let app_handle_stdout = app_handle.clone();
@@ -134,6 +146,8 @@ pub fn iniciar_cloudflare_tunnel(app_handle: tauri::AppHandle) {
                 }
             });
         }
+    } else {
+        tracing::warn!("⚠️ Falha ao iniciar Cloudflare Tunnel");
     }
 }
 

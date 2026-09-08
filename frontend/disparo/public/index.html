@@ -1618,8 +1618,21 @@ function salvarConfigDisparo() {
     } : null,
     dataHoraSalvo: new Date().toISOString()
   };
-  localStorage.setItem('luna_disparo_config', JSON.stringify(config));
-  console.log('[Disparo] Configuração salva:', config);
+  
+  try {
+    localStorage.setItem('luna_disparo_config', JSON.stringify(config));
+    console.log('[Disparo] ✓ Configuração salva no localStorage:', config);
+    
+    // Verifica se salvou mesmo
+    const verificacao = localStorage.getItem('luna_disparo_config');
+    if (verificacao) {
+      console.log('[Disparo] ✓ Verificação: localStorage persistiu corretamente');
+    } else {
+      console.error('[Disparo] ✗ ERRO: localStorage NÃO persistiu!');
+    }
+  } catch (err) {
+    console.error('[Disparo] ✗ Erro ao salvar no localStorage:', err);
+  }
 }
 
 function salvarConfigDisparoManual() {
@@ -1716,10 +1729,18 @@ function salvarConfigDisparoManual() {
 
 async function carregarConfigDisparo() {
   try {
-    console.log('[Disparo] Carregando configuração...');
+    console.log('[Disparo] ════════════════════════════════════════');
+    console.log('[Disparo] 📥 INICIANDO CARREGAMENTO DE CONFIGURAÇÃO');
+    console.log('[Disparo] Estado atual:');
+    console.log('[Disparo]   - itensDisponiveis.length:', itensDisponiveis.length);
+    console.log('[Disparo]   - itemSelecionado:', itemSelecionado);
+    console.log('[Disparo]   - document.readyState:', document.readyState);
+    console.log('[Disparo] ════════════════════════════════════════');
     
     // Primeiro tenta localStorage (mais rápido e sempre funciona)
     const saved = localStorage.getItem('luna_disparo_config');
+    console.log('[Disparo] localStorage raw:', saved ? saved.substring(0, 100) + '...' : 'null');
+    
     if (saved) {
       const config = JSON.parse(saved);
       console.log('[Disparo] ✓ Configuração carregada do localStorage:', config);
@@ -1754,13 +1775,25 @@ async function carregarConfigDisparo() {
         }
       }
       
-      // Restaura item selecionado
-      if (config.itemSelecionado) {
-        itemSelecionado = config.itemSelecionado;
+      // Restaura item selecionado BUSCANDO no array de itens disponíveis
+      if (config.itemSelecionado && config.itemSelecionado.id) {
+        // Busca o item completo no array atualizado
+        const itemEncontrado = itensDisponiveis.find(i => 
+          i.id === config.itemSelecionado.id && i.tipo === config.itemSelecionado.tipo
+        );
+        
+        if (itemEncontrado) {
+          itemSelecionado = itemEncontrado;
+          console.log('[Disparo] → Item encontrado e restaurado:', itemSelecionado);
+        } else {
+          // Se não encontrar, usa o objeto salvo mesmo
+          itemSelecionado = config.itemSelecionado;
+          console.log('[Disparo] ⚠ Item não encontrado no array, usando objeto salvo:', itemSelecionado);
+        }
+        
         const buscaInput = document.getElementById('disparo-busca-item');
         if (buscaInput) buscaInput.value = itemSelecionado.nome;
         mostrarItemSelecionado();
-        console.log('[Disparo] → Item selecionado restaurado:', itemSelecionado);
       }
       
       // Atualiza cálculo e botão
@@ -1906,19 +1939,21 @@ async function carregarItensDisparo() {
     itensDisponiveis = data || [];
     console.log(`[Disparo] ✓ ${itensDisponiveis.length} itens carregados`);
     
-    // Após carregar itens, tenta carregar configuração salva
-    setTimeout(() => {
-      console.log('[Disparo] Itens carregados, tentando carregar configuração...');
-      carregarConfigDisparo().then(loaded => {
-        if (loaded) {
-          console.log('[Disparo] ✓ Configuração restaurada com itens');
-        }
+    // AGUARDA DOM estar pronto antes de restaurar config
+    if (document.readyState === 'loading') {
+      console.log('[Disparo] ⏳ Aguardando DOM...');
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('[Disparo] ✓ DOM pronto, carregando configuração...');
+        carregarConfigDisparo();
       });
-    }, 300);
+    } else {
+      // DOM já está pronto, carrega imediatamente
+      console.log('[Disparo] ✓ DOM já pronto, carregando configuração...');
+      carregarConfigDisparo();
+    }
   } catch (err) {
     console.error('[Disparo] Erro ao carregar itens:', err);
-    // Mesmo se falhar, tenta carregar config (para campos sem item)
-    setTimeout(() => carregarConfigDisparo(), 300);
+    itensDisponiveis = [];
   }
 }
 
