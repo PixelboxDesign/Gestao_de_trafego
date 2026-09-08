@@ -24,6 +24,8 @@ app.use('/api', async (req, res) => {
   // Remove /api prefix from req.url since API_BASE_URL already points to the full backend
   const targetUrl = `${API_BASE_URL}/api${req.url}`;
   
+  console.log(`🔀 Proxying: ${req.method} ${req.url} → ${targetUrl}`);
+  
   try {
     const fetch = (await import('node-fetch')).default;
     const response = await fetch(targetUrl, {
@@ -33,6 +35,7 @@ app.use('/api', async (req, res) => {
         ...req.headers,
       },
       body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body) : undefined,
+      timeout: 30000, // 30 segundos de timeout
     });
 
     const contentType = response.headers.get('content-type');
@@ -53,6 +56,8 @@ app.use('/api', async (req, res) => {
     }
   } catch (error) {
     console.error(`[Proxy Error] ${req.method} ${req.url}:`, error.message);
+    console.error(`[Proxy Error] Target URL: ${targetUrl}`);
+    console.error(`[Proxy Error] Full error:`, error);
     res.status(502).json({ 
       error: 'Proxy Error', 
       message: error.message,
@@ -74,4 +79,7 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Luna Catálogo Server running on http://0.0.0.0:${PORT}`);
   console.log(`📡 Proxying API requests to: ${API_BASE_URL}`);
   console.log(`📂 Serving static files from: ${join(__dirname, 'dist')}`);
+  
+  // Log da variável de ambiente para debug
+  console.log(`🔍 VITE_API_BASE_URL = ${process.env.VITE_API_BASE_URL}`);
 });
