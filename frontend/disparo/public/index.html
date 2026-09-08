@@ -1630,6 +1630,18 @@ function salvarConfigDisparo() {
   };
   
   try {
+    // Testa se localStorage funciona
+    const testKey = '_test_ls_' + Date.now();
+    try {
+      localStorage.setItem(testKey, 'test');
+      localStorage.removeItem(testKey);
+      console.log('[Disparo] ✓ localStorage está funcional');
+    } catch (testErr) {
+      console.error('[Disparo] ✗ localStorage NÃO FUNCIONA:', testErr.message);
+      alert('⚠️ Erro: localStorage bloqueado!\n\nSeu navegador está bloqueando o armazenamento local.\n\nPossíveis causas:\n• Modo anônimo/privado ativado\n• Extensões bloqueando cookies\n• Configurações de privacidade muito restritivas');
+      return;
+    }
+    
     localStorage.setItem('luna_disparo_config', JSON.stringify(config));
     console.log('[Disparo] ✓ Configuração salva no localStorage:', config);
     
@@ -1637,11 +1649,18 @@ function salvarConfigDisparo() {
     const verificacao = localStorage.getItem('luna_disparo_config');
     if (verificacao) {
       console.log('[Disparo] ✓ Verificação: localStorage persistiu corretamente');
+      const parsed = JSON.parse(verificacao);
+      if (parsed.dataHoraSalvo === config.dataHoraSalvo) {
+        console.log('[Disparo] ✓ Timestamp match: dados estão corretos');
+      } else {
+        console.error('[Disparo] ✗ AVISO: Timestamp não bate!');
+      }
     } else {
       console.error('[Disparo] ✗ ERRO: localStorage NÃO persistiu!');
     }
   } catch (err) {
     console.error('[Disparo] ✗ Erro ao salvar no localStorage:', err);
+    alert('⚠️ Erro ao salvar configuração:\n\n' + err.message);
   }
 }
 
