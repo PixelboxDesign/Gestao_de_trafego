@@ -15,7 +15,7 @@
 
 | Versão | Data | Título | Commit original | Commit atual | Amends |
 |---|---|---|---|---|---|
-| [v18-whatsapp-disparo-persistencia](#checkpoint-v18-whatsapp-disparo-persistencia) | 08/09/2026 | 📱 Sistema Completo de Disparo WhatsApp (Site + Painel) | `PENDING` | `PENDING` | — |
+| [v18-whatsapp-disparo-persistencia](#checkpoint-v18-whatsapp-disparo-persistencia) | 08/09/2026 | 📱 Sistema Completo de Disparo WhatsApp (Site + Painel) | `5d7387b` | `5d7387b` | — |
 | [v17-render-deploy-fix-401](#checkpoint-v17-render-deploy-fix-401) | 02/09/2026 | 🔥 FIX CRÍTICO: Deploy Render 401 Unauthorized | `207fa7f` | `207fa7f` | — |
 | [v16-whatsapp-integrado](#checkpoint-v16-whatsapp-integrado) | 15/05/2026 | WhatsApp Totalmente Integrado (Sem Janelas CMD) | `1cef5fb` | `1cef5fb` | — |
 | [v15-whatsapp-auto-start](#checkpoint-v15-whatsapp-auto-start) | 15/05/2026 | WhatsApp Sidecar Auto-Start + Sessão Persistente | `3344f15` | `3344f15` | — |
@@ -33,7 +33,7 @@
 
 **Título:** Sistema Completo de Disparo WhatsApp com Persistência (Static Site + Painel Desktop)
 
-**Data:** 08/09/2026 | **Commits:** `PENDING` | **Status:** ✅ ESTÁVEL | **Prioridade:** 🟢 FUNCIONAL
+**Data:** 08/09/2026 | **Commits:** `5d7387b` | **Status:** ✅ ESTÁVEL | **Prioridade:** 🟢 FUNCIONAL
 
 ### 🎯 RESUMO EXECUTIVO
 
@@ -1144,7 +1144,7 @@ Closes: #XXX (se houver issue)
 - ⏳ Agendamento de disparos (data/hora futura)
 - ⏳ Relatórios e estatísticas
 
-**Rollback:** Commit `PENDING` (será preenchido após git commit)
+**Rollback:** Commit `5d7387b`
 
 ---
 
