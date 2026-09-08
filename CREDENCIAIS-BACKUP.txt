@@ -1,0 +1,17 @@
+# BACKUP DE CREDENCIAIS - frontend/catalogos/.env
+# Salvo em: 08/09/2026
+# Origem: f:\luna_cosmeticos\frontend\catalogos\.env (REMOVIDO)
+
+# URL do backend Luna Server (via Tailscale)
+LUNA_API_URL=https://saying-gardening-optimize-rotation.trycloudflare.com
+
+# Banco de dados
+DB_HOST=100.78.156.3
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=1728f1br
+DB_NAME=luna_cosmeticos
+
+# Nota: Estas credenciais estavam na pasta frontend/catalogos que foi removida
+# pois o site estava "em construção" e não tinha funcionalidade real.
+# O site principal é frontend/disparo (luna-disparo.onrender.com)
