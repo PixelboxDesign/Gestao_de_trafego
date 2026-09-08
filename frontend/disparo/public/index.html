@@ -11,11 +11,21 @@
   <meta http-equiv="Expires" content="0">
   <script>
     // Force reload se estiver com versão antiga no cache
-    const CURRENT_VERSION = 30;
+    const CURRENT_VERSION = 31;
     const stored = localStorage.getItem('luna_version');
+    const isReloading = sessionStorage.getItem('luna_reloading');
+    
     if (!stored || parseInt(stored) < CURRENT_VERSION) {
       localStorage.setItem('luna_version', CURRENT_VERSION);
-      if (stored) location.replace(location.href + '?v=' + Date.now());
+      
+      // Só recarrega UMA VEZ por sessão
+      if (stored && !isReloading) {
+        sessionStorage.setItem('luna_reloading', '1');
+        location.replace(location.href + '?v=' + Date.now());
+      }
+    } else {
+      // Limpa flag de reload se versão está OK
+      sessionStorage.removeItem('luna_reloading');
     }
   </script>
   <style>
@@ -1739,7 +1749,9 @@ async function carregarConfigDisparo() {
     
     // Primeiro tenta localStorage (mais rápido e sempre funciona)
     const saved = localStorage.getItem('luna_disparo_config');
-    console.log('[Disparo] localStorage raw:', saved ? saved.substring(0, 100) + '...' : 'null');
+    console.log('[Disparo] 🔍 localStorage raw:', saved ? saved.substring(0, 150) + '...' : '❌ NULL');
+    console.log('[Disparo] 🔍 localStorage COMPLETO:', saved);
+    console.log('[Disparo] 🔍 Todas as chaves no localStorage:', Object.keys(localStorage));
     
     if (saved) {
       const config = JSON.parse(saved);
