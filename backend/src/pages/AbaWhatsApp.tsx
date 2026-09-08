@@ -81,11 +81,86 @@ export default function AbaWhatsApp() {
     carregarItens();
   }, []);
 
+  // Carregar configuração salva da API ao abrir
+  useEffect(() => {
+    async function carregarConfig() {
+      try {
+        const res = await fetch(`${API}/api/disparos/config`);
+        const data = await res.json();
+        
+        if (data.ok && data.config) {
+          console.log("[Painel] Configuração carregada da API:", data.config);
+          
+          setConfig({
+            mensagem: data.config.mensagem || "",
+            itemSelecionado: data.config.item_id ? {
+              id: data.config.item_id,
+              nome: data.config.item_nome || "",
+              tipo: (data.config.item_tipo as "kit" | "produto") || "kit",
+              thumb_url: data.config.item_thumb_url || null
+            } : null,
+            quantidade: data.config.quantidade || 10,
+            intervaloHoras: data.config.intervalo_valor || 1,
+          });
+
+          if (data.config.item_nome) {
+            setBuscaItem(data.config.item_nome);
+          }
+        } else {
+          console.log("[Painel] Nenhuma configuração salva encontrada");
+        }
+      } catch (err) {
+        console.error("[Painel] Erro ao carregar configuração:", err);
+      }
+    }
+    
+    // Aguarda itens carregarem antes de carregar config
+    if (itensDisponiveis.length > 0) {
+      carregarConfig();
+    }
+  }, [itensDisponiveis]);
+
   async function desconectar() {
     setCarregando(true);
     try {
       await fetch(`${API}/api/whatsapp/desconectar`, { method: "POST" });
       await buscarStatus();
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  async function salvarConfig() {
+    if (!config.mensagem || !config.itemSelecionado) {
+      alert("Preencha a mensagem e selecione um kit/produto antes de salvar");
+      return;
+    }
+
+    setCarregando(true);
+    try {
+      const res = await fetch(`${API}/api/disparos/config`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mensagem: config.mensagem,
+          item_id: config.itemSelecionado.id,
+          item_tipo: config.itemSelecionado.tipo,
+          item_nome: config.itemSelecionado.nome,
+          item_thumb_url: config.itemSelecionado.thumb_url,
+          quantidade: config.quantidade,
+          intervalo_valor: config.intervaloHoras,
+          intervalo_unidade: "horas",
+        }),
+      });
+
+      if (res.ok) {
+        alert("✓ Configuração salva com sucesso!");
+      } else {
+        const erro = await res.text();
+        alert("Erro ao salvar: " + erro);
+      }
+    } catch (err: any) {
+      alert("Erro: " + err.message);
     } finally {
       setCarregando(false);
     }
@@ -450,22 +525,43 @@ export default function AbaWhatsApp() {
                 </div>
               )}
 
-              {/* Botão: Iniciar Disparo */}
-              <button
-                onClick={iniciarDisparo}
-                disabled={carregando || !config.mensagem || !config.itemSelecionado}
-                className="btn btn-primary"
-                style={{
-                  padding: "1rem",
-                  fontSize: 16,
-                  fontWeight: 700,
-                  borderRadius: 8,
-                  opacity: (carregando || !config.mensagem || !config.itemSelecionado) ? 0.5 : 1,
-                  cursor: (carregando || !config.mensagem || !config.itemSelecionado) ? "not-allowed" : "pointer"
-                }}
-              >
-                {carregando ? "Iniciando..." : "🚀 Iniciar Disparo"}
-              </button>
+              {/* Botões: Salvar Configurações e Iniciar Disparo */}
+              <div style={{ display: "flex", gap: "1rem" }}>
+                <button
+                  onClick={salvarConfig}
+                  disabled={carregando || !config.mensagem || !config.itemSelecionado}
+                  className="btn btn-success"
+                  style={{
+                    flex: 1,
+                    padding: "1rem",
+                    fontSize: 16,
+                    fontWeight: 700,
+                    borderRadius: 8,
+                    background: "var(--success)",
+                    opacity: (carregando || !config.mensagem || !config.itemSelecionado) ? 0.5 : 1,
+                    cursor: (carregando || !config.mensagem || !config.itemSelecionado) ? "not-allowed" : "pointer"
+                  }}
+                >
+                  {carregando ? "Salvando..." : "💾 Salvar Configurações"}
+                </button>
+
+                <button
+                  onClick={iniciarDisparo}
+                  disabled={carregando || !config.mensagem || !config.itemSelecionado}
+                  className="btn btn-primary"
+                  style={{
+                    flex: 1,
+                    padding: "1rem",
+                    fontSize: 16,
+                    fontWeight: 700,
+                    borderRadius: 8,
+                    opacity: (carregando || !config.mensagem || !config.itemSelecionado) ? 0.5 : 1,
+                    cursor: (carregando || !config.mensagem || !config.itemSelecionado) ? "not-allowed" : "pointer"
+                  }}
+                >
+                  {carregando ? "Iniciando..." : "🚀 Iniciar Disparo"}
+                </button>
+              </div>
             </div>
           )}
 
