@@ -2212,3 +2212,452 @@ Total de pastas criadas: 597
 
 ---
 
+
+
+---
+
+## 🚨 ERROS CRÍTICOS DOCUMENTADOS
+
+### ERRO #1: Persistência de localStorage vs Banco de Dados (09/09/2026)
+
+**Sintoma:**
+- Usuário preenche configuração de disparo no site `luna-disparo.onrender.com`
+- Clica em "Salvar Configurações" → Aparece "✓ Configuração salva no banco de dados"
+- Recarrega a página → **TODOS os campos voltam vazios**
+- Log do console mostra: `[Disparo] localStorage raw: null`
+
+**Contexto do erro:**
+- Site estático no Render.com (GitHub Pages)
+- Backend Luna Server rodando **localmente** (porta 3001)
+- API endpoint: `POST /api/disparos/config` e `GET /api/disparos/config`
+- Tentativa de salvar em 2 lugares: localStorage (navegador) + API (banco MySQL)
+
+**Causa raiz identificada:**
+
+#### 1. localStorage do navegador NÃO persiste entre reloads
+```javascript
+// TENTATIVA 1: Salvar no localStorage
+localStorage.setItem('luna_disparo_config', JSON.stringify(config));
+console.log('[Disparo] ✓ Configuração salva no localStorage:', config);
+
+// VERIFICAÇÃO IMEDIATA (funciona):
+const verificacao = localStorage.getItem('luna_disparo_config');
+console.log('[Disparo] ✓ Verificação: localStorage persistiu corretamente');
+
+// APÓS RECARREGAR A PÁGINA (falha):
+const saved = localStorage.getItem('luna_disparo_config');
+console.log('[Disparo] localStorage raw:', saved);  // ← RETORNA NULL!
+```
+
+**Por que localStorage falhava?**
+- Navegador em modo privado/anônimo (não persiste localStorage)
+- Extensões de privacidade bloqueando cookies/storage
+- Domínio Render.com com políticas restritivas de storage
+- **Motivo real:** O localStorage funcionava, MAS não era a solução certa!
+
+#### 2. API retornava `{"ok": true, "config": null}` — Tabela não existia
+
+```javascript
+// TENTATIVA 2: Buscar do banco via API
+const res = await fetch('/api/disparos/config');
+const data = await res.json();
+
+console.log('[Disparo] Resposta completa da API:', data);
+// Resultado: {"ok": true, "config": null}  ← Config é NULL!
+```
+
+**Por que API retornava null?**
+- ✅ POST funcionava: `{"ok": true}` (salvava no banco)
+- ❌ GET retornava null: Tabela `app_disparo_config` **NÃO EXISTIA** no banco
+
+**Verificação no banco local:**
+```powershell
+node -e "const mysql = require('mysql2/promise'); (async () => { 
+  const conn = await mysql.createConnection({ 
+    host: 'localhost', 
+    port: 3306, 
+    user: 'root', 
+    password: '1728f1br', 
+    database: 'luna_cosmeticos' 
+  }); 
+  const [rows] = await conn.execute('SELECT * FROM app_disparo_config'); 
+  console.log(rows);  // ← ERRO: Table doesn't exist
+})();"
+```
+
+#### 3. Backend Rust escondia o erro com `unwrap_or(None)`
+
+```rust
+// CÓDIGO PROBLEMÁTICO:
+let config: Option<ConfigDisparo> = sqlx::query_as(
+    r#"SELECT id, mensagem, item_id, ... FROM app_disparo_config LIMIT 1"#
+)
+.fetch_optional(&state_lock.db)
+.await
+.unwrap_or(None);  // ← ESCONDE ERROS! Se query falha, retorna None
+
+match config {
+    Some(cfg) => Json(serde_json::json!({ "ok": true, "config": cfg })),
+    None => Json(serde_json::json!({ "ok": true, "config": null })),  // ← Sempre cai aqui
+}
+```
+
+**Por que `unwrap_or(None)` é perigoso:**
+- Se tabela não existe → `sqlx` retorna `Err(...)`
+- `unwrap_or(None)` **transforma erro em None** silenciosamente
+- API retorna `{"ok": true, "config": null}` mesmo com erro
+- Usuário não sabe que tabela não existe!
+
+#### 4. Tipo DECIMAL incompatível com f64 no Rust
+
+**Erro oculto revelado após corrigir `unwrap_or`:**
+```
+error occurred while decoding column "intervalo_valor": 
+mismatched types; Rust type `f64` (as SQL type `DOUBLE`) 
+is not compatible with SQL type `DECIMAL`
+```
+
+**Causa:**
+```sql
+-- Tabela criada assim:
+CREATE TABLE app_disparo_config (
+  intervalo_valor DECIMAL(10,2) NOT NULL DEFAULT 1.00  ← DECIMAL
+);
+```
+
+```rust
+// Struct Rust espera:
+pub struct ConfigDisparo {
+    pub intervalo_valor: f64,  ← f64 (SQL type DOUBLE)
+}
+```
+
+**SQLx não faz conversão automática de DECIMAL → f64!**
+
+---
+
+### ✅ SOLUÇÕES IMPLEMENTADAS
+
+#### Solução 1: Criar tabela no banco local
+
+**Script:** `criar_tabela_disparo_config.js`
+```javascript
+const mysql = require('mysql2/promise');
+
+(async () => {
+  const conn = await mysql.createConnection({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: '1728f1br',
+    database: 'luna_cosmeticos'
+  });
+  
+  const createTableSQL = `
+CREATE TABLE IF NOT EXISTS app_disparo_config (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  mensagem TEXT NOT NULL,
+  item_id INT UNSIGNED NULL,
+  item_tipo VARCHAR(20) NULL COMMENT 'kit ou produto',
+  item_nome VARCHAR(255) NULL,
+  item_thumb_url TEXT NULL,
+  quantidade INT UNSIGNED NOT NULL DEFAULT 10,
+  intervalo_valor DOUBLE NOT NULL DEFAULT 1.0,  ← DOUBLE (não DECIMAL)
+  intervalo_unidade VARCHAR(20) NOT NULL DEFAULT 'horas',
+  criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `;
+  
+  await conn.execute(createTableSQL);
+  console.log('✅ Tabela criada com sucesso!');
+  await conn.end();
+})();
+```
+
+**Executado:**
+```powershell
+cd "f:\luna_cosmeticos"
+node criar_tabela_disparo_config.js
+# ✅ Tabela app_disparo_config criada com sucesso!
+```
+
+#### Solução 2: Corrigir backend para LOGAR erros
+
+**ANTES (escondia erros):**
+```rust
+let config: Option<ConfigDisparo> = sqlx::query_as(...)
+    .fetch_optional(&state_lock.db)
+    .await
+    .unwrap_or(None);  // ← Erro vira None
+
+match config {
+    Some(cfg) => Json(serde_json::json!({ "ok": true, "config": cfg })),
+    None => Json(serde_json::json!({ "ok": true, "config": null })),
+}
+```
+
+**DEPOIS (expõe erros):**
+```rust
+let result = sqlx::query_as::<_, ConfigDisparo>(...)
+    .fetch_optional(&state_lock.db)
+    .await;
+
+match result {
+    Ok(Some(cfg)) => Json(serde_json::json!({ "ok": true, "config": cfg })),
+    Ok(None) => Json(serde_json::json!({ "ok": true, "config": null })),
+    Err(e) => {
+        eprintln!("[ERRO] Falha ao carregar config do banco: {:?}", e);
+        Json(serde_json::json!({ 
+            "ok": false, 
+            "erro": e.to_string(),  // ← Erro visível na resposta!
+            "config": null 
+        }))
+    }
+}
+```
+
+**Resultado:**
+```json
+{
+  "config": null,
+  "erro": "error occurred while decoding column \"intervalo_valor\": mismatched types; Rust type `f64` (as SQL type `DOUBLE`) is not compatible with SQL type `DECIMAL`",
+  "ok": false
+}
+```
+
+Agora o erro era **visível** e podia ser diagnosticado!
+
+#### Solução 3: Alterar tipo da coluna de DECIMAL para DOUBLE
+
+**Comando executado:**
+```powershell
+node -e "const mysql = require('mysql2/promise'); (async () => { 
+  const conn = await mysql.createConnection({ 
+    host: 'localhost', 
+    port: 3306, 
+    user: 'root', 
+    password: '1728f1br', 
+    database: 'luna_cosmeticos' 
+  }); 
+  
+  console.log('Alterando tipo de DECIMAL para DOUBLE...');
+  await conn.execute('ALTER TABLE app_disparo_config MODIFY COLUMN intervalo_valor DOUBLE NOT NULL DEFAULT 1.0');
+  console.log('✅ Coluna alterada com sucesso!');
+  
+  await conn.end();
+})();"
+```
+
+**Resultado:**
+```
+Alterando tipo de DECIMAL para DOUBLE...
+✅ Coluna alterada com sucesso!
+```
+
+#### Solução 4: Teste final — GET agora funciona!
+
+**Teste executado:**
+```powershell
+node testar_disparo_config.js
+```
+
+**Resultado:**
+```json
+{
+  "config": {
+    "atualizado_em": "2026-09-08T16:06:11",
+    "criado_em": "2026-09-01T23:37:05",
+    "id": 1,
+    "intervalo_unidade": "horas",
+    "intervalo_valor": 1.5,  ← Agora funciona!
+    "item_id": 1,
+    "item_nome": "Kit Teste",
+    "item_thumb_url": null,
+    "item_tipo": "kit",
+    "mensagem": "Teste via script Node.js",
+    "quantidade": 10
+  },
+  "ok": true  ← Sucesso!
+}
+```
+
+#### Solução 5: Atualizar SQL de criação da tabela
+
+**Arquivo corrigido:** `DADOS/tables/app_disparo_config.sql`
+
+**ANTES:**
+```sql
+intervalo_valor DECIMAL(10,2) NOT NULL DEFAULT 1.00,  ← Causava erro
+```
+
+**DEPOIS:**
+```sql
+intervalo_valor DOUBLE NOT NULL DEFAULT 1.0 COMMENT 'Valor do intervalo (usar DOUBLE, não DECIMAL)',
+```
+
+---
+
+### 📚 LIÇÕES APRENDIDAS
+
+#### 1. **NUNCA use `unwrap_or(None)` em queries SQL**
+
+**❌ ERRADO:**
+```rust
+let result = sqlx::query_as(...)
+    .await
+    .unwrap_or(None);  // Esconde erros!
+```
+
+**✅ CORRETO:**
+```rust
+let result = sqlx::query_as(...)
+    .await;
+
+match result {
+    Ok(Some(data)) => /* sucesso */,
+    Ok(None) => /* vazio */,
+    Err(e) => {
+        eprintln!("[ERRO] {}", e);  // Loga erro!
+        /* retorna erro para cliente */
+    }
+}
+```
+
+#### 2. **Tipos SQL devem corresponder exatamente aos tipos Rust**
+
+| SQL Type | Rust Type | SQLx Comportamento |
+|----------|-----------|-------------------|
+| `INT` | `i32` | ✅ Conversão automática |
+| `BIGINT` | `i64` | ✅ Conversão automática |
+| `DOUBLE` | `f64` | ✅ Conversão automática |
+| `DECIMAL(10,2)` | `f64` | ❌ **Erro: mismatched types** |
+| `VARCHAR` | `String` | ✅ Conversão automática |
+| `TEXT` | `String` | ✅ Conversão automática |
+
+**Solução para DECIMAL:**
+- Opção A: Alterar coluna para `DOUBLE` (preferido para float)
+- Opção B: Usar `Decimal` do crate `rust_decimal` (preferido para dinheiro)
+  ```rust
+  use rust_decimal::Decimal;
+  pub struct ConfigDisparo {
+      pub intervalo_valor: Decimal,  // Em vez de f64
+  }
+  ```
+
+#### 3. **localStorage não é confiável para dados críticos**
+
+**Problemas com localStorage:**
+- ❌ Não persiste em modo privado/anônimo
+- ❌ Extensões podem bloquear
+- ❌ Quotas pequenas (~5-10 MB por domínio)
+- ❌ Não funciona entre dispositivos
+- ❌ Sem sincronização
+
+**Quando usar localStorage:**
+- ✅ Preferências de UI (tema escuro/claro)
+- ✅ Cache temporário de dados não-críticos
+- ✅ Rascunhos de formulários (com aviso de perda)
+
+**Quando usar Banco de Dados:**
+- ✅ Configurações críticas (como este caso)
+- ✅ Dados que precisam persistir entre dispositivos
+- ✅ Dados compartilhados entre usuários
+- ✅ Histórico e auditoria
+
+#### 4. **Sempre testar API diretamente, não só via UI**
+
+**Fluxo de diagnóstico correto:**
+1. ✅ Testar endpoint com `curl` ou `Invoke-RestMethod`
+2. ✅ Verificar resposta raw (não só status 200)
+3. ✅ Inspecionar banco de dados diretamente
+4. ✅ Conferir logs do backend (não só logs do frontend)
+
+**Neste caso:**
+- Frontend mostrava "✓ Configuração salva" → mentiroso!
+- API retornava `{"ok": true}` → mentiroso!
+- Banco não tinha a tabela → verdade revelada!
+
+#### 5. **Documentar erros críticos para evitar reincidência**
+
+Este erro consumiu **2 horas de diagnóstico** por múltiplas causas:
+1. localStorage não persistia (red herring)
+2. API escondia erro com `unwrap_or(None)`
+3. Tabela não existia no banco
+4. Tipo DECIMAL incompatível com f64
+
+**Sem documentação:** Mesma sequência de erros poderia acontecer no futuro.
+
+**Com documentação:** Próximo desenvolvedor vê:
+- ✅ "Ah, DECIMAL não funciona com f64, devo usar DOUBLE"
+- ✅ "Ah, nunca usar `unwrap_or` em queries, devo fazer match explícito"
+- ✅ "Ah, tabelas devem ser criadas ANTES de usar API"
+
+---
+
+### 🔧 ARQUIVOS MODIFICADOS
+
+```
+backend/src-tauri/src/api/disparos.rs         — corrigido unwrap_or → match explícito
+f:\luna_cosmeticos\DADOS\tables\app_disparo_config.sql — DECIMAL → DOUBLE + comentário
+f:\luna_cosmeticos\criar_tabela_disparo_config.js — script de criação
+documentacao/CHECKPOINTS.md                    — esta documentação
+```
+
+### ✅ CHECKLIST DE VALIDAÇÃO
+
+Para confirmar que o problema foi resolvido:
+
+```powershell
+# 1. Tabela existe no banco?
+node -e "const mysql = require('mysql2/promise'); (async () => { 
+  const conn = await mysql.createConnection({ 
+    host: 'localhost', 
+    user: 'root', 
+    password: '1728f1br', 
+    database: 'luna_cosmeticos' 
+  }); 
+  const [rows] = await conn.execute('DESC app_disparo_config'); 
+  console.log(rows); 
+})();"
+# Esperado: Lista de colunas, incluindo intervalo_valor DOUBLE
+
+# 2. POST funciona?
+curl -X POST http://localhost:3001/api/disparos/config `
+  -H "Content-Type: application/json" `
+  -d '{"mensagem":"Teste","item_id":1,"item_tipo":"kit","item_nome":"Kit Teste","quantidade":10,"intervalo_valor":1.5,"intervalo_unidade":"horas"}'
+# Esperado: {"ok":true}
+
+# 3. GET retorna dados?
+curl http://localhost:3001/api/disparos/config
+# Esperado: {"ok":true,"config":{...}}  (NÃO null!)
+
+# 4. Site funciona?
+# Acessar https://luna-disparo.onrender.com/
+# Preencher configuração → Salvar → Recarregar
+# Esperado: Configuração volta preenchida
+```
+
+**Resultado esperado:** ✅ em todos os 4 testes
+
+---
+
+### 🎓 REFERÊNCIAS
+
+- [SQLx Documentation - Type Mappings](https://docs.rs/sqlx/latest/sqlx/mysql/types/index.html)
+- [Rust Decimal Crate](https://docs.rs/rust_decimal/latest/rust_decimal/)
+- [MySQL DECIMAL vs DOUBLE](https://dev.mysql.com/doc/refman/8.0/en/floating-point-types.html)
+- [localStorage Limitations](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage#description)
+
+---
+
+**Status:** 🟢 PROBLEMA RESOLVIDO E DOCUMENTADO
+
+**Próximas ações:**
+1. ✅ Documentação completa (feito)
+2. ⏳ Aplicar mesma correção no banco **remoto** (vps.hawktecnologia.com)
+3. ⏳ Criar migration script para produção
+4. ⏳ Adicionar testes automatizados para detectar tipo incompatível
+
+---

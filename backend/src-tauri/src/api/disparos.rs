@@ -336,7 +336,7 @@ pub async fn obter_config(
 ) -> Json<serde_json::Value> {
     let state_lock = state.lock().await;
 
-    let config: Option<ConfigDisparo> = sqlx::query_as(
+    let result = sqlx::query_as::<_, ConfigDisparo>(
         r#"SELECT id, mensagem, item_id, item_tipo, item_nome, item_thumb_url,
                   quantidade, intervalo_valor, intervalo_unidade,
                   DATE_FORMAT(criado_em, '%Y-%m-%dT%T') as criado_em,
@@ -346,11 +346,14 @@ pub async fn obter_config(
            LIMIT 1"#
     )
     .fetch_optional(&state_lock.db)
-    .await
-    .unwrap_or(None);
+    .await;
 
-    match config {
-        Some(cfg) => Json(serde_json::json!({ "ok": true, "config": cfg })),
-        None => Json(serde_json::json!({ "ok": true, "config": null })),
+    match result {
+        Ok(Some(cfg)) => Json(serde_json::json!({ "ok": true, "config": cfg })),
+        Ok(None) => Json(serde_json::json!({ "ok": true, "config": null })),
+        Err(e) => {
+            eprintln!("[ERRO] Falha ao carregar config do banco: {:?}", e);
+            Json(serde_json::json!({ "ok": false, "erro": e.to_string(), "config": null }))
+        }
     }
 }
