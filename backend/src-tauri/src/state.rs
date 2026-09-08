@@ -12,7 +12,7 @@ pub struct AppState {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RenderConfig {
     pub api_key: String,
-    pub service_id: String,
+    pub service_ids: Vec<String>, // ← MUDOU: array de service IDs
     pub env_var_name: String,
 }
 

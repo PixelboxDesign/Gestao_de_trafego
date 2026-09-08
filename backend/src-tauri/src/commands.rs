@@ -10,28 +10,35 @@ pub async fn get_tunnel_url(state: State<'_, Arc<Mutex<AppState>>>) -> Result<Op
     Ok(state.get_tunnel_url())
 }
 
-/// Salva configuração do Render (API Key, Service ID, etc)
+/// Salva configuração do Render (API Key, Service IDs, etc)
 #[tauri::command]
 pub async fn save_render_config(
     state: State<'_, Arc<Mutex<AppState>>>,
     api_key: String,
-    service_id: String,
+    service_ids: Vec<String>, // ← MUDOU: array
     env_var_name: String,
 ) -> Result<String, String> {
     if api_key.trim().is_empty() {
         return Err("API Key não pode estar vazia".to_string());
     }
-    if service_id.trim().is_empty() {
-        return Err("Service ID não pode estar vazio".to_string());
+    if service_ids.is_empty() {
+        return Err("Adicione pelo menos um Service ID".to_string());
     }
     if env_var_name.trim().is_empty() {
         return Err("Nome da variável de ambiente não pode estar vazio".to_string());
     }
 
+    // Valida que todos os IDs são válidos
+    for id in &service_ids {
+        if id.trim().is_empty() {
+            return Err("Service IDs não podem estar vazios".to_string());
+        }
+    }
+
     let mut state = state.lock().await;
     state.render_config = Some(RenderConfig {
         api_key,
-        service_id,
+        service_ids,
         env_var_name,
     });
 
@@ -177,7 +184,11 @@ pub async fn update_render_env(state: State<'_, Arc<Mutex<AppState>>>) -> Result
     let config = state
         .render_config
         .as_ref()
-        .ok_or("Configure o Render primeiro (API Key e Service ID)")?;
+        .ok_or("Configure o Render primeiro (API Key e Service IDs)")?;
+
+    if config.service_ids.is_empty() {
+        return Err("Adicione pelo menos um Service ID na configuração".to_string());
+    }
 
     // Valida URL do tunnel
     let tunnel_url = state
@@ -194,85 +205,110 @@ pub async fn update_render_env(state: State<'_, Arc<Mutex<AppState>>>) -> Result
         }
     ]);
 
-    tracing::info!("🔄 Passo 1/2: Atualizando variável '{}' no Render com URL: {}", config.env_var_name, tunnel_url);
+    let mut success_count = 0;
+    let mut error_messages = Vec::new();
+    let mut deploy_ids = Vec::new();
 
-    // Passo 1: Atualizar variável de ambiente
-    let response = client
-        .put(format!(
-            "https://api.render.com/v1/services/{}/env-vars",
-            config.service_id
-        ))
-        .header("Authorization", format!("Bearer {}", config.api_key))
-        .header("Content-Type", "application/json")
-        .json(&body)
-        .send()
-        .await
-        .map_err(|e| format!("Erro ao atualizar variável: {}", e))?;
+    tracing::info!("🔄 Iniciando deploy em {} serviço(s)...", config.service_ids.len());
 
-    if !response.status().is_success() {
-        let status = response.status();
-        let error_text = response.text().await.unwrap_or_default();
-        return Err(format!("❌ Erro ao atualizar variável HTTP {}: {}", status, error_text));
+    for (index, service_id) in config.service_ids.iter().enumerate() {
+        tracing::info!("📦 [{}/{}] Processando serviço: {}", index + 1, config.service_ids.len(), service_id);
+
+        // Passo 1: Atualizar variável de ambiente
+        let response = client
+            .put(format!(
+                "https://api.render.com/v1/services/{}/env-vars",
+                service_id
+            ))
+            .header("Authorization", format!("Bearer {}", config.api_key))
+            .header("Content-Type", "application/json")
+            .json(&body)
+            .send()
+            .await;
+
+        let response = match response {
+            Ok(r) => r,
+            Err(e) => {
+                error_messages.push(format!("❌ {}: {}", service_id, e));
+                continue;
+            }
+        };
+
+        if !response.status().is_success() {
+            let status = response.status();
+            let error_text = response.text().await.unwrap_or_default();
+            error_messages.push(format!("❌ {} (HTTP {}): {}", service_id, status, error_text));
+            continue;
+        }
+
+        tracing::info!("✅ Variável atualizada no serviço {}!", service_id);
+
+        // Passo 2: Triggerar deploy manual
+        let deploy_body = serde_json::json!({
+            "clearCache": "do_not_clear"
+        });
+
+        let deploy_response = client
+            .post(format!(
+                "https://api.render.com/v1/services/{}/deploys",
+                service_id
+            ))
+            .header("Authorization", format!("Bearer {}", config.api_key))
+            .header("Content-Type", "application/json")
+            .json(&deploy_body)
+            .send()
+            .await;
+
+        match deploy_response {
+            Ok(resp) if resp.status().is_success() => {
+                let deploy_info: serde_json::Value = resp
+                    .json()
+                    .await
+                    .unwrap_or(serde_json::json!({}));
+                
+                let deploy_id = deploy_info
+                    .get("id")
+                    .and_then(|id| id.as_str())
+                    .unwrap_or("N/A");
+
+                deploy_ids.push(format!("{}: {}", service_id, deploy_id));
+                success_count += 1;
+                tracing::info!("✅ Deploy iniciado no {}: {}", service_id, deploy_id);
+            }
+            Ok(resp) => {
+                let status = resp.status();
+                let error_text = resp.text().await.unwrap_or_default();
+                error_messages.push(format!("⚠️ {}: Deploy falhou (HTTP {})", service_id, status));
+            }
+            Err(e) => {
+                error_messages.push(format!("❌ {}: {}", service_id, e));
+            }
+        }
     }
 
-    tracing::info!("✅ Variável atualizada com sucesso!");
-    tracing::info!("🚀 Passo 2/2: Triggerando deploy no Render...");
-
-    // Passo 2: Triggerar deploy manual
-    let deploy_body = serde_json::json!({
-        "clearCache": "do_not_clear"
-    });
-
-    let deploy_response = client
-        .post(format!(
-            "https://api.render.com/v1/services/{}/deploys",
-            config.service_id
-        ))
-        .header("Authorization", format!("Bearer {}", config.api_key))
-        .header("Content-Type", "application/json")
-        .json(&deploy_body)
-        .send()
-        .await
-        .map_err(|e| format!("Erro ao triggerar deploy: {}", e))?;
-
-    if deploy_response.status().is_success() {
-        let deploy_info: serde_json::Value = deploy_response
-            .json()
-            .await
-            .unwrap_or(serde_json::json!({}));
-        
-        let deploy_id = deploy_info
-            .get("id")
-            .and_then(|id| id.as_str())
-            .unwrap_or("N/A");
-
-        tracing::info!("✅ Deploy triggerado com sucesso! ID: {}", deploy_id);
-
-        Ok(format!(
-            "✅ Sucesso!\n\n\
-            📝 Variável '{}' atualizada\n\
-            🚀 Deploy iniciado (ID: {})\n\n\
-            ⏱️ Tempo estimado: 2-5 minutos\n\
-            🌐 Acompanhe em: https://dashboard.render.com/web/{}",
-            config.env_var_name,
-            deploy_id,
-            config.service_id
-        ))
-    } else {
-        let status = deploy_response.status();
-        let error_text = deploy_response.text().await.unwrap_or_default();
-        
-        // Se o deploy falhou mas a variável foi atualizada, informa isso
-        Ok(format!(
-            "⚠️ Variável atualizada, mas erro ao triggerar deploy:\n\
-            HTTP {}: {}\n\n\
-            💡 Você pode fazer deploy manual em:\n\
-            https://dashboard.render.com/web/{}/deploys",
-            status,
-            error_text,
-            config.service_id
-        ))
+    if success_count == 0 {
+        return Err(format!("Todos os deploys falharam:\n{}", error_messages.join("\n")));
     }
+
+    let mut result = format!(
+        "✅ Deploy(s) iniciado(s) com sucesso: {}/{}\n\n\
+        📝 Variável atualizada: {}\n\
+        🌐 Nova URL: {}\n\n\
+        🚀 Deploy IDs:\n{}",
+        success_count,
+        config.service_ids.len(),
+        config.env_var_name,
+        tunnel_url,
+        deploy_ids.join("\n")
+    );
+
+    if !error_messages.is_empty() {
+        result.push_str(&format!("\n\n⚠️ Erros:\n{}", error_messages.join("\n")));
+    }
+
+    result.push_str("\n\n⏱️ Tempo estimado: 2-5 minutos");
+
+    Ok(result)
 }
 
 // ── Funções auxiliares de arquivo ────────────────────────────────────────────

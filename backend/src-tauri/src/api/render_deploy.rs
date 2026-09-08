@@ -28,12 +28,12 @@ pub async fn deploy_com_url_nova(
     info!("🚀 Iniciando deploy automático no Render...");
 
     // 1. Ler configuração do Render do AppState
-    let (render_api_key, service_id, env_var_name) = {
+    let (render_api_key, service_ids, env_var_name) = {
         let state_guard = state.lock().await;
         match &state_guard.render_config {
             Some(config) => (
                 config.api_key.clone(),
-                config.service_id.clone(),
+                config.service_ids.clone(), // ← MUDOU: agora é array
                 config.env_var_name.clone(),
             ),
             None => {
@@ -46,8 +46,16 @@ pub async fn deploy_com_url_nova(
         }
     };
 
+    if service_ids.is_empty() {
+        error!("❌ Nenhum Service ID configurado");
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "Configure pelo menos um Service ID no Render".to_string(),
+        ));
+    }
+
     info!("✅ Configuração do Render carregada");
-    info!("📋 Service ID: {}", service_id);
+    info!("📋 Service IDs ({}): {:?}", service_ids.len(), service_ids);
     info!("📋 Variável: {}", env_var_name);
 
     // 2. Ler URL do Cloudflare do AppState
@@ -70,103 +78,127 @@ pub async fn deploy_com_url_nova(
     // 3. Criar cliente HTTP
     let client = reqwest::Client::new();
 
-    // 4. Atualizar variável de ambiente no Render (endpoint específico para uma variável)
-    info!("🔄 Atualizando variável '{}' no Render...", env_var_name);
+    // 4. Atualizar variável de ambiente e triggerar deploy em TODOS os Service IDs
+    let mut deploy_ids = Vec::new();
+    let mut success_count = 0;
+    let mut error_count = 0;
 
-    let env_value = serde_json::json!({
-        "value": tunnel_url.clone()
-    });
+    for (index, service_id) in service_ids.iter().enumerate() {
+        info!("📦 [{}/{}] Processando Service ID: {}", index + 1, service_ids.len(), service_id);
 
-    let update_url = format!(
-        "https://api.render.com/v1/services/{}/env-vars/{}",
-        service_id, env_var_name
-    );
+        // 4.1. Atualizar variável de ambiente
+        info!("🔄 Atualizando variável '{}' no serviço {}...", env_var_name, service_id);
 
-    let update_response = client
-        .put(&update_url)
-        .header("Authorization", format!("Bearer {}", render_api_key))
-        .header("Content-Type", "application/json")
-        .json(&env_value)
-        .send()
-        .await;
+        let env_value = serde_json::json!({
+            "value": tunnel_url.clone()
+        });
 
-    match update_response {
-        Ok(resp) if resp.status().is_success() => {
-            info!("✅ Variável atualizada com sucesso!");
+        let update_url = format!(
+            "https://api.render.com/v1/services/{}/env-vars/{}",
+            service_id, env_var_name
+        );
+
+        let update_response = client
+            .put(&update_url)
+            .header("Authorization", format!("Bearer {}", render_api_key))
+            .header("Content-Type", "application/json")
+            .json(&env_value)
+            .send()
+            .await;
+
+        match update_response {
+            Ok(resp) if resp.status().is_success() => {
+                info!("✅ Variável atualizada no serviço {}!", service_id);
+            }
+            Ok(resp) => {
+                let status = resp.status();
+                let body = resp.text().await.unwrap_or_else(|_| "sem corpo".to_string());
+                error!("❌ Erro ao atualizar variável no {}: {} - {}", service_id, status, body);
+                error_count += 1;
+                continue; // Pula para o próximo service_id
+            }
+            Err(e) => {
+                error!("❌ Erro de conexão ao atualizar variável no {}: {}", service_id, e);
+                error_count += 1;
+                continue;
+            }
         }
-        Ok(resp) => {
-            let status = resp.status();
-            let body = resp.text().await.unwrap_or_else(|_| "sem corpo".to_string());
-            error!("❌ Erro ao atualizar variável: {} - {}", status, body);
-            return Err((
-                StatusCode::BAD_GATEWAY,
-                format!("Erro do Render ao atualizar variável: {} - {}", status, body),
-            ));
-        }
-        Err(e) => {
-            error!("❌ Erro de conexão ao atualizar variável: {}", e);
-            return Err((
-                StatusCode::BAD_GATEWAY,
-                format!("Erro de conexão com Render: {}", e),
-            ));
+
+        // 4.2. Triggerar deploy
+        info!("🚀 Triggerando deploy no serviço {}...", service_id);
+
+        let deploy_url = format!(
+            "https://api.render.com/v1/services/{}/deploys",
+            service_id
+        );
+
+        let deploy_body = RenderDeployRequest {
+            clear_cache: "do_not_clear".to_string(),
+        };
+
+        let deploy_response = client
+            .post(&deploy_url)
+            .header("Authorization", format!("Bearer {}", render_api_key))
+            .header("Content-Type", "application/json")
+            .json(&deploy_body)
+            .send()
+            .await;
+
+        match deploy_response {
+            Ok(resp) if resp.status().is_success() => {
+                let body: serde_json::Value = resp
+                    .json()
+                    .await
+                    .unwrap_or_else(|_| serde_json::json!({}));
+                let deploy_id = body["id"].as_str().map(|s| s.to_string());
+
+                info!("✅ Deploy iniciado no {}! ID: {:?}", service_id, deploy_id);
+                
+                if let Some(id) = deploy_id {
+                    deploy_ids.push(id);
+                }
+                success_count += 1;
+            }
+            Ok(resp) => {
+                let status = resp.status();
+                let body = resp.text().await.unwrap_or_else(|_| "sem corpo".to_string());
+                error!("❌ Erro ao triggerar deploy no {}: {} - {}", service_id, status, body);
+                error_count += 1;
+            }
+            Err(e) => {
+                error!("❌ Erro de conexão ao triggerar deploy no {}: {}", service_id, e);
+                error_count += 1;
+            }
         }
     }
 
-    // 5. Triggerar deploy
-    info!("🚀 Triggerando deploy no Render...");
+    // 5. Retornar resultado consolidado
+    if success_count == 0 {
+        error!("❌ Nenhum deploy foi iniciado com sucesso");
+        return Err((
+            StatusCode::BAD_GATEWAY,
+            "Todos os deploys falharam. Verifique os logs para detalhes.".to_string(),
+        ));
+    }
 
-    let deploy_url = format!(
-        "https://api.render.com/v1/services/{}/deploys",
-        service_id
-    );
-
-    let deploy_body = RenderDeployRequest {
-        clear_cache: "do_not_clear".to_string(),
+    let mensagem = if error_count > 0 {
+        format!(
+            "✅ {} deploy(s) iniciado(s) com sucesso! | ⚠️ {} falhou(aram) | URL: {} | Aguarde 2-5 minutos",
+            success_count, error_count, tunnel_url
+        )
+    } else {
+        format!(
+            "✅ Todos os {} deploy(s) iniciados com sucesso! | URL: {} | Aguarde 2-5 minutos",
+            success_count, tunnel_url
+        )
     };
 
-    let deploy_response = client
-        .post(&deploy_url)
-        .header("Authorization", format!("Bearer {}", render_api_key))
-        .header("Content-Type", "application/json")
-        .json(&deploy_body)
-        .send()
-        .await;
+    info!("🎉 {}", mensagem);
 
-    match deploy_response {
-        Ok(resp) if resp.status().is_success() => {
-            let body: serde_json::Value = resp
-                .json()
-                .await
-                .unwrap_or_else(|_| serde_json::json!({}));
-            let deploy_id = body["id"].as_str().map(|s| s.to_string());
-
-            info!("✅ Deploy iniciado! ID: {:?}", deploy_id);
-
-            Ok(Json(RenderDeployResponse {
-                ok: true,
-                mensagem: format!(
-                    "Deploy iniciado com sucesso! URL: {} | Aguarde 2-5 minutos",
-                    tunnel_url
-                ),
-                deploy_id,
-                url_cloudflare: Some(tunnel_url),
-            }))
-        }
-        Ok(resp) => {
-            let status = resp.status();
-            let body = resp.text().await.unwrap_or_else(|_| "sem corpo".to_string());
-            error!("❌ Erro ao triggerar deploy: {} - {}", status, body);
-            Err((
-                StatusCode::BAD_GATEWAY,
-                format!("Erro do Render ao triggerar deploy: {} - {}", status, body),
-            ))
-        }
-        Err(e) => {
-            error!("❌ Erro de conexão ao triggerar deploy: {}", e);
-            Err((
-                StatusCode::BAD_GATEWAY,
-                format!("Erro de conexão com Render: {}", e),
-            ))
-        }
-    }
+    Ok(Json(RenderDeployResponse {
+        ok: true,
+        mensagem,
+        deploy_id: deploy_ids.first().cloned(), // Retorna o primeiro deploy_id (compatibilidade)
+        url_cloudflare: Some(tunnel_url),
+    }))
 }

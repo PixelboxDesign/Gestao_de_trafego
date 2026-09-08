@@ -4,8 +4,13 @@ import { listen } from '@tauri-apps/api/event';
 
 interface RenderConfig {
   api_key: string;
-  service_id: string;
+  service_ids: string[]; // ← MUDOU: array de service IDs
   env_var_name: string;
+}
+
+interface ServiceIdItem {
+  id: string;
+  name: string; // Nome amigável (opcional)
 }
 
 export default function AbaTunnel() {
@@ -15,7 +20,7 @@ export default function AbaTunnel() {
   
   // Configuração do Render
   const [apiKey, setApiKey] = useState('');
-  const [serviceId, setServiceId] = useState('');
+  const [serviceIds, setServiceIds] = useState<ServiceIdItem[]>([{ id: '', name: '' }]); // ← MUDOU: array
   const [envVarName, setEnvVarName] = useState('VITE_API_BASE_URL');
   
   // Estados de carregamento e mensagens
@@ -99,7 +104,15 @@ export default function AbaTunnel() {
       const config = await invoke<RenderConfig | null>('load_render_config');
       if (config) {
         setApiKey(config.api_key);
-        setServiceId(config.service_id);
+        
+        // Converte array de strings para array de ServiceIdItem
+        if (config.service_ids && config.service_ids.length > 0) {
+          setServiceIds(config.service_ids.map((id, index) => ({
+            id,
+            name: `Serviço ${index + 1}`
+          })));
+        }
+        
         setEnvVarName(config.env_var_name);
         setIsConfigured(true);
       }
@@ -118,18 +131,33 @@ export default function AbaTunnel() {
   };
 
   const testConnection = async () => {
-    if (!apiKey.trim() || !serviceId.trim()) {
-      showMessage('error', '⚠️ Preencha API Key e Service ID primeiro');
+    const validIds = serviceIds.filter(s => s.id.trim()).map(s => s.id.trim());
+    
+    if (!apiKey.trim() || validIds.length === 0) {
+      showMessage('error', '⚠️ Preencha API Key e pelo menos um Service ID');
       return;
     }
 
     setTestingConnection(true);
     try {
-      const result = await invoke<string>('test_render_connection', {
-        apiKey: apiKey.trim(),
-        serviceId: serviceId.trim(),
-      });
-      showMessage('success', result);
+      // Testa todos os Service IDs
+      const results = await Promise.allSettled(
+        validIds.map(id => 
+          invoke<string>('test_render_connection', {
+            apiKey: apiKey.trim(),
+            serviceId: id,
+          })
+        )
+      );
+
+      const successCount = results.filter(r => r.status === 'fulfilled').length;
+      const failCount = results.filter(r => r.status === 'rejected').length;
+
+      if (failCount === 0) {
+        showMessage('success', `✅ Todos os ${successCount} serviços testados com sucesso!`);
+      } else {
+        showMessage('error', `⚠️ ${successCount} OK, ${failCount} com erro. Verifique os Service IDs.`);
+      }
     } catch (error) {
       showMessage('error', String(error));
     } finally {
@@ -138,8 +166,10 @@ export default function AbaTunnel() {
   };
 
   const saveConfig = async () => {
-    if (!apiKey.trim() || !serviceId.trim() || !envVarName.trim()) {
-      showMessage('error', '⚠️ Preencha todos os campos');
+    const validIds = serviceIds.filter(s => s.id.trim()).map(s => s.id.trim());
+    
+    if (!apiKey.trim() || validIds.length === 0 || !envVarName.trim()) {
+      showMessage('error', '⚠️ Preencha API Key e pelo menos um Service ID');
       return;
     }
 
@@ -147,7 +177,7 @@ export default function AbaTunnel() {
     try {
       const result = await invoke<string>('save_render_config', {
         apiKey: apiKey.trim(),
-        serviceId: serviceId.trim(),
+        serviceIds: validIds, // ← Agora envia array
         envVarName: envVarName.trim(),
       });
       showMessage('success', result);
@@ -158,6 +188,23 @@ export default function AbaTunnel() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Funções para gerenciar Service IDs
+  const addServiceId = () => {
+    setServiceIds([...serviceIds, { id: '', name: '' }]);
+  };
+
+  const removeServiceId = (index: number) => {
+    if (serviceIds.length > 1) {
+      setServiceIds(serviceIds.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateServiceId = (index: number, field: 'id' | 'name', value: string) => {
+    const newIds = [...serviceIds];
+    newIds[index][field] = value;
+    setServiceIds(newIds);
   };
 
   const updateRenderEnv = async () => {
@@ -367,26 +414,90 @@ export default function AbaTunnel() {
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', color: '#ccc', fontSize: '14px' }}>
-                Service ID:
-              </label>
-              <input
-                type="text"
-                value={serviceId}
-                onChange={(e) => setServiceId(e.target.value)}
-                placeholder="srv-xxxxxxxxxxxxx"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: '1px solid #3a3a4e',
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <label style={{ color: '#ccc', fontSize: '14px', fontWeight: 'bold' }}>
+                  Service IDs: ({serviceIds.filter(s => s.id.trim()).length})
+                </label>
+                <button
+                  onClick={addServiceId}
+                  style={{
+                    padding: '6px 16px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    backgroundColor: '#28a745',
+                    color: '#fff',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  ➕ Adicionar Serviço
+                </button>
+              </div>
+
+              {serviceIds.map((service, index) => (
+                <div key={index} style={{
+                  marginBottom: '12px',
+                  padding: '16px',
                   backgroundColor: '#0f0f1e',
-                  color: '#fff',
-                  fontSize: '14px'
-                }}
-              />
-              <small style={{ color: '#888', fontSize: '12px' }}>
-                Encontre na URL do seu serviço: dashboard.render.com/web/<strong>srv-xxx</strong>
+                  borderRadius: '8px',
+                  border: '1px solid #2a2a3e'
+                }}>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                    <input
+                      type="text"
+                      value={service.name}
+                      onChange={(e) => updateServiceId(index, 'name', e.target.value)}
+                      placeholder="Nome (opcional)"
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        borderRadius: '6px',
+                        border: '1px solid #3a3a4e',
+                        backgroundColor: '#1a1a2e',
+                        color: '#fff',
+                        fontSize: '13px'
+                      }}
+                    />
+                    {serviceIds.length > 1 && (
+                      <button
+                        onClick={() => removeServiceId(index)}
+                        style={{
+                          padding: '10px 16px',
+                          borderRadius: '6px',
+                          border: 'none',
+                          backgroundColor: '#dc3545',
+                          color: '#fff',
+                          cursor: 'pointer',
+                          fontSize: '14px'
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    value={service.id}
+                    onChange={(e) => updateServiceId(index, 'id', e.target.value)}
+                    placeholder="srv-xxxxxxxxxxxxx"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      borderRadius: '6px',
+                      border: '1px solid #3a3a4e',
+                      backgroundColor: '#1a1a2e',
+                      color: '#fff',
+                      fontSize: '13px',
+                      fontFamily: 'monospace'
+                    }}
+                  />
+                </div>
+              ))}
+              
+              <small style={{ color: '#888', fontSize: '12px', display: 'block', marginTop: '8px' }}>
+                💡 Adicione múltiplos Service IDs para deployar em vários serviços de uma vez<br />
+                Encontre na URL: dashboard.render.com/web/<strong>srv-xxx</strong>
               </small>
             </div>
 

@@ -21,7 +21,8 @@ app.use((req, res, next) => {
 
 // API Proxy Routes
 app.use('/api', async (req, res) => {
-  const targetUrl = `${API_BASE_URL}${req.url}`;
+  // Remove /api prefix from req.url since API_BASE_URL already points to the full backend
+  const targetUrl = `${API_BASE_URL}/api${req.url}`;
   
   try {
     const fetch = (await import('node-fetch')).default;
