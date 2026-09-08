@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste localStorage</title>
+  <style>
+    body { 
+      background: #0f1117; 
+      color: #e2e8f0; 
+      font-family: monospace; 
+      padding: 2rem; 
+    }
+    button { 
+      padding: 1rem 2rem; 
+      margin: 0.5rem; 
+      font-size: 1rem; 
+      cursor: pointer; 
+    }
+    #output { 
+      background: #1a1d27; 
+      padding: 1rem; 
+      margin-top: 1rem; 
+      border: 1px solid #2d3148; 
+      white-space: pre-wrap; 
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Teste de Persistência localStorage</h1>
+  
+  <button onclick="salvar()">💾 Salvar Config</button>
+  <button onclick="carregar()">📥 Carregar Config</button>
+  <button onclick="limpar()">🗑️ Limpar localStorage</button>
+  <button onclick="location.reload()">🔄 Recarregar Página</button>
+  
+  <div id="output"></div>
+  
+  <script>
+    const log = (msg) => {
+      const output = document.getElementById('output');
+      output.innerHTML += msg + '\n';
+      console.log(msg);
+    };
+    
+    // Simula o código de versionamento
+    const CURRENT_VERSION = 31;
+    const stored = localStorage.getItem('luna_version');
+    const isReloading = sessionStorage.getItem('luna_reloading');
+    
+    log('═══════════════════════════════════════');
+    log('🚀 INICIALIZANDO');
+    log(`Versão atual: ${CURRENT_VERSION}`);
+    log(`Versão armazenada: ${stored || 'nenhuma'}`);
+    log(`Flag reloading: ${isReloading || 'nenhuma'}`);
+    log('═══════════════════════════════════════');
+    
+    if (!stored || parseInt(stored) < CURRENT_VERSION) {
+      localStorage.setItem('luna_version', CURRENT_VERSION);
+      log(`✓ Versão atualizada para ${CURRENT_VERSION}`);
+      
+      if (stored && !isReloading) {
+        log('⚠️ Versão antiga detectada, marcando para reload...');
+        sessionStorage.setItem('luna_reloading', '1');
+        // NÃO recarrega automaticamente no teste
+        log('❌ AUTO-RELOAD DESABILITADO NO TESTE');
+      }
+    } else {
+      sessionStorage.removeItem('luna_reloading');
+      log('✓ Versão OK, nenhum reload necessário');
+    }
+    
+    // Tenta carregar config existente
+    const config = localStorage.getItem('luna_disparo_config');
+    if (config) {
+      log('\n📦 Configuração encontrada no localStorage:');
+      log(config);
+    } else {
+      log('\n❌ Nenhuma configuração no localStorage');
+    }
+    
+    log('\n🔑 Todas as chaves no localStorage:');
+    log(Object.keys(localStorage).join(', '));
+    
+    function salvar() {
+      const config = {
+        mensagem: 'Teste de persistência ' + new Date().toLocaleTimeString(),
+        quantidade: 30,
+        intervaloValor: 5,
+        intervaloUnidade: 'horas',
+        itemSelecionado: {
+          id: 123,
+          tipo: 'kit',
+          nome: 'Kit Teste',
+          thumb_url: 'https://example.com/thumb.jpg'
+        },
+        dataHoraSalvo: new Date().toISOString()
+      };
+      
+      localStorage.setItem('luna_disparo_config', JSON.stringify(config));
+      log('\n💾 Configuração SALVA:');
+      log(JSON.stringify(config, null, 2));
+      
+      // Verifica imediatamente
+      const verificacao = localStorage.getItem('luna_disparo_config');
+      if (verificacao) {
+        log('\n✅ VERIFICAÇÃO: localStorage persistiu corretamente');
+      } else {
+        log('\n❌ ERRO: localStorage NÃO persistiu!');
+      }
+    }
+    
+    function carregar() {
+      log('\n📥 Tentando CARREGAR configuração...');
+      const saved = localStorage.getItem('luna_disparo_config');
+      
+      if (saved) {
+        const config = JSON.parse(saved);
+        log('✅ Configuração carregada:');
+        log(JSON.stringify(config, null, 2));
+      } else {
+        log('❌ Nenhuma configuração salva');
+      }
+      
+      log('\n🔑 Todas as chaves no localStorage:');
+      log(Object.keys(localStorage).join(', '));
+    }
+    
+    function limpar() {
+      localStorage.removeItem('luna_disparo_config');
+      log('\n🗑️ Configuração removida do localStorage');
+      
+      log('\n🔑 Chaves restantes:');
+      log(Object.keys(localStorage).join(', '));
+    }
+  </script>
+</body>
+</html>

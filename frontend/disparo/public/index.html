@@ -2482,14 +2482,6 @@ carregarItensDisparo();
 tick();
 setInterval(tick, 4000); // atualiza a cada 4s
 
-async function tick() {
-  const online = await verificarServidor();
-  if (online) {
-    await atualizarWhatsApp();
-    await carregarHistorico();
-  }
-}
-
 tick();
 setInterval(tick, 4000); // atualiza a cada 4s
 
