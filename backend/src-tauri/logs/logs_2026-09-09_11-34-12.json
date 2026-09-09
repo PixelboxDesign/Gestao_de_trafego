@@ -1,0 +1,51 @@
+[
+  {
+    "timestamp": "11:32:29",
+    "level": "Info",
+    "module": "Sistema",
+    "message": "Luna Server iniciado com sucesso",
+    "source": "backend"
+  },
+  {
+    "timestamp": "11:32:29",
+    "level": "Info",
+    "module": "Database",
+    "message": "Conexão com MySQL estabelecida",
+    "source": "backend"
+  },
+  {
+    "timestamp": "11:32:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "11:32:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (133.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "11:32:41",
+    "level": "Info",
+    "module": "Cloudflare",
+    "message": "Nova URL detectada: https://rica-vatican-mother-budgets.trycloudflare.com",
+    "source": "backend"
+  },
+  {
+    "timestamp": "11:33:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "11:33:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (50.5µs)",
+    "source": "backend"
+  }
+]

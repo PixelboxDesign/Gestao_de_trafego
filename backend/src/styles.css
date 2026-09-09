@@ -72,7 +72,7 @@ body {
 .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
 /* Content */
-.content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.content { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; }
 
 /* Dot status */
 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }

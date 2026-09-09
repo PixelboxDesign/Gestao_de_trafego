@@ -1,0 +1,135 @@
+[
+  {
+    "timestamp": "13:32:15",
+    "level": "Info",
+    "module": "Sistema",
+    "message": "Luna Server iniciado com sucesso",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:15",
+    "level": "Info",
+    "module": "Database",
+    "message": "Conexão com MySQL estabelecida",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (104.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET / - 200 OK (261.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /assets/index-0Hg4FUoz.js",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /assets/index-CvkZ8EOH.css",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /assets/index-0Hg4FUoz.js - 200 OK (531.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /assets/index-CvkZ8EOH.css - 200 OK (373.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (51.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /favicon.ico",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:21",
+    "level": "Warn",
+    "module": "HTTP",
+    "message": "Response: GET /favicon.ico - 404 Not Found (19.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/clientes/filtros/ufs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/clientes?page=1&limit=100 - 200 OK (5.0425825s)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:26",
+    "level": "Info",
+    "module": "Cloudflare",
+    "message": "Nova URL detectada: https://conscious-desert-aaa-cloudy.trycloudflare.com",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:32:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (48µs)",
+    "source": "backend"
+  }
+]

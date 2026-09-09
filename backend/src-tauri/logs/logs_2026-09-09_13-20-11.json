@@ -1,0 +1,37 @@
+[
+  {
+    "timestamp": "13:19:09",
+    "level": "Info",
+    "module": "Sistema",
+    "message": "Luna Server iniciado com sucesso",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:19:09",
+    "level": "Info",
+    "module": "Database",
+    "message": "Conexão com MySQL estabelecida",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:19:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:19:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (88.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "13:19:23",
+    "level": "Info",
+    "module": "Cloudflare",
+    "message": "Nova URL detectada: https://february-patrol-confirmed-latina.trycloudflare.com",
+    "source": "backend"
+  }
+]
