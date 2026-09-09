@@ -19,12 +19,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// API Proxy Routes
-app.use('/api', async (req, res) => {
-  // Remove /api prefix from req.url since API_BASE_URL already points to the full backend
+// API Proxy Routes - CRITICAL: Must come BEFORE express.static!
+app.use('/api', async (req, res, next) => {
   const targetUrl = `${API_BASE_URL}/api${req.url}`;
   
-  console.log(`🔀 Proxying: ${req.method} ${req.url} → ${targetUrl}`);
+  console.log(`🔀 [PROXY] ${req.method} ${req.url} → ${targetUrl}`);
   
   try {
     const fetch = (await import('node-fetch')).default;
@@ -35,30 +34,26 @@ app.use('/api', async (req, res) => {
         'User-Agent': 'Luna-Catalogo-Proxy/1.0',
       },
       body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body) : undefined,
-      timeout: 30000, // 30 segundos de timeout
+      timeout: 30000,
     });
 
     const contentType = response.headers.get('content-type');
-    
-    // Forward response
     res.status(response.status);
     
     if (contentType?.includes('application/json')) {
       const data = await response.json();
-      res.json(data);
+      return res.json(data);
     } else if (contentType?.includes('image/')) {
       const buffer = await response.arrayBuffer();
       res.set('Content-Type', contentType);
-      res.send(Buffer.from(buffer));
+      return res.send(Buffer.from(buffer));
     } else {
       const text = await response.text();
-      res.send(text);
+      return res.send(text);
     }
   } catch (error) {
-    console.error(`[Proxy Error] ${req.method} ${req.url}:`, error.message);
-    console.error(`[Proxy Error] Target URL: ${targetUrl}`);
-    console.error(`[Proxy Error] Full error:`, error);
-    res.status(502).json({ 
+    console.error(`❌ [PROXY ERROR]`, error.message);
+    return res.status(502).json({ 
       error: 'Proxy Error', 
       message: error.message,
       target: targetUrl 
@@ -66,12 +61,14 @@ app.use('/api', async (req, res) => {
   }
 });
 
-// Serve static files from dist/
+// Serve static files from dist/ (MUST come AFTER /api proxy!)
 app.use(express.static(join(__dirname, 'dist')));
 
-// SPA fallback - serve index.html for all other routes
+// SPA fallback - serve index.html for all other non-API routes
 app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, 'dist', 'index.html'));
+  if (!req.url.startsWith('/api')) {
+    res.sendFile(join(__dirname, 'dist', 'index.html'));
+  }
 });
 
 // Start server
