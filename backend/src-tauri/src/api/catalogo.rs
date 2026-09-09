@@ -451,7 +451,7 @@ pub async fn serve_file(
 
 /// POST /api/catalogo/upload-thumb/:marca/:kit?tipo=produto — faz upload da thumbnail
 pub async fn upload_thumb(
-    State(_state): State<Arc<Mutex<AppState>>>,
+    State(state): State<Arc<Mutex<AppState>>>,
     Path((marca_nome, kit_nome)): Path<(String, String)>,
     Query(params): Query<HashMap<String, String>>,
     mut multipart: Multipart,
@@ -522,7 +522,25 @@ pub async fn upload_thumb(
         // Salva nova thumb
         let img_path = canonical_kit.join(format!("thumb.{}", ext));
         match fs::write(&img_path, &data).await {
-            Ok(_) => return Json(serde_json::json!({ "ok": true, "arquivo": format!("thumb.{}", ext) })),
+            Ok(_) => {
+                // Atualiza banco de dados
+                let state_lock = state.lock().await;
+                let pool = &state_lock.db;
+                
+                let update_query = if tipo == "produto" {
+                    "UPDATE produtos SET tem_thumb = 1, thumb_ext = ? WHERE nome = ?"
+                } else {
+                    "UPDATE kits SET tem_thumb = 1, thumb_ext = ? WHERE nome = ?"
+                };
+                
+                let _ = sqlx::query(update_query)
+                    .bind(ext)
+                    .bind(&kit_nome)
+                    .execute(pool)
+                    .await;
+                
+                return Json(serde_json::json!({ "ok": true, "arquivo": format!("thumb.{}", ext) }));
+            },
             Err(e) => return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao salvar: {}", e) })),
         }
     }
