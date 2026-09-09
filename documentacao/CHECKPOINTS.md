@@ -35,6 +35,7 @@
 
 | Versão | Data | Título | Commit original | Commit atual | Amends |
 |---|---|---|---|---|---|
+| [v20-thumbnails-kits-componentes](#checkpoint-v20-thumbnails-kits-componentes) | 09/09/2026 | 🖼️ Thumbnails Componentes nos Kits + Fix Carregamento Tauri | `bb64fd8` | `bb64fd8` | — |
 | [v19-catalogo-web-service](#checkpoint-v19-catalogo-web-service) | 09/09/2026 | 📦 Catálogo Web como Serviço Independente | `84857ba` | `84857ba` | — |
 | [v18-whatsapp-disparo-persistencia](#checkpoint-v18-whatsapp-disparo-persistencia) | 08/09/2026 | 📱 Sistema Completo de Disparo WhatsApp (Site + Painel) | `5d7387b` | `5d7387b` | — |
 | [v17-render-deploy-fix-401](#checkpoint-v17-render-deploy-fix-401) | 02/09/2026 | 🔥 FIX CRÍTICO: Deploy Render 401 Unauthorized | `207fa7f` | `207fa7f` | — |
@@ -47,6 +48,437 @@
 | [v10-thumb-carrossel](#checkpoint-v10-thumb-carrossel) | 25/08/2026 | Sistema de Thumbnails Otimizadas + Carrossel de Imagens | `e9a40b1` | `e9a40b1` | — |
 
 > ⚠️ **Regra de restauração:** Sempre use o **Commit atual** para rollback. Quando há amends, o commit original deixa de existir no Git e é substituído pelo mais recente.
+
+---
+
+## 🖼️ CHECKPOINT v20-thumbnails-kits-componentes
+
+**Título:** Thumbnails dos Componentes nos Kits + Fix Carregamento Interface Tauri  
+**Data:** 09/09/2026 | **Commit:** `bb64fd8` | **Status:** ✅ ESTÁVEL | **Prioridade:** 🟢 FUNCIONAL
+
+### 🎯 RESUMO EXECUTIVO
+
+**Problema resolvido:** Kits não mostravam thumbnails dos produtos componentes. Interface Tauri carregava de `file://` em vez do servidor HTTP.
+
+**Funcionalidades implementadas:**
+- ✅ Backend busca thumbnails de cada componente individualmente
+- ✅ Cards de kits exibem até 4 miniaturas dos produtos componentes
+- ✅ Modal do kit mostra seção "🖼️ CARROSSEL" com todas as thumbnails em scroll horizontal
+- ✅ Interface Tauri carrega corretamente de `http://localhost:3001` (servidor Axum)
+- ✅ Scroll vertical habilitado na área de conteúdo do painel
+
+---
+
+### 🔧 ALTERAÇÕES TÉCNICAS
+
+#### Backend Rust
+
+**Arquivo:** `backend/src-tauri/src/api/catalogo_db.rs`
+
+**Struct `ComponenteResponse`:**
+```rust
+pub struct ComponenteResponse {
+    pub nome_limpo: String,
+    pub nome_produto: String,
+    pub quantidade: i32,
+    pub tem_thumb: bool,          // ← NOVO
+    pub thumb_ext: Option<String>, // ← NOVO
+}
+```
+
+**Função `listar_kits_db()`:**
+```rust
+// Para cada componente, busca thumbnail individualmente
+for comp in &mut kit.componentes {
+    let (tem_thumb, thumb_ext) = verificar_thumb_produto(&comp.nome_limpo);
+    comp.tem_thumb = tem_thumb;
+    comp.thumb_ext = thumb_ext;
+}
+```
+
+**Helper existente reutilizada:**
+```rust
+fn verificar_thumb_produto(nome_pasta: &str) -> (bool, Option<String>) {
+    let base = PathBuf::from("f:\\luna_cosmeticos\\catalogos\\Alphahall\\produtos");
+    let dir = base.join(nome_pasta);
+    
+    for ext in &["jpg", "jpeg", "png", "webp"] {
+        if dir.join(format!("thumb.{}", ext)).exists() {
+            return (true, Some(ext.to_string()));
+        }
+    }
+    (false, None)
+}
+```
+
+---
+
+#### Frontend React (Painel)
+
+**Arquivo:** `backend/src/pages/AbaKits.tsx`
+
+**Interface atualizada:**
+```typescript
+interface Componente {
+  nome_limpo: string;
+  nome_produto: string;
+  quantidade: number;
+  tem_thumb: bool;          // ← NOVO
+  thumb_ext?: string;        // ← NOVO
+}
+```
+
+**Card do kit - exibe 4 miniaturas:**
+```tsx
+{kit.componentes.length > 0 && (
+  <div className="miniatures">
+    {kit.componentes.slice(0, 4).map((comp, idx) => (
+      <div key={idx} className="mini-thumb">
+        {comp.tem_thumb && comp.thumb_ext ? (
+          <img
+            src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(comp.nome_limpo)}/thumb.${comp.thumb_ext}?tipo=produto`}
+            alt={comp.nome_produto}
+          />
+        ) : (
+          <div className="mini-placeholder">📦</div>
+        )}
+      </div>
+    ))}
+    {kit.componentes.length > 4 && (
+      <div className="mini-count">+{kit.componentes.length - 4}</div>
+    )}
+  </div>
+)}
+```
+
+**Modal do kit - seção carrossel:**
+```tsx
+{kitDetalhes.componentes.length > 0 && (
+  <section className="modal-section">
+    <h3>🖼️ CARROSSEL</h3>
+    <div className="carousel-horizontal">
+      {kitDetalhes.componentes.map((comp, idx) => (
+        <div key={idx} className="carousel-item">
+          {comp.tem_thumb && comp.thumb_ext ? (
+            <img
+              src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(comp.nome_limpo)}/thumb.${comp.thumb_ext}?tipo=produto`}
+              alt={comp.nome_produto}
+            />
+          ) : (
+            <div className="placeholder">📦</div>
+          )}
+          <span className="item-label">{comp.nome_produto}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+```
+
+**CSS:**
+```css
+.miniatures {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.mini-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.carousel-horizontal {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.carousel-item {
+  flex-shrink: 0;
+  width: 120px;
+  text-align: center;
+}
+```
+
+---
+
+#### Fix Carregamento Tauri
+
+**Problema:** Janela Tauri carregava HTML de `file://dist/index.html` em vez de `http://localhost:3001`
+
+**Solução:** Remover `frontendDist` do `tauri.conf.json`
+
+**Arquivo:** `backend/src-tauri/tauri.conf.json`
+
+```json
+// ❌ ANTES (carregava file://)
+{
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
+  }
+}
+
+// ✅ DEPOIS (força HTTP sempre)
+{
+  "build": {
+    "devUrl": "http://localhost:3001",
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "npm run build"
+  }
+}
+```
+
+**Resultado:**
+- Janela Tauri sempre carrega de `http://localhost:3001` (servidor Axum)
+- Frontend React pode fazer fetch para `/api/*` sem CORS
+- Atualizações do frontend são refletidas com F5 (sem rebuild Rust)
+
+---
+
+#### Scroll Vertical no Painel
+
+**Arquivo:** `backend/src/styles.css`
+
+```css
+/* ❌ ANTES - conteúdo cortado */
+.content { 
+  flex: 1; 
+  overflow: hidden;  /* ← Bloqueava scroll */
+  display: flex; 
+  flex-direction: column; 
+}
+
+/* ✅ DEPOIS - scroll habilitado */
+.content { 
+  flex: 1; 
+  overflow-y: auto;      /* ← Scroll vertical */
+  overflow-x: hidden;    /* ← Evita scroll horizontal */
+  display: flex; 
+  flex-direction: column; 
+}
+```
+
+---
+
+### 📁 ESTRUTURA DE DIRETÓRIOS (Thumbnails)
+
+```
+f:\luna_cosmeticos\catalogos\Alphahall\
+├── kits\
+│   └── {NOME_KIT}\
+│       ├── thumb.{ext}           # Thumbnail do KIT (capa)
+│       └── img_*.{ext}           # Outras imagens do kit
+└── produtos\
+    └── {NOME_PRODUTO}\
+        ├── thumb.{ext}           # Thumbnail do PRODUTO ← usado no carrossel
+        └── img_*.{ext}           # Carrossel do produto individual
+```
+
+**Query param distingue tipo:**
+```
+# Thumbnail do KIT:
+/api/catalogo/imagem/Alphahall/kit-banho-de-seda/thumb.jpg?tipo=kit
+
+# Thumbnail do PRODUTO (componente):
+/api/catalogo/imagem/Alphahall/shampoo-hidratante/thumb.jpg?tipo=produto
+```
+
+---
+
+### 🔌 API (Endpoints Afetados)
+
+**GET** `/api/catalogo/v2/kits`
+
+**Response atualizado:**
+```json
+{
+  "kits": [
+    {
+      "nome": "Kit Banho de Seda",
+      "componentes": [
+        {
+          "nome_limpo": "shampoo-hidratante",
+          "nome_produto": "Shampoo Hidratante 500ml",
+          "quantidade": 1,
+          "tem_thumb": true,
+          "thumb_ext": "jpg"
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### 🚀 BUILD & DEPLOY
+
+**Compilação frontend:**
+```bash
+cd f:\luna_cosmeticos\backend
+npm run build
+# Gera: backend/dist/index.html + assets/
+```
+
+**Compilação backend (release):**
+```bash
+cd f:\luna_cosmeticos\backend\src-tauri
+cargo build --release
+# Gera: target/release/luna-server.exe
+```
+
+**Execução:**
+```bash
+# Inicia servidor HTTP (porta 3001) + janela Tauri
+.\target\release\luna-server.exe
+```
+
+---
+
+### 🐛 PROBLEMAS RESOLVIDOS
+
+#### 1. Thumbnails não apareciam nos kits
+
+**Causa:** Backend não buscava thumbnails dos componentes
+
+**Solução:** Loop em `listar_kits_db()` chama `verificar_thumb_produto()` para cada componente
+
+**Commit:** `bb64fd8`
+
+---
+
+#### 2. Janela Tauri mostrava "localhost se recusou a conectar"
+
+**Causa:** Tauri carregava `file://dist/index.html`, mas React tentava fetch `http://localhost:3001`
+
+**Sintomas:**
+- Janela abria mas ficava em branco
+- DevTools mostravam: `ERR_CONNECTION_REFUSED`
+- Servidor Axum estava rodando corretamente (porta 3001 listening)
+
+**Root cause:** Propriedade `frontendDist` no `tauri.conf.json` forçava carregamento de arquivos locais
+
+**Solução:** 
+1. Remover `frontendDist` do config
+2. Configurar `devUrl: "http://localhost:3001"`
+3. Servidor Axum serve HTML em `/` + assets em `/assets/*`
+
+**Resultado:** Janela sempre carrega via HTTP, fetch funciona sem CORS
+
+**Commit:** `bb64fd8`
+
+---
+
+#### 3. Conteúdo do painel cortado (sem scroll)
+
+**Causa:** CSS `overflow: hidden` na classe `.content`
+
+**Solução:** Trocar para `overflow-y: auto` + `overflow-x: hidden`
+
+**Commit:** `bb64fd8`
+
+---
+
+### ✅ CHECKLIST DE VALIDAÇÃO
+
+```bash
+# 1. Verificar servidor rodando
+netstat -ano | findstr :3001
+# Esperado: LISTENING 3001
+
+# 2. Testar API kits
+curl http://localhost:3001/api/catalogo/v2/kits
+# Esperado: JSON com tem_thumb: true, thumb_ext: "jpg"
+
+# 3. Testar imagem componente
+curl http://localhost:3001/api/catalogo/imagem/Alphahall/shampoo-hidratante/thumb.jpg?tipo=produto -I
+# Esperado: HTTP/1.1 200 OK
+
+# 4. Abrir painel
+.\target\release\luna-server.exe
+# Verificar:
+# - Janela abre e carrega conteúdo
+# - Aba "Catálogo" > Kits mostra miniaturas
+# - Clicar em kit abre modal com carrossel de thumbnails
+# - Scroll vertical funciona
+```
+
+---
+
+### 📊 FLUXO COMPLETO
+
+```
+1. Usuário abre luna-server.exe
+   ↓
+2. Tauri inicia servidor Axum (porta 3001)
+   ↓
+3. Janela Tauri carrega http://localhost:3001
+   ↓
+4. React App renderiza (código em dist/)
+   ↓
+5. Usuário vai em "Catálogo" > "Kits"
+   ↓
+6. Frontend: fetch('/api/catalogo/v2/kits')
+   ↓
+7. Backend: listar_kits_db()
+   ├─ Busca kits no DB
+   ├─ Para cada componente:
+   │  └─ verificar_thumb_produto() → (tem_thumb, thumb_ext)
+   └─ Retorna JSON com thumbnails
+   ↓
+8. Frontend renderiza:
+   ├─ Card: 4 miniaturas (max)
+   └─ Modal: carrossel horizontal com todas
+```
+
+---
+
+### 📝 ARQUIVOS MODIFICADOS
+
+```
+backend/src-tauri/src/api/catalogo_db.rs   ← ComponenteResponse + busca thumbs
+backend/src-tauri/tauri.conf.json          ← Remove frontendDist
+backend/src/pages/AbaKits.tsx              ← Renderiza thumbnails
+backend/src/styles.css                      ← overflow-y: auto
+backend/dist/                               ← Rebuild frontend
+```
+
+---
+
+### 🎓 LIÇÕES APRENDIDAS
+
+1. **Tauri `frontendDist` vs `devUrl`**
+   - `frontendDist`: carrega HTML local (`file://`) - bom para app offline
+   - `devUrl` sem `frontendDist`: carrega de servidor HTTP - necessário para API local
+   - **Para Luna Server:** sempre HTTP porque backend Axum serve dados dinâmicos
+
+2. **Verificação de thumbnails deve ser por item**
+   - Kits e produtos têm thumbnails separadas
+   - Componentes podem não ter thumbnail (placeholder `📦`)
+   - Query param `?tipo=produto|kit` diferencia path no filesystem
+
+3. **CSS overflow: hidden bloqueia scroll**
+   - Uso comum para evitar layout shift
+   - **Luna Server:** conteúdo dinâmico precisa scroll
+   - Solução: `overflow-y: auto` + `overflow-x: hidden`
+
+4. **Build release Rust é incremental**
+   - Mudanças só em JSON não recompilam tudo
+   - Build completo: ~2min
+   - Build incremental: ~5-10s
+
+---
+
+### 🔗 REFERÊNCIAS
+
+- Arquitetura detalhada: `documentacao/ARQUITETURA_SISTEMA.md`
+- Stack completa: `documentacao/stack.md`
+- API v2 catálogo: Ver [v14-catalogo-database](#checkpoint-v14-catalogo-database)
 
 ---
 
