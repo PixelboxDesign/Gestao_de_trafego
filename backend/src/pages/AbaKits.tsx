@@ -24,6 +24,8 @@ interface Componente {
   quantidade: number;
   preco?: number;
   descricao?: string;
+  tem_thumb: boolean;
+  thumb_ext: string | null;
 }
 
 interface ModalState {
@@ -448,6 +450,84 @@ export default function AbaKits() {
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  🖼️ CARROSSEL (Thumbnails dos Produtos)
+                </label>
+                {modal.kit.componentes.length === 0 ? (
+                  <p style={{ fontSize: 12, color: "var(--text2)", fontStyle: "italic", padding: "0.75rem", background: "var(--bg3)", borderRadius: 6 }}>
+                    ⚠️ Nenhum componente cadastrado. O carrossel ficará vazio.
+                  </p>
+                ) : (
+                  <div style={{ 
+                    display: "flex", 
+                    gap: "0.5rem", 
+                    overflowX: "auto", 
+                    padding: "0.5rem", 
+                    background: "var(--bg3)", 
+                    borderRadius: 8,
+                  }}>
+                    {modal.kit.componentes.map((comp, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          minWidth: 80,
+                          height: 80,
+                          borderRadius: 6,
+                          overflow: "hidden",
+                          background: "var(--bg2)",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          border: "1px solid var(--border)",
+                          position: "relative",
+                        }}
+                        title={comp.nome}
+                      >
+                        {comp.tem_thumb && comp.thumb_ext ? (
+                          <img
+                            src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(comp.nome.replace(/[<>:"/\\|?*]/g, '').trim())}/thumb.${comp.thumb_ext}?tipo=produto`}
+                            alt={comp.nome}
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = "none";
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = '<span style="font-size: 24px; opacity: 0.3">📦</span>';
+                              }
+                            }}
+                          />
+                        ) : (
+                          <span style={{ fontSize: 24, opacity: 0.3 }}>📦</span>
+                        )}
+                        <div style={{
+                          position: "absolute",
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          background: "rgba(0,0,0,0.7)",
+                          padding: "2px 4px",
+                          fontSize: 9,
+                          fontWeight: 700,
+                          color: "#fff",
+                          textAlign: "center",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}>
+                          {idx + 1}/{modal.kit.componentes.length}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p style={{ fontSize: 11, color: "var(--text2)", fontStyle: "italic", margin: "0.25rem 0 0 0" }}>
+                  💡 O carrossel do kit no site mostrará as thumbnails dos produtos que o compõem.
+                </p>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   Produtos que Compõem Este Kit ({modal.kit.componentes.length})
                 </label>
                 {modal.kit.componentes.length === 0 && (
@@ -765,9 +845,63 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
         )}
 
         {kit.componentes.length > 0 && (
-          <span style={{ fontSize: 10, color: "var(--text2)", marginTop: "0.25rem" }}>
-            📦 {kit.componentes.length} {kit.componentes.length === 1 ? 'produto' : 'produtos'}
-          </span>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.5rem" }}>
+            <span style={{ fontSize: 10, color: "var(--text2)" }}>
+              📦 {kit.componentes.length} {kit.componentes.length === 1 ? 'produto' : 'produtos'}
+            </span>
+            <div style={{ display: "flex", gap: "0.25rem", flexWrap: "wrap" }}>
+              {kit.componentes.slice(0, 4).map((comp, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 4,
+                    overflow: "hidden",
+                    background: "var(--bg3)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid var(--border)",
+                  }}
+                  title={comp.nome}
+                >
+                  {comp.tem_thumb && comp.thumb_ext ? (
+                    <img
+                      src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(comp.nome.replace(/[<>:"/\\|?*]/g, '').trim())}/thumb.${comp.thumb_ext}?tipo=produto`}
+                      alt={comp.nome}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                        (e.target as HTMLImageElement).parentElement!.innerHTML = '<span style="font-size: 12px; opacity: 0.5">📦</span>';
+                      }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: 12, opacity: 0.5 }}>📦</span>
+                  )}
+                </div>
+              ))}
+              {kit.componentes.length > 4 && (
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 4,
+                    background: "var(--bg3)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid var(--border)",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: "var(--text2)",
+                  }}
+                >
+                  +{kit.componentes.length - 4}
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </div>
 

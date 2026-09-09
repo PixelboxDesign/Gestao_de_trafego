@@ -70,6 +70,8 @@ pub struct ComponenteResponse {
     pub sku: Option<String>,
     pub nome: String,
     pub quantidade: f64,
+    pub tem_thumb: bool,
+    pub thumb_ext: Option<String>,
 }
 
 // ─── Handlers ────────────────────────────────────────────────────────────────
@@ -194,12 +196,32 @@ pub async fn listar_kits_db(
     let mut kits = Vec::new();
     
     for kit in kits_raw {
-        let componentes = if let Some(comp_json) = kit.componentes {
+        let componentes_raw = if let Some(comp_json) = kit.componentes {
             serde_json::from_value::<Vec<ComponenteResponse>>(comp_json)
                 .unwrap_or_default()
         } else {
             Vec::new()
         };
+
+        // Para cada componente, buscar se tem thumbnail
+        let mut componentes = Vec::new();
+        for comp in componentes_raw {
+            let nome_pasta_componente = comp.nome
+                .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
+                .trim()
+                .to_string();
+            
+            let (tem_thumb, thumb_ext) = verificar_thumb_produto(&nome_pasta_componente).await;
+
+            componentes.push(ComponenteResponse {
+                produto_id: comp.produto_id,
+                sku: comp.sku,
+                nome: comp.nome,
+                quantidade: comp.quantidade,
+                tem_thumb,
+                thumb_ext,
+            });
+        }
 
         // Verificar se tem thumb (buscar pela pasta com o nome do produto em kits/)
         let nome_pasta = kit.nome.as_ref()
