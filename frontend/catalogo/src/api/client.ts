@@ -1,6 +1,7 @@
 import type { Marca, Kit, Produto } from '../types';
 
 // Sempre usa /api relativo - o server.js faz o proxy para o backend
+// Build timestamp: 2026-09-08T23:40:00Z
 const API_BASE = '/api';
 
 /**
