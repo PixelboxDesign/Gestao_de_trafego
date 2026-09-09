@@ -52,6 +52,7 @@ export default function AbaKits() {
   const [modal, setModal] = useState<ModalState | null>(null);
   const [modalComponente, setModalComponente] = useState<ModalComponente | null>(null);
   const [busca, setBusca] = useState("");
+  const [refreshKey, setRefreshKey] = useState(Date.now());
 
   const carregar = useCallback(async () => {
     setLoading(true);
@@ -60,6 +61,7 @@ export default function AbaKits() {
       const res = await fetch(`${API}/api/catalogo/v2/kits`);
       const data: Kit[] = await res.json();
       setKits(data);
+      setRefreshKey(Date.now());
     } catch {
       setErro("Não foi possível carregar o catálogo. Verifique se o servidor está rodando.");
     } finally {
@@ -276,6 +278,7 @@ export default function AbaKits() {
               key={kit.nome}
               kit={kit}
               onClick={() => abrirModal(kit)}
+              refreshKey={refreshKey}
             />
           ))}
         </div>
@@ -752,7 +755,7 @@ export default function AbaKits() {
 
 // ─── Card individual ──────────────────────────────────────────────────────────
 
-function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
+function KitCard({ kit, onClick, refreshKey }: { kit: Kit; onClick: () => void; refreshKey: number }) {
   const [imgErro, setImgErro] = useState(false);
 
   return (
@@ -788,7 +791,7 @@ function KitCard({ kit, onClick }: { kit: Kit; onClick: () => void }) {
       }}>
         {kit.tem_thumb && !imgErro ? (
           <img
-            src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(kit.nome.replace(/[<>:"/\\|?*]/g, '').trim())}/thumb.${kit.thumb_ext}`}
+            src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(kit.nome.replace(/[<>:"/\\|?*]/g, '').trim())}/thumb.${kit.thumb_ext}?t=${refreshKey}`}
             alt={kit.nome}
             onError={() => setImgErro(true)}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
