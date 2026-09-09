@@ -1,0 +1,3502 @@
+[
+  {
+    "timestamp": "20:12:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (665.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.698ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (730.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (59.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (61.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3818ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.203ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.471ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (675.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (56.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (41.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4647ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (732.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4871ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (631.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (57.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (51.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.657ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2933ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (681.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (738.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (41.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3628ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (746.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:12:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (644.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (63.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.307ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (651µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3523ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (638.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (48.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3728ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (665.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2357ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (672.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (66.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3661ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (695.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.5196ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (726µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (41.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.7663ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (732.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3151ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (841.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (125.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2923ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.3119ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (695.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (34.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3682ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (660.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4454ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:24",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:24",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (644µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (57.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3846ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3716ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (653.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (683.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (47.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (51.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4236ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (676µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4997ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (655.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (67.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (37.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3003ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4288ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (700.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:36",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:36",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (634.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (41.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4595ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4608ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (685.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (746.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (67.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (73.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2623ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (735.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2409ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (680.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (41µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3195ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.381ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4471ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (790.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (65.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (61.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2846ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.2021ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4117ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (706.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (37.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.1826ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (704.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3478ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:56",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (665µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (52.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3023ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (700.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4332ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:13:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (693.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (56.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4285ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2431ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (649.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (41.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3091ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.269ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4818ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.0064ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (62.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (29.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.5734ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (717µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4642ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (673.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (64.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (51µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3845ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (667.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2459ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (714µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (74.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4389ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (691.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3673ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (625.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (60.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (57.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.5058ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.1781ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4222ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (657.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (59.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (47.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3106ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.303ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (694.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (922.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (42.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4765ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (732µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2129ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (670µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (34.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:34",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3178ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2924ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (660.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (837.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (69.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:38",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.325ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.3385ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4863ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:39",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (678.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (59.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (37.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:42",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.397ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (700.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.5504ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (643.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (56.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (49.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:46",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.5765ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.1485ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3861ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:47",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (744.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (59µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2883ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (686.1µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3111ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:51",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (663.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (51.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (68µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:54",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4212ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.1746ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.4532ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:55",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (750µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:58",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (35.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3619ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:14:59",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (821.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:00",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:00",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (618µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (59.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:02",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (54.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3012ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3597ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:03",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (600.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (637.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (59µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (34.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:06",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.5939ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3162ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (648.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (837.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (61.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (45.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3855ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.6204ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (682.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (700µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (66.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (39.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:14",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3727ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3664ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (647.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (662.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (62.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (39.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:18",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: POST /api/render/deploy-com-url-nova",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3466ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (712µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:19",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3905ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (659.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:21",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: POST /api/render/deploy-com-url-nova - 200 OK (2.5156344s)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (60.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:22",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (71.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3169ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.1991ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.4294ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:23",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (681.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (61.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (40.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:26",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3817ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3044ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (686.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:27",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (639.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (64.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3493ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3328ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:31",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (625.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:32",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:32",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (654.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (46.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:49",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3392ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.2286ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (699.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:15:50",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (697.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:16:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:16:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (58.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:17:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:17:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (82.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:18:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:18:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (64.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:19:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:19:52",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (64.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:21:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:21:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (55.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:22:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:22:04",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (50.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:23:08",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: POST /api/render/deploy-com-url-nova",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:23:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: POST /api/render/deploy-com-url-nova - 200 OK (2.0570492s)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:23:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "20:23:30",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (68.5µs)",
+    "source": "backend"
+  }
+]

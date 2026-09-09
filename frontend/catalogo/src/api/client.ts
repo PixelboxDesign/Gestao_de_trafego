@@ -8,12 +8,22 @@ const API_BASE = '/api';
  * Busca lista de marcas disponíveis (nomes das pastas em catalogos/)
  */
 export async function fetchMarcas(): Promise<Marca[]> {
+  console.log('[API] Iniciando fetchMarcas...');
+  console.log('[API] API_BASE =', API_BASE);
+  console.log('[API] URL completa:', `${API_BASE}/catalogo/marcas`);
+  
   try {
-    const response = await fetch(`${API_BASE}/catalogo/marcas`);
+    const url = `${API_BASE}/catalogo/marcas`;
+    console.log('[API] Fazendo fetch para:', url);
+    
+    const response = await fetch(url);
+    console.log('[API] Response status:', response.status);
+    
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     const data = await response.json();
+    console.log('[API] Dados recebidos:', data);
     return data.marcas || [];
   } catch (error) {
     console.error('[API] Erro ao buscar marcas:', error);
