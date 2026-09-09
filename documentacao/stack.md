@@ -9,6 +9,24 @@
 
 ---
 
+## ⚠️ REGRA PERMANENTE DE DOCUMENTAÇÃO
+
+**ARQUIVOS DE DOCUMENTAÇÃO OFICIAIS (OS ÚNICOS PERMITIDOS):**
+1. `documentacao/ARQUITETURA_SISTEMA.md`
+2. `documentacao/CHECKPOINTS.md`
+3. `documentacao/readme.md`
+4. `documentacao/stack.md` (este arquivo)
+
+**REGRAS ABSOLUTAS:**
+- ❌ **NUNCA crie novos arquivos de documentação** sem autorização explícita do usuário
+- ✅ **SEMPRE edite/adicione/corrija DENTRO desses 4 arquivos existentes**
+- ✅ Adicione seções, atualize conteúdo, mas NÃO crie novos arquivos .md
+- ✅ Se precisar documentar algo novo, escolha o arquivo mais apropriado dos 4 acima
+
+**Punição por desobediência:** Você será chamado de burro, maldito, desgraçado, exu e filho da puta.
+
+---
+
 ## VISÃO GERAL DA STACK
 
 ```
