@@ -134,7 +134,7 @@ export default function AbaProdutos() {
     const nomePasta = modal.produto.nome.replace(/[<>:"/\\|?*]/g, '').trim();
 
     try {
-      const res = await fetch(`${API}/api/catalogo/deletar-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}?tipo=produto`, {
+      const res = await fetch(`${API}/api/catalogo/deletar-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}`, {
         method: 'DELETE',
       });
       const data = await res.json();
@@ -171,15 +171,15 @@ export default function AbaProdutos() {
     formData.append('imagem', file);
 
     try {
-      const res = await fetch(`${API}/api/catalogo/upload-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}?tipo=produto`, {
+      const res = await fetch(`${API}/api/catalogo/upload-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}`, {
         method: 'POST',
         body: formData,
       });
       const data = await res.json();
       if (data.ok) {
         alert('Thumbnail atualizada com sucesso!');
-        await carregar(); // Aguarda recarregar antes de fechar
-        fecharModal();
+        carregar(); // Recarrega a lista
+        fecharModal(); // Fecha o modal para recarregar a imagem
       } else {
         alert('Erro: ' + data.erro);
       }
