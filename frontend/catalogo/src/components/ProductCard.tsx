@@ -1,3 +1,4 @@
+// [LUNA-FIX-CACHE-BUST-v11-refreshKey-2026] Force cache refresh
 import { useState } from 'react';
 import { getImageUrl } from '../api/client';
 import type { Kit, Produto } from '../types';

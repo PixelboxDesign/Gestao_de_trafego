@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 
+// [LUNA-FIX-CACHE-BUST-v11-refreshKey-2026] Force cache refresh
 const API = "http://localhost:3001";
 const MARCA_PADRAO = "Alphahall";
 
