@@ -24,7 +24,9 @@ export async function fetchMarcas(): Promise<Marca[]> {
     }
     const data = await response.json();
     console.log('[API] Dados recebidos:', data);
-    return data.marcas || [];
+    
+    // Backend retorna array diretamente, não { marcas: [...] }
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error('[API] Erro ao buscar marcas:', error);
     return [];
@@ -41,7 +43,8 @@ export async function fetchKits(marca: string): Promise<Kit[]> {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     const data = await response.json();
-    return data.kits || [];
+    // Backend retorna array diretamente
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error(`[API] Erro ao buscar kits da marca "${marca}":`, error);
     return [];
@@ -58,7 +61,8 @@ export async function fetchProdutos(marca: string): Promise<Produto[]> {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     const data = await response.json();
-    return data.produtos || [];
+    // Backend retorna array diretamente
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error(`[API] Erro ao buscar produtos da marca "${marca}":`, error);
     return [];
