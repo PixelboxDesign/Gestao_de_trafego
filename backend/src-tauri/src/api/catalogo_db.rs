@@ -65,6 +65,15 @@ pub struct KitResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ComponenteFromDB {
+    pub produto_id: String,
+    #[serde(default)]
+    pub sku: Option<String>,
+    pub nome: String,
+    pub quantidade: i32,  // Banco retorna int
+}
+
+#[derive(Debug, Serialize, Clone)]
 pub struct ComponenteResponse {
     pub produto_id: String,
     pub sku: Option<String>,
@@ -197,9 +206,21 @@ pub async fn listar_kits_db(
     
     for kit in kits_raw {
         let componentes_raw = if let Some(comp_json) = kit.componentes {
-            serde_json::from_value::<Vec<ComponenteResponse>>(comp_json)
-                .unwrap_or_default()
+            match serde_json::from_value::<Vec<ComponenteFromDB>>(comp_json.clone()) {
+                Ok(comps) => {
+                    tracing::info!("✅ Componentes parseados: {} itens", comps.len());
+                    comps
+                }
+                Err(e) => {
+                    tracing::error!("❌ Erro ao parsear componentes do kit '{}': {}", 
+                        kit.nome.as_ref().unwrap_or(&"".to_string()), e);
+                    tracing::error!("JSON recebido: {}", comp_json);
+                    Vec::new()
+                }
+            }
         } else {
+            tracing::warn!("⚠️ Kit '{}' não tem componentes no banco", 
+                kit.nome.as_ref().unwrap_or(&"".to_string()));
             Vec::new()
         };
 
@@ -217,7 +238,7 @@ pub async fn listar_kits_db(
                 produto_id: comp.produto_id,
                 sku: comp.sku,
                 nome: comp.nome,
-                quantidade: comp.quantidade,
+                quantidade: comp.quantidade as f64,  // Convert int -> float
                 tem_thumb,
                 thumb_ext,
             });

@@ -42,6 +42,7 @@ export default function AbaProdutos() {
   const [erro, setErro] = useState<string | null>(null);
   const [modal, setModal] = useState<ModalState | null>(null);
   const [busca, setBusca] = useState("");
+  const [refreshKey, setRefreshKey] = useState(Date.now()); // Para forçar reload de imagens
 
   const carregar = useCallback(async () => {
     setLoading(true);
@@ -50,6 +51,7 @@ export default function AbaProdutos() {
       const res = await fetch(`${API}/api/catalogo/v2/produtos-individuais`);
       const data: Produto[] = await res.json();
       setProdutos(data);
+      setRefreshKey(Date.now()); // Atualiza key para forçar reload das imagens
     } catch {
       setErro("Não foi possível carregar os produtos. Verifique se o servidor está rodando.");
     } finally {
@@ -175,7 +177,7 @@ export default function AbaProdutos() {
       const data = await res.json();
       if (data.ok) {
         alert('Thumbnail atualizada com sucesso!');
-        carregar();
+        await carregar(); // Aguarda recarregar antes de fechar
         fecharModal();
       } else {
         alert('Erro: ' + data.erro);
@@ -326,6 +328,7 @@ export default function AbaProdutos() {
               key={produto.nome}
               produto={produto}
               onClick={() => abrirModal(produto)}
+              refreshKey={refreshKey}
             />
           ))}
         </div>
@@ -373,7 +376,7 @@ export default function AbaProdutos() {
               {modal.produto.tem_thumb && (
                 <div style={{ background: "var(--bg3)", display: "flex", justifyContent: "center", padding: "1rem" }}>
                   <img
-                    src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/produtos/${encodeURIComponent(modal.produto.nome.replace(/[<>:"/\\|?*]/g, '').trim())}/thumb.${modal.produto.thumb_ext}?t=${Date.now()}`}
+                    src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(modal.produto.nome.replace(/[<>:"/\\|?*]/g, '').trim())}/thumb.${modal.produto.thumb_ext}?tipo=produto&t=${Date.now()}`}
                     alt={modal.produto.nome}
                     style={{
                       maxHeight: 200, maxWidth: "100%",
@@ -822,7 +825,7 @@ export default function AbaProdutos() {
 
 // ─── Card individual ──────────────────────────────────────────────────────────
 
-function ProdutoCard({ produto, onClick }: { produto: Produto; onClick: () => void }) {
+function ProdutoCard({ produto, onClick, refreshKey }: { produto: Produto; onClick: () => void; refreshKey: number }) {
   const [imgErro, setImgErro] = useState(false);
 
   return (
@@ -859,7 +862,7 @@ function ProdutoCard({ produto, onClick }: { produto: Produto; onClick: () => vo
       }}>
         {produto.tem_thumb && !imgErro ? (
           <img
-            src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/produtos/${encodeURIComponent(produto.nome.replace(/[<>:"/\\|?*]/g, '').trim())}/thumb.${produto.thumb_ext}`}
+            src={`${API}/api/catalogo/imagem/${MARCA_PADRAO}/${encodeURIComponent(produto.nome.replace(/[<>:"/\\|?*]/g, '').trim())}/thumb.${produto.thumb_ext}?tipo=produto&t=${refreshKey}`}
             alt={produto.nome}
             onError={() => setImgErro(true)}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}

@@ -5,7 +5,7 @@ import type { Kit, Produto } from '../types';
 interface ProductCardProps {
   item: Kit | Produto;
   brandName: string;
-  tipo: 'kits' | 'produtos';
+  tipo: 'kit' | 'produto';
   revealed: boolean;
   index: number;
 }
@@ -14,7 +14,8 @@ export function ProductCard({ item, brandName, tipo, revealed, index }: ProductC
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [imageError, setImageError] = useState(false);
 
-  const images = item.carrossel || [];
+  // API v2: imagens_carrossel já vem populado
+  const images = item.imagens_carrossel || [];
   const hasMultipleImages = images.length > 1;
   const currentImage = images[currentImageIndex];
 
@@ -30,10 +31,11 @@ export function ProductCard({ item, brandName, tipo, revealed, index }: ProductC
     setImageError(false);
   };
 
-  const thumbnailUrl = item.thumbnail
-    ? getImageUrl(brandName, tipo, item.slug, item.thumbnail)
+  // API v2: usa tem_thumb + thumb_ext para construir URL
+  const thumbnailUrl = item.tem_thumb && item.thumb_ext
+    ? getImageUrl(brandName, tipo, item.nome, `thumb.${item.thumb_ext}`)
     : currentImage
-    ? getImageUrl(brandName, tipo, item.slug, currentImage)
+    ? getImageUrl(brandName, tipo, item.nome, currentImage)
     : null;
 
   return (
@@ -103,7 +105,7 @@ export function ProductCard({ item, brandName, tipo, revealed, index }: ProductC
           </>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-6xl text-muted-foreground/30">
-            {tipo === 'kits' ? '📦' : '✨'}
+            {tipo === 'kit' ? '📦' : '✨'}
           </div>
         )}
       </div>
@@ -114,18 +116,18 @@ export function ProductCard({ item, brandName, tipo, revealed, index }: ProductC
           {item.nome}
         </h3>
 
-        {/* Categoria Badge (se disponível) */}
-        {'categoria' in item && item.categoria && (
-          <span className="inline-block px-3 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium">
-            {item.categoria}
-          </span>
+        {/* Preço (se disponível) */}
+        {item.preco > 0 && (
+          <div className="text-xl font-bold text-primary mt-2">
+            R$ {item.preco.toFixed(2).replace('.', ',')}
+          </div>
         )}
 
         {/* Kit Info */}
-        {'produtos' in item && item.produtos && item.produtos.length > 0 && (
+        {'componentes' in item && item.componentes && item.componentes.length > 0 && (
           <div className="mt-3 text-sm text-muted-foreground">
-            <span className="font-medium">{item.produtos.length}</span> produto
-            {item.produtos.length !== 1 ? 's' : ''} neste kit
+            <span className="font-medium">{item.componentes.length}</span> produto
+            {item.componentes.length !== 1 ? 's' : ''} neste kit
           </div>
         )}
       </div>

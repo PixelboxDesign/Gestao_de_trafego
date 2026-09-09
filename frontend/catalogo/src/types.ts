@@ -3,22 +3,46 @@ export interface Marca {
   slug: string;
 }
 
+// API v2 - Database response
 export interface Produto {
+  id: number;
+  produto_id: string;
+  sku: string;
   nome: string;
-  slug: string;
-  marca: string;
-  thumbnail?: string;
-  carrossel: string[];
-  categoria?: string;
+  tipo: string;
+  preco: number;
+  descricao: string;
+  descricao_peso: string;
+  descricao_tamanho: string;
+  descricao_composicao: string;
+  tem_thumb: boolean;
+  thumb_ext: string | null;
+  imagens_carrossel: string[];
 }
 
-export interface Kit {
+// Componente de kit (produto dentro do kit)
+export interface Componente {
+  produto_id: string;
+  sku: string;
   nome: string;
-  slug: string;
-  marca: string;
-  thumbnail?: string;
-  carrossel: string[];
-  produtos: Produto[];
+  quantidade: number;
+  tem_thumb: boolean;
+  thumb_ext: string | null;
+}
+
+// API v2 - Database response
+export interface Kit {
+  id: number;
+  produto_id: string;
+  sku: string;
+  nome: string;
+  tipo: string;
+  preco: number;
+  descricao: string;
+  eh_kit: boolean;
+  tem_thumb: boolean;
+  thumb_ext: string | null;
+  componentes: Componente[];
 }
 
 export interface CatalogoResponse {

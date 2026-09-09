@@ -464,6 +464,13 @@ pub async fn upload_thumb(
     let subfolder = if tipo == "produto" { "produtos" } else { "kits" };
     let kit_path = marca_path.join(subfolder).join(&kit_nome);
 
+    // Cria a pasta se não existir
+    if !kit_path.exists() {
+        if let Err(e) = fs::create_dir_all(&kit_path).await {
+            return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao criar pasta: {}", e) }));
+        }
+    }
+
     // Segurança
     let canonical_base = match base.canonicalize() {
         Ok(p) => p,
@@ -537,6 +544,13 @@ pub async fn upload_carrossel(
     let tipo = params.get("tipo").map(|s| s.as_str()).unwrap_or("kit");
     let subfolder = if tipo == "produto" { "produtos" } else { "kits" };
     let kit_path = marca_path.join(subfolder).join(&kit_nome);
+
+    // Cria a pasta se não existir
+    if !kit_path.exists() {
+        if let Err(e) = fs::create_dir_all(&kit_path).await {
+            return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao criar pasta: {}", e) }));
+        }
+    }
 
     // Segurança
     let canonical_base = match base.canonicalize() {

@@ -34,11 +34,11 @@ export async function fetchMarcas(): Promise<Marca[]> {
 }
 
 /**
- * Busca kits de uma marca específica
+ * Busca kits de uma marca específica (API v2 - Database)
  */
 export async function fetchKits(marca: string): Promise<Kit[]> {
   try {
-    const response = await fetch(`${API_BASE}/catalogo/kits/${encodeURIComponent(marca)}`);
+    const response = await fetch(`${API_BASE}/catalogo/v2/kits`);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
@@ -46,17 +46,17 @@ export async function fetchKits(marca: string): Promise<Kit[]> {
     // Backend retorna array diretamente
     return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error(`[API] Erro ao buscar kits da marca "${marca}":`, error);
+    console.error(`[API] Erro ao buscar kits:`, error);
     return [];
   }
 }
 
 /**
- * Busca produtos individuais de uma marca específica
+ * Busca produtos individuais de uma marca específica (API v2 - Database)
  */
 export async function fetchProdutos(marca: string): Promise<Produto[]> {
   try {
-    const response = await fetch(`${API_BASE}/catalogo/produtos/${encodeURIComponent(marca)}`);
+    const response = await fetch(`${API_BASE}/catalogo/v2/produtos-individuais`);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
@@ -64,16 +64,20 @@ export async function fetchProdutos(marca: string): Promise<Produto[]> {
     // Backend retorna array diretamente
     return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.error(`[API] Erro ao buscar produtos da marca "${marca}":`, error);
+    console.error(`[API] Erro ao buscar produtos:`, error);
     return [];
   }
 }
 
 /**
  * Retorna URL completa para uma imagem do catálogo
+ * @param marca Nome da marca (ex: "Alphahall")
+ * @param tipo Tipo de produto ('kit' ou 'produto')
+ * @param nome Nome do produto/kit do banco de dados
+ * @param filename Nome do arquivo (ex: "thumb.jpg", "img_1.jpg")
  */
-export function getImageUrl(marca: string, tipo: 'kits' | 'produtos', produtoSlug: string, filename: string): string {
-  // Adiciona query parameter ?tipo=produto ou ?tipo=kit
-  const tipoParam = tipo === 'produtos' ? 'produto' : 'kit';
-  return `${API_BASE}/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(produtoSlug)}/${encodeURIComponent(filename)}?tipo=${tipoParam}`;
+export function getImageUrl(marca: string, tipo: 'kit' | 'produto', nome: string, filename: string): string {
+  // Limpa o nome para usar como pasta (mesmo tratamento do backend)
+  const nomePasta = nome.replace(/[<>:"/\\|?*]/g, '').trim();
+  return `${API_BASE}/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(nomePasta)}/${encodeURIComponent(filename)}?tipo=${tipo}`;
 }

@@ -1,0 +1,401 @@
+[
+  {
+    "timestamp": "14:59:01",
+    "level": "Info",
+    "module": "Sistema",
+    "message": "Luna Server iniciado com sucesso",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:01",
+    "level": "Info",
+    "module": "Database",
+    "message": "Conexão com MySQL estabelecida",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:01",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:01",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET / - 200 OK (313.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (128.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /assets/index-CtvbFaJR.css",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /assets/index-DO5EeO4v.js",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Error",
+    "module": "HTTP",
+    "message": "Response: GET /assets/index-CtvbFaJR.css - 304 Not Modified (530.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Error",
+    "module": "HTTP",
+    "message": "Response: GET /assets/index-DO5EeO4v.js - 304 Not Modified (426.7µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (55µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /favicon.ico",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Warn",
+    "module": "HTTP",
+    "message": "Response: GET /favicon.ico - 404 Not Found (21.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:07",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/clientes/filtros/ufs",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/clientes?page=1&limit=100 - 200 OK (4.729875s)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:15",
+    "level": "Info",
+    "module": "Cloudflare",
+    "message": "Nova URL detectada: https://nice-praise-persons-vancouver.trycloudflare.com",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:15",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (44.6µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (48.9µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:35",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (52.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:41",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: POST /api/render/deploy-com-url-nova",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:43",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: POST /api/render/deploy-com-url-nova - 200 OK (1.9828676s)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/catalogo/v2/kits",
+    "source": "backend"
+  },
+  {
+    "timestamp": "14:59:53",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/catalogo/v2/kits - 200 OK (33.9054ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:00:28",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:00:28",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (82.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:00:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:00:57",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (60.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (53.3µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (34.5µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (2.9301ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3213ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.0096ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:01:12",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (631.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (56.8µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:09",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (89.4µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (2.1873ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (1.3552ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/whatsapp/status",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:10",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/whatsapp/status - 200 OK (1.3304ms)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /api/disparos?limit=60",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:11",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /api/disparos?limit=60 - 200 OK (650.2µs)",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Request: GET /health",
+    "source": "backend"
+  },
+  {
+    "timestamp": "15:02:20",
+    "level": "Info",
+    "module": "HTTP",
+    "message": "Response: GET /health - 200 OK (48.5µs)",
+    "source": "backend"
+  }
+]
