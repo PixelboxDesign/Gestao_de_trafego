@@ -277,7 +277,7 @@ pub async fn update_render_env(state: State<'_, Arc<Mutex<AppState>>>) -> Result
             }
             Ok(resp) => {
                 let status = resp.status();
-                let error_text = resp.text().await.unwrap_or_default();
+                let _error_text = resp.text().await.unwrap_or_default();
                 error_messages.push(format!("⚠️ {}: Deploy falhou (HTTP {})", service_id, status));
             }
             Err(e) => {

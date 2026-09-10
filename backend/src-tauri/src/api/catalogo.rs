@@ -533,11 +533,21 @@ pub async fn upload_thumb(
                     "UPDATE kits SET tem_thumb = 1, thumb_ext = ? WHERE nome = ?"
                 };
                 
-                let _ = sqlx::query(update_query)
+                println!("[THUMB-DEBUG] Tipo: {}, Nome: {}, Ext: {}", tipo, kit_nome, ext);
+                
+                match sqlx::query(update_query)
                     .bind(ext)
                     .bind(&kit_nome)
                     .execute(pool)
-                    .await;
+                    .await
+                {
+                    Ok(result) => {
+                        println!("[THUMB-DEBUG] DB Update - Rows affected: {}", result.rows_affected());
+                    }
+                    Err(e) => {
+                        println!("[THUMB-DEBUG] DB Update ERROR: {}", e);
+                    }
+                }
                 
                 return Json(serde_json::json!({ "ok": true, "arquivo": format!("thumb.{}", ext) }));
             },
