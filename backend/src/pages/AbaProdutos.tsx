@@ -134,7 +134,7 @@ export default function AbaProdutos() {
     const nomePasta = modal.produto.nome.replace(/[<>:"/\\|?*]/g, '').trim();
 
     try {
-      const res = await fetch(`${API}/api/catalogo/deletar-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}`, {
+      const res = await fetch(`${API}/api/catalogo/deletar-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}?tipo=produto`, {
         method: 'DELETE',
       });
       const data = await res.json();
@@ -171,7 +171,7 @@ export default function AbaProdutos() {
     formData.append('imagem', file);
 
     try {
-      const res = await fetch(`${API}/api/catalogo/upload-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}`, {
+      const res = await fetch(`${API}/api/catalogo/upload-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}?tipo=produto`, {
         method: 'POST',
         body: formData,
       });
