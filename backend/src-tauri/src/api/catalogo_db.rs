@@ -251,6 +251,16 @@ pub async fn listar_kits_db(
             .trim()
             .to_string();
         
+        // ✅ TASK #1: Verificar se a pasta existe ANTES de adicionar
+        use std::path::PathBuf;
+        let base_kits = PathBuf::from("f:\\luna_cosmeticos\\catalogos\\Alphahall\\kits");
+        let pasta_kit = base_kits.join(&nome_pasta);
+        
+        // Se a pasta não existe, pula este kit (normalização)
+        if !pasta_kit.exists() || !pasta_kit.is_dir() {
+            continue;
+        }
+        
         let (tem_thumb, thumb_ext) = verificar_thumb_kit(&nome_pasta).await;
 
         kits.push(KitResponse {
@@ -314,6 +324,16 @@ pub async fn listar_produtos_individuais_db(
             .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
             .trim()
             .to_string();
+        
+        // ✅ TASK #1: Verificar se a pasta existe ANTES de adicionar
+        use std::path::PathBuf;
+        let base = PathBuf::from("f:\\luna_cosmeticos\\catalogos\\Alphahall\\produtos");
+        let pasta_produto = base.join(&nome_pasta);
+        
+        // Se a pasta não existe, pula este produto (normalização)
+        if !pasta_produto.exists() || !pasta_produto.is_dir() {
+            continue;
+        }
         
         let (tem_thumb, thumb_ext) = verificar_thumb_produto(&nome_pasta).await;
         let imagens_carrossel = listar_imagens_carrossel_produto(&nome_pasta).await;
