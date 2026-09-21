@@ -151,66 +151,43 @@ export default function AbaProdutos() {
   }
 
   async function handleThumbUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log('[THUMB-UPLOAD] Função handleThumbUpload foi chamada!');
-    console.log('[THUMB-UPLOAD] modal:', modal);
-    console.log('[THUMB-UPLOAD] e.target.files:', e.target.files);
-    
-    if (!modal) {
-      console.log('[THUMB-UPLOAD] ERRO: modal é null');
-      return;
-    }
-    
+    if (!modal) return;
     const file = e.target.files?.[0];
-    console.log('[THUMB-UPLOAD] arquivo selecionado:', file);
-    
-    if (!file) {
-      console.log('[THUMB-UPLOAD] ERRO: Nenhum arquivo selecionado');
-      alert('⚠️ Nenhum arquivo foi selecionado. Por favor, selecione uma imagem.');
-      return;
-    }
+    if (!file) return;
 
+    // Valida tipo
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      console.log('[THUMB-UPLOAD] ERRO: Tipo de arquivo inválido:', file.type);
       alert('Tipo inválido. Use JPG, PNG ou WebP.');
       return;
     }
 
+    // Valida tamanho (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      console.log('[THUMB-UPLOAD] ERRO: Arquivo muito grande:', file.size);
       alert('Arquivo muito grande. Máximo 5MB.');
       return;
     }
 
+    // Nome da pasta = nome do produto (sem SKU, sem prefixo)
     const nomePasta = modal.produto.nome.replace(/[<>:"/\\|?*]/g, '').trim();
-    console.log('[THUMB-UPLOAD] nomePasta:', nomePasta);
-    
+
     const formData = new FormData();
     formData.append('imagem', file);
 
-    console.log('[THUMB-UPLOAD] Iniciando upload...');
     try {
-      const url = `${API}/api/catalogo/upload-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}?tipo=produto`;
-      console.log('[THUMB-UPLOAD] URL:', url);
-      
-      const res = await fetch(url, {
+      const res = await fetch(`${API}/api/catalogo/upload-thumb/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}?tipo=produto`, {
         method: 'POST',
         body: formData,
       });
-      console.log('[THUMB-UPLOAD] Response status:', res.status);
-      
       const data = await res.json();
-      console.log('[THUMB-UPLOAD] Response data:', data);
-      
       if (data.ok) {
-        alert('✅ Thumbnail atualizada com sucesso!');
+        alert('Thumbnail atualizada com sucesso!');
         carregar(); // Recarrega a lista
         fecharModal(); // Fecha o modal para recarregar a imagem
       } else {
         alert('Erro: ' + data.erro);
       }
     } catch (err) {
-      console.error('[THUMB-UPLOAD] Erro ao fazer upload:', err);
       alert('Erro ao fazer upload');
     }
   }
