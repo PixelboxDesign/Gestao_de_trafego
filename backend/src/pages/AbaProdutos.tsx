@@ -817,42 +817,84 @@ export default function AbaProdutos() {
               borderTop: "1px solid var(--border)",
               display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem"
             }}>
-              {/* Botão Excluir (vermelho) - Task #2 */}
-              <button 
-                className="btn" 
-                onClick={async () => {
-                  if (!confirm(`⚠️ TEM CERTEZA que deseja EXCLUIR "${modal.produto.nome}"?\n\nIsso vai deletar TODA a pasta com thumbnails e imagens!\n\nEsta ação NÃO pode ser desfeita!`)) {
-                    return;
-                  }
-                  
-                  const nomePasta = modal.produto.nome.replace(/[<>:"/\\|?*]/g, '').trim();
-                  
-                  try {
-                    const res = await fetch(`${API}/api/catalogo/produto/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}`, {
-                      method: 'DELETE'
-                    });
-                    const data = await res.json();
-                    
-                    if (data.ok) {
-                      alert('✅ Produto excluído com sucesso!');
-                      fecharModal();
-                      carregar(); // Recarrega a lista
-                    } else {
-                      alert('❌ Erro ao excluir: ' + data.erro);
+              {/* Botões de ação perigosa - Task #2 e #3 */}
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                {/* Botão Desabilitar - Task #3 */}
+                <button 
+                  className="btn" 
+                  onClick={async () => {
+                    if (!confirm(`Desabilitar "${modal.produto.nome}"?\n\nEle não vai aparecer no Luna Catálogo, mas continua no painel de disparo.`)) {
+                      return;
                     }
-                  } catch (err) {
-                    alert('❌ Erro ao excluir produto: ' + err);
-                  }
-                }}
-                style={{ 
-                  background: "rgba(239,68,68,0.1)", 
-                  color: "#ef4444",
-                  border: "1px solid rgba(239,68,68,0.3)",
-                  fontWeight: 600
-                }}
-              >
-                🗑️ Excluir Produto
-              </button>
+                    
+                    const nomePasta = modal.produto.nome.replace(/[<>:"/\\|?*]/g, '').trim();
+                    
+                    try {
+                      const res = await fetch(`${API}/api/catalogo/v2/produto/${modal.produto.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ visivel: false })
+                      });
+                      const data = await res.json();
+                      
+                      if (data.ok) {
+                        alert('✅ Produto desabilitado! Não aparecerá mais no catálogo web.');
+                        fecharModal();
+                        carregar();
+                      } else {
+                        alert('❌ Erro ao desabilitar: ' + data.erro);
+                      }
+                    } catch (err) {
+                      alert('❌ Erro ao desabilitar produto: ' + err);
+                    }
+                  }}
+                  style={{ 
+                    background: "rgba(251,191,36,0.1)", 
+                    color: "#f59e0b",
+                    border: "1px solid rgba(251,191,36,0.3)",
+                    fontWeight: 600
+                  }}
+                >
+                  👁️‍🗨️ Desabilitar
+                </button>
+
+                {/* Botão Excluir (vermelho) - Task #2 */}
+                <button 
+                  className="btn" 
+                  onClick={async () => {
+                    if (!confirm(`⚠️ TEM CERTEZA que deseja EXCLUIR "${modal.produto.nome}"?\n\nIsso vai deletar TODA a pasta com thumbnails e imagens!\n\nEsta ação NÃO pode ser desfeita!`)) {
+                      return;
+                    }
+                    
+                    const nomePasta = modal.produto.nome.replace(/[<>:"/\\|?*]/g, '').trim();
+                    
+                    try {
+                      const res = await fetch(`${API}/api/catalogo/produto/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}`, {
+                        method: 'DELETE'
+                      });
+                      const data = await res.json();
+                      
+                      if (data.ok) {
+                        alert('✅ Produto excluído com sucesso!');
+                        fecharModal();
+                        carregar(); // Recarrega a lista
+                      } else {
+                        alert('❌ Erro ao excluir: ' + data.erro);
+                      }
+                    } catch (err) {
+                      alert('❌ Erro ao excluir produto: ' + err);
+                    }
+                  }}
+                  style={{ 
+                    background: "rgba(239,68,68,0.1)", 
+                    color: "#ef4444",
+                    border: "1px solid rgba(239,68,68,0.3)",
+                    fontWeight: 600
+                  }}
+                >
+                  🗑️ Excluir Produto
+                </button>
+              </div>
 
               <div style={{ flex: 1 }} />
 
