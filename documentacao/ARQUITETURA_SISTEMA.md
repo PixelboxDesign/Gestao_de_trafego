@@ -1,5 +1,5 @@
 # LUNA COSMÉTICOS — DOCUMENTAÇÃO OFICIAL DO SISTEMA
-**Fonte Única de Verdade | Última Atualização: 08/09/2026**
+**Fonte Única de Verdade | Última Atualização: 15/05/2026**
 
 ---
 
@@ -127,6 +127,63 @@ O Sistema de Catálogos Luna Cosméticos utiliza uma **arquitetura híbrida**:
 ---
 
 ## 2. INFRAESTRUTURA E DEPLOY
+
+### ⚠️ 2.0 PORTAS DO SISTEMA — REGRA CRÍTICA
+
+**A PORTA 3000 ESTÁ OCUPADA POR OUTRO PROJETO (PixelBox)**
+
+**PORTAS CORRETAS DO LUNA COSMÉTICOS:**
+
+| Serviço | Porta | Observação |
+|---|---|---|
+| **Backend Tauri (Local)** | **3001** | Porta principal do Luna Server |
+| **Frontend Disparo (Local)** | **5173** | Vite dev server (desenvolvimento) |
+| **Frontend Catálogo (Local)** | **5174** | Vite dev server (desenvolvimento) |
+| **Render.com (Produção)** | Automática | Render fornece via variável `PORT` |
+| **MySQL** | 3306 | Banco de dados local |
+
+**❌ NÃO USE A PORTA 3000 — ELA NÃO É DO LUNA COSMÉTICOS!**
+
+**Como acessar localmente:**
+
+```bash
+# Backend API
+http://localhost:3001
+
+# Frontend Disparo (dev)
+http://localhost:5173
+
+# Frontend Catálogo (dev)
+http://localhost:5174
+```
+
+**Comandos corretos:**
+
+```bash
+# Backend
+cd backend/src-tauri
+cargo run --release
+# Output: Server running on http://localhost:3001
+
+# Frontend Disparo (dev local com Vite)
+cd frontend/disparo
+npm run dev
+# Output: Local: http://localhost:5173
+
+# Frontend Catálogo (dev local com Vite)
+cd frontend/catalogo
+npm run dev
+# Output: Local: http://localhost:5174
+```
+
+**Em produção (Render.com):**
+- Render fornece a porta automaticamente via variável `PORT`
+- O `server.js` lê: `const PORT = process.env.PORT || 3000`
+- Mas localmente, o Vite usa 5173/5174, NÃO 3000!
+
+**NUNCA mencione "acesse localhost:3000" — essa porta é de outro projeto!**
+
+---
 
 ### 2.1 Render.com (Frontend Proxy)
 
@@ -1487,6 +1544,32 @@ Nenhuma variável de ambiente necessária — caminhos hardcoded nos scripts.
 ---
 
 ## 19. CHANGELOG
+
+### 15/05/2026 — v12-portas-correcao
+
+#### ⚠️ CORREÇÃO CRÍTICA: Portas do Sistema
+
+**Problema identificado:**
+- Porta 3000 está ocupada por outro projeto (PixelBox)
+- Instruções anteriores mencionavam incorretamente localhost:3000
+- Causava confusão e redirecionamento para aplicação errada
+
+**Portas corretas documentadas:**
+- Backend Tauri: **3001** (porta principal do Luna Server)
+- Frontend Disparo (dev): **5173** (Vite dev server)
+- Frontend Catálogo (dev): **5174** (Vite dev server)
+- Render.com produção: Porta automática (variável `PORT`)
+
+**Seção adicionada:**
+- Nova seção 2.0 "PORTAS DO SISTEMA — REGRA CRÍTICA"
+- Tabela de referência com todas as portas
+- Comandos corretos para cada serviço
+- Avisos para NUNCA usar porta 3000
+
+**Regra permanente:**
+- Sempre verificar portas antes de dar instruções
+- Nunca assumir que porta 3000 está disponível
+- Especificar porta correta em cada comando
 
 ### 08/09/2026 — v11-frontend-catalogo
 

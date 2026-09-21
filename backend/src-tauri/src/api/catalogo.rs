@@ -456,6 +456,10 @@ pub async fn upload_thumb(
     Query(params): Query<HashMap<String, String>>,
     mut multipart: Multipart,
 ) -> Json<serde_json::Value> {
+    println!("========================================");
+    println!("[THUMB-UPLOAD-START] Marca: {}, Nome: {}", marca_nome, kit_nome);
+    println!("[THUMB-UPLOAD] Query params: {:?}", params);
+    
     let base = catalogo_path();
     let marca_path = base.join(&marca_nome);
     
@@ -463,12 +467,20 @@ pub async fn upload_thumb(
     let tipo = params.get("tipo").map(|s| s.as_str()).unwrap_or("kit");
     let subfolder = if tipo == "produto" { "produtos" } else { "kits" };
     let kit_path = marca_path.join(subfolder).join(&kit_nome);
+    
+    println!("[THUMB-UPLOAD] Tipo: {}, Subfolder: {}", tipo, subfolder);
+    println!("[THUMB-UPLOAD] Path completo: {:?}", kit_path);
 
     // Cria a pasta se não existir
     if !kit_path.exists() {
+        println!("[THUMB-UPLOAD] Pasta não existe, criando: {:?}", kit_path);
         if let Err(e) = fs::create_dir_all(&kit_path).await {
+            println!("[THUMB-UPLOAD-ERROR] Falha ao criar pasta: {}", e);
             return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao criar pasta: {}", e) }));
         }
+        println!("[THUMB-UPLOAD] Pasta criada com sucesso");
+    } else {
+        println!("[THUMB-UPLOAD] Pasta já existe");
     }
 
     // Segurança
@@ -477,25 +489,43 @@ pub async fn upload_thumb(
         Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Catálogo não encontrado" })),
     };
     let canonical_kit = match kit_path.canonicalize() {
-        Ok(p) => p,
-        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": format!("{} não encontrado", if tipo == "produto" { "Produto" } else { "Kit" }) })),
+        Ok(p) => {
+            println!("[THUMB-UPLOAD] Path canônico: {:?}", p);
+            p
+        },
+        Err(e) => {
+            println!("[THUMB-UPLOAD-ERROR] Erro ao obter path canônico: {}", e);
+            return Json(serde_json::json!({ "ok": false, "erro": format!("{} não encontrado", if tipo == "produto" { "Produto" } else { "Kit" }) }));
+        }
     };
     if !canonical_kit.starts_with(&canonical_base) {
+        println!("[THUMB-UPLOAD-ERROR] Acesso negado - path fora do catálogo");
         return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
     }
+    
+    println!("[THUMB-UPLOAD] Iniciando leitura do multipart...");
 
     while let Ok(Some(field)) = multipart.next_field().await {
         let name = field.name().unwrap_or("").to_string();
+        println!("[THUMB-UPLOAD] Field recebido: {}", name);
         if name != "imagem" {
             continue;
         }
 
+        println!("[THUMB-UPLOAD] Lendo bytes da imagem...");
         let data = match field.bytes().await {
-            Ok(bytes) => bytes,
-            Err(e) => return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao ler: {}", e) })),
+            Ok(bytes) => {
+                println!("[THUMB-UPLOAD] Bytes lidos: {} bytes", bytes.len());
+                bytes
+            },
+            Err(e) => {
+                println!("[THUMB-UPLOAD-ERROR] Erro ao ler bytes: {}", e);
+                return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao ler: {}", e) }));
+            }
         };
 
         if data.len() > 5 * 1024 * 1024 {
+            println!("[THUMB-UPLOAD-ERROR] Arquivo muito grande: {} bytes", data.len());
             return Json(serde_json::json!({ "ok": false, "erro": "Arquivo muito grande (máx 5MB)" }));
         }
 
@@ -506,14 +536,19 @@ pub async fn upload_thumb(
         } else if data.starts_with(b"RIFF") && data.len() > 12 && &data[8..12] == b"WEBP" {
             "webp"
         } else {
+            println!("[THUMB-UPLOAD-ERROR] Formato inválido");
             return Json(serde_json::json!({ "ok": false, "erro": "Formato inválido (JPG, PNG ou WebP)" }));
         };
+        
+        println!("[THUMB-UPLOAD] Formato detectado: {}", ext);
 
         // Remove thumb antiga
+        println!("[THUMB-UPLOAD] Removendo thumbs antigas...");
         if let Ok(mut entries) = fs::read_dir(&canonical_kit).await {
             while let Ok(Some(entry)) = entries.next_entry().await {
                 let nome = entry.file_name().to_string_lossy().to_lowercase();
                 if nome.starts_with("thumb") {
+                    println!("[THUMB-UPLOAD] Removendo: {:?}", entry.path());
                     let _ = fs::remove_file(entry.path()).await;
                 }
             }
@@ -521,8 +556,18 @@ pub async fn upload_thumb(
 
         // Salva nova thumb
         let img_path = canonical_kit.join(format!("thumb.{}", ext));
+        println!("[THUMB-UPLOAD] Salvando thumb em: {:?}", img_path);
         match fs::write(&img_path, &data).await {
             Ok(_) => {
+                println!("[THUMB-UPLOAD] ✅ Arquivo salvo com sucesso!");
+                
+                // Verifica se o arquivo realmente existe
+                if img_path.exists() {
+                    println!("[THUMB-UPLOAD] ✅ Verificado: arquivo existe no disco");
+                } else {
+                    println!("[THUMB-UPLOAD] ⚠️ ALERTA: fs::write retornou Ok mas arquivo não existe!");
+                }
+                
                 // Atualiza banco de dados
                 let state_lock = state.lock().await;
                 let pool = &state_lock.db;
@@ -533,7 +578,8 @@ pub async fn upload_thumb(
                     "UPDATE kits SET tem_thumb = 1, thumb_ext = ? WHERE nome = ?"
                 };
                 
-                println!("[THUMB-DEBUG] Tipo: {}, Nome: {}, Ext: {}", tipo, kit_nome, ext);
+                println!("[THUMB-UPLOAD] Atualizando DB - Query: {}", update_query);
+                println!("[THUMB-UPLOAD] Valores: ext={}, nome={}", ext, kit_nome);
                 
                 match sqlx::query(update_query)
                     .bind(ext)
@@ -542,19 +588,27 @@ pub async fn upload_thumb(
                     .await
                 {
                     Ok(result) => {
-                        println!("[THUMB-DEBUG] DB Update - Rows affected: {}", result.rows_affected());
+                        println!("[THUMB-UPLOAD] ✅ DB Update - Rows affected: {}", result.rows_affected());
+                        if result.rows_affected() == 0 {
+                            println!("[THUMB-UPLOAD] ⚠️ ALERTA: Nenhuma linha atualizada no DB! Nome não encontrado?");
+                        }
                     }
                     Err(e) => {
-                        println!("[THUMB-DEBUG] DB Update ERROR: {}", e);
+                        println!("[THUMB-UPLOAD] ❌ DB Update ERROR: {}", e);
                     }
                 }
                 
+                println!("[THUMB-UPLOAD] ========================================");
                 return Json(serde_json::json!({ "ok": true, "arquivo": format!("thumb.{}", ext) }));
             },
-            Err(e) => return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao salvar: {}", e) })),
+            Err(e) => {
+                println!("[THUMB-UPLOAD-ERROR] ❌ Erro ao salvar arquivo: {}", e);
+                return Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao salvar: {}", e) }));
+            }
         }
     }
 
+    println!("[THUMB-UPLOAD-ERROR] Nenhum arquivo recebido no multipart");
     Json(serde_json::json!({ "ok": false, "erro": "Nenhum arquivo recebido" }))
 }
 

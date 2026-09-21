@@ -1,0 +1,23 @@
+[
+  {
+    "timestamp": "08:47:14",
+    "level": "Info",
+    "module": "Sistema",
+    "message": "Luna Server iniciado com sucesso",
+    "source": "backend"
+  },
+  {
+    "timestamp": "08:47:14",
+    "level": "Info",
+    "module": "Database",
+    "message": "Conexão com MySQL estabelecida",
+    "source": "backend"
+  },
+  {
+    "timestamp": "08:47:25",
+    "level": "Info",
+    "module": "Cloudflare",
+    "message": "Nova URL detectada: https://desired-reservoir-own-fought.trycloudflare.com",
+    "source": "backend"
+  }
+]

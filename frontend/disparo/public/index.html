@@ -3715,7 +3715,9 @@ async function salvarCampoProduto(campo) {
 }
 
 function handleProdutoThumbSelect(input) {
+  console.log('[FRONTEND-THUMB-SELECT] Called with input:', input);
   const file = input.files?.[0];
+  console.log('[FRONTEND-THUMB-SELECT] Selected file:', file);
   if (!file) {
     arquivoProdutoThumb = null;
     document.getElementById('file-name-produto-thumb').textContent = '';
@@ -3743,23 +3745,39 @@ function handleProdutoThumbSelect(input) {
   }
 
   arquivoProdutoThumb = file;
+  console.log('[FRONTEND-THUMB-SELECT] File validated, arquivoProdutoThumb set:', arquivoProdutoThumb);
+  console.log('[FRONTEND-THUMB-SELECT] produtoAtual:', produtoAtual);
   document.getElementById('file-name-produto-thumb').textContent = `✔️ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
   
-  // Upload automático
-  uploadProdutoThumb();
+  // ❌ REMOVIDO: Upload automático (igual aos kits, só faz upload ao clicar em Salvar)
+  // uploadProdutoThumb();
+  
+  console.log('[FRONTEND-THUMB-SELECT] Arquivo selecionado. Clique em Salvar para fazer upload.');
 }
 
 async function uploadProdutoThumb() {
-  if (!arquivoProdutoThumb || !produtoAtual) return;
+  console.log('[FRONTEND-UPLOAD-THUMB] Function called');
+  console.log('[FRONTEND-UPLOAD-THUMB] arquivoProdutoThumb:', arquivoProdutoThumb);
+  console.log('[FRONTEND-UPLOAD-THUMB] produtoAtual:', produtoAtual);
+  
+  if (!arquivoProdutoThumb || !produtoAtual) {
+    console.log('[FRONTEND-UPLOAD-THUMB] EARLY RETURN - missing file or produto');
+    return;
+  }
 
   const formData = new FormData();
   formData.append('imagem', arquivoProdutoThumb);
+  
+  console.log('[FRONTEND-UPLOAD-THUMB] FormData created, making fetch...');
+  console.log('[FRONTEND-UPLOAD-THUMB] URL:', `/api/catalogo/upload-thumb/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}?tipo=produto`);
 
   try {
     const res = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(produtoAtual.marca)}/${encodeURIComponent(produtoAtual.nome)}?tipo=produto`, {
       method: 'POST',
       body: formData
     });
+
+    console.log('[FRONTEND-UPLOAD-THUMB] Response received:', res.status, res.statusText);
 
     if (!res.ok) {
       const err = await res.text();
@@ -3784,12 +3802,13 @@ async function uploadProdutoThumb() {
     document.getElementById('file-name-produto-thumb').textContent = '';
     arquivoProdutoThumb = null;
 
+    console.log('[FRONTEND-UPLOAD-THUMB] SUCCESS - showing toast');
     showToast('✔️ Thumbnail atualizada', 'success');
     
     // Recarrega catálogo
     await carregarProdutos();
   } catch (err) {
-    console.error('Erro ao upload thumbnail:', err);
+    console.error('[FRONTEND-UPLOAD-THUMB] ERROR:', err);
     alert('❌ Erro ao atualizar thumbnail: ' + err.message);
   }
 }
@@ -4051,7 +4070,7 @@ async function salvarProduto() {
   try {
     const marca = produtoAtual.marca || 'Alphahall';
     
-    // Atualiza descrição
+    // 1. Atualiza descrição
     const res = await fetch(`/api/catalogo/v2/produto/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -4061,6 +4080,43 @@ async function salvarProduto() {
     if (!res.ok) {
       const err = await res.text();
       throw new Error(err || 'Erro ao salvar');
+    }
+
+    // 2. Upload de thumbnail (se selecionou) - IGUAL AOS KITS!
+    if (arquivoProdutoThumb) {
+      console.log('[SALVAR-PRODUTO] Fazendo upload da thumbnail...');
+      const formData = new FormData();
+      formData.append('imagem', arquivoProdutoThumb);
+
+      const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}?tipo=produto`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!uploadRes.ok) {
+        const err = await uploadRes.text();
+        throw new Error('Erro no upload da thumb: ' + err);
+      }
+      
+      console.log('[SALVAR-PRODUTO] Thumbnail uploaded com sucesso!');
+      
+      // Atualiza visualmente
+      produtoAtual.tem_thumb = true;
+      const ext = arquivoProdutoThumb.name.split('.').pop();
+      produtoAtual.thumb_ext = ext;
+      
+      document.getElementById('modal-produto-img-wrap').innerHTML = `
+        <div class="modal-img-preview">
+          <img src="/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}/thumb.${ext}?tipo=produto&t=${Date.now()}" alt="${esc(produtoAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
+        </div>`;
+      
+      document.getElementById('produto-thumb-btn-text').textContent = '🔄 Alterar Thumbnail';
+      document.getElementById('btn-deletar-produto-thumb').style.display = 'block';
+      
+      // Limpa input
+      document.getElementById('modal-produto-file-thumb').value = '';
+      document.getElementById('file-name-produto-thumb').textContent = '';
+      arquivoProdutoThumb = null;
     }
 
     // Atualiza dados locais

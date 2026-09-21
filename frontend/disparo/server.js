@@ -81,6 +81,9 @@ app.get('/health-check', async (req, res) => {
 app.all('/api/*', async (req, res) => {
   const destino = `${LUNA_API}${req.originalUrl}`;
   
+  console.log(`[PROXY] ${req.method} ${req.originalUrl} → ${destino}`);
+  console.log(`[PROXY] Content-Type: ${req.headers['content-type']}`);
+  
   try {
     const opcoes = {
       method: req.method,
@@ -93,8 +96,11 @@ app.all('/api/*', async (req, res) => {
     // Detecta se é upload multipart/form-data
     const isMultipart = req.headers['content-type']?.includes('multipart/form-data');
     
+    console.log(`[PROXY] Is multipart: ${isMultipart}`);
+    
     if (isMultipart) {
       // Para uploads, precisamos repassar o stream do body
+      console.log(`[PROXY] Proxying multipart body as stream`);
       opcoes.body = req;
       opcoes.headers['Content-Type'] = req.headers['content-type'];
     } else {
@@ -107,6 +113,8 @@ app.all('/api/*', async (req, res) => {
     
     const resposta = await fetch(destino, opcoes);
 
+    console.log(`[PROXY] Response status: ${resposta.status}`);
+
     // Repassa Content-Type da resposta
     const ct = resposta.headers.get('content-type') || 'application/json';
     res.status(resposta.status).set('Content-Type', ct);
@@ -117,9 +125,11 @@ app.all('/api/*', async (req, res) => {
       res.send(buffer);
     } else {
       const texto = await resposta.text();
+      console.log(`[PROXY] Response text:`, texto.substring(0, 200));
       res.send(texto);
     }
   } catch (err) {
+    console.error(`[PROXY ERROR]`, err);
     res.status(503).json({
       erro: 'Luna Server inacessível',
       detalhe: err.message,
