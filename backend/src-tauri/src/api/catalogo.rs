@@ -41,6 +41,12 @@ pub struct KitInfo {
     pub sku_kit: String,
     #[serde(default)]
     pub skus_itens: Vec<String>,
+    #[serde(default = "default_true")]
+    pub visivel: bool,
+}
+
+fn default_true() -> bool {
+    true
 }
 
 impl Default for KitInfo {
@@ -50,6 +56,7 @@ impl Default for KitInfo {
             descricao: String::new(),
             sku_kit: String::new(),
             skus_itens: Vec::new(),
+            visivel: true,
         }
     }
 }
@@ -863,5 +870,79 @@ pub async fn deletar_thumb(
         Json(serde_json::json!({ "ok": true, "mensagem": "Thumbnail deletada com sucesso" }))
     } else {
         Json(serde_json::json!({ "ok": false, "erro": "Nenhuma thumbnail encontrada" }))
+    }
+}
+
+/// DELETE /api/catalogo/produto/:marca/:nome — DELETA TODA A PASTA DO PRODUTO (Task #6)
+pub async fn deletar_produto(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Path((marca_nome, nome)): Path<(String, String)>,
+) -> Json<serde_json::Value> {
+    let base = catalogo_path();
+    let marca_path = base.join(&marca_nome);
+    let produto_path = marca_path.join("produtos").join(&nome);
+
+    println!("[DELETE-PRODUTO] Tentando deletar: {:?}", produto_path);
+
+    // Segurança
+    let canonical_base = match base.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Catálogo não encontrado" })),
+    };
+    let canonical_produto = match produto_path.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Produto não encontrado" })),
+    };
+    if !canonical_produto.starts_with(&canonical_base) {
+        return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
+    }
+
+    // Remove a pasta inteira recursivamente
+    match fs::remove_dir_all(&canonical_produto).await {
+        Ok(_) => {
+            println!("[DELETE-PRODUTO] ✅ Pasta deletada com sucesso");
+            Json(serde_json::json!({ "ok": true, "mensagem": "Produto excluído com sucesso" }))
+        },
+        Err(e) => {
+            println!("[DELETE-PRODUTO] ❌ Erro ao deletar: {}", e);
+            Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao deletar produto: {}", e) }))
+        }
+    }
+}
+
+/// DELETE /api/catalogo/kit/:marca/:nome — DELETA TODA A PASTA DO KIT (Task #7)
+pub async fn deletar_kit(
+    State(_state): State<Arc<Mutex<AppState>>>,
+    Path((marca_nome, nome)): Path<(String, String)>,
+) -> Json<serde_json::Value> {
+    let base = catalogo_path();
+    let marca_path = base.join(&marca_nome);
+    let kit_path = marca_path.join("kits").join(&nome);
+
+    println!("[DELETE-KIT] Tentando deletar: {:?}", kit_path);
+
+    // Segurança
+    let canonical_base = match base.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Catálogo não encontrado" })),
+    };
+    let canonical_kit = match kit_path.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return Json(serde_json::json!({ "ok": false, "erro": "Kit não encontrado" })),
+    };
+    if !canonical_kit.starts_with(&canonical_base) {
+        return Json(serde_json::json!({ "ok": false, "erro": "Acesso negado" }));
+    }
+
+    // Remove a pasta inteira recursivamente
+    match fs::remove_dir_all(&canonical_kit).await {
+        Ok(_) => {
+            println!("[DELETE-KIT] ✅ Pasta deletada com sucesso");
+            Json(serde_json::json!({ "ok": true, "mensagem": "Kit excluído com sucesso" }))
+        },
+        Err(e) => {
+            println!("[DELETE-KIT] ❌ Erro ao deletar: {}", e);
+            Json(serde_json::json!({ "ok": false, "erro": format!("Erro ao deletar kit: {}", e) }))
+        }
     }
 }

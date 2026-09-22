@@ -18,6 +18,7 @@ export interface Produto {
   tem_thumb: boolean;
   thumb_ext: string | null;
   imagens_carrossel: string[];
+  visivel: boolean;
 }
 
 // Componente de kit (produto dentro do kit)
@@ -43,6 +44,7 @@ export interface Kit {
   tem_thumb: boolean;
   thumb_ext: string | null;
   componentes: Componente[];
+  visivel: boolean;
 }
 
 export interface CatalogoResponse {

@@ -47,6 +47,7 @@ pub struct ProdutoResponse {
     pub tem_thumb: bool,
     pub thumb_ext: Option<String>,
     pub imagens_carrossel: Vec<String>,
+    pub visivel: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -62,6 +63,7 @@ pub struct KitResponse {
     pub tem_thumb: bool,
     pub thumb_ext: Option<String>,
     pub componentes: Vec<ComponenteResponse>,
+    pub visivel: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -262,6 +264,7 @@ pub async fn listar_kits_db(
         }
         
         let (tem_thumb, thumb_ext) = verificar_thumb_kit(&nome_pasta).await;
+        let visivel = ler_visivel_kit(&nome_pasta).await;
 
         kits.push(KitResponse {
             id: kit.id,
@@ -275,6 +278,7 @@ pub async fn listar_kits_db(
             tem_thumb,
             thumb_ext,
             componentes,
+            visivel,
         });
     }
 
@@ -337,6 +341,7 @@ pub async fn listar_produtos_individuais_db(
         
         let (tem_thumb, thumb_ext) = verificar_thumb_produto(&nome_pasta).await;
         let imagens_carrossel = listar_imagens_carrossel_produto(&nome_pasta).await;
+        let visivel = ler_visivel_produto(&nome_pasta).await;
 
         produtos.push(ProdutoResponse {
             id: produto.id,
@@ -352,6 +357,7 @@ pub async fn listar_produtos_individuais_db(
             tem_thumb,
             thumb_ext,
             imagens_carrossel,
+            visivel,
         });
     }
 
@@ -359,6 +365,46 @@ pub async fn listar_produtos_individuais_db(
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
+
+#[derive(Debug, serde::Deserialize)]
+struct InfoJson {
+    #[serde(default = "default_true_helper")]
+    visivel: bool,
+}
+
+fn default_true_helper() -> bool {
+    true
+}
+
+async fn ler_visivel_kit(nome_pasta: &str) -> bool {
+    use std::path::PathBuf;
+    use tokio::fs;
+
+    let base = PathBuf::from("f:\\luna_cosmeticos\\catalogos\\Alphahall\\kits");
+    let info_path = base.join(nome_pasta).join("info.json");
+
+    if let Ok(conteudo) = fs::read_to_string(&info_path).await {
+        if let Ok(info) = serde_json::from_str::<InfoJson>(&conteudo) {
+            return info.visivel;
+        }
+    }
+    true // Default = visível
+}
+
+async fn ler_visivel_produto(nome_pasta: &str) -> bool {
+    use std::path::PathBuf;
+    use tokio::fs;
+
+    let base = PathBuf::from("f:\\luna_cosmeticos\\catalogos\\Alphahall\\produtos");
+    let info_path = base.join(nome_pasta).join("info.json");
+
+    if let Ok(conteudo) = fs::read_to_string(&info_path).await {
+        if let Ok(info) = serde_json::from_str::<InfoJson>(&conteudo) {
+            return info.visivel;
+        }
+    }
+    true // Default = visível
+}
 
 async fn verificar_thumb_kit(nome_pasta: &str) -> (bool, Option<String>) {
     use std::path::PathBuf;

@@ -24,8 +24,9 @@ export function CatalogViewport({ brandName, onBack }: CatalogViewportProps) {
         fetchKits(brandName),
         fetchProdutos(brandName),
       ]);
-      setKits(kitsData);
-      setProdutos(produtosData);
+      // Filtrar apenas itens visíveis
+      setKits(kitsData.filter(k => k.visivel !== false));
+      setProdutos(produtosData.filter(p => p.visivel !== false));
       setLoading(false);
       setTimeout(() => setRevealed(true), 100);
     }

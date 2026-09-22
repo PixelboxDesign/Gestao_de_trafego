@@ -145,6 +145,8 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .route("/api/catalogo/v2/produto/:marca/:nome", axum::routing::put(catalogo_db::atualizar_produto))
         .route("/api/catalogo/v2/kit/:marca/:nome", axum::routing::put(catalogo_db::atualizar_kit))
         .route("/api/catalogo/deletar-thumb/:marca/:nome", axum::routing::delete(catalogo::deletar_thumb))
+        .route("/api/catalogo/produto/:marca/:nome", axum::routing::delete(catalogo::deletar_produto))
+        .route("/api/catalogo/kit/:marca/:nome", axum::routing::delete(catalogo::deletar_kit))
         // Rotas de WhatsApp
         .route("/api/whatsapp/status", get(whatsapp::status))
         .route("/api/whatsapp/qr", get(whatsapp::get_qr))
@@ -165,7 +167,7 @@ pub async fn start_server(state: Arc<Mutex<AppState>>) {
         .layer(cors)
         .with_state(state);
     
-    info!("✅ [HTTP] {} rotas registradas", 34);
+    info!("✅ [HTTP] {} rotas registradas", 36);
 
     info!("🔌 [HTTP] Vinculando à porta...");
     let (listener, port) = bind_available_port(3001).await;
