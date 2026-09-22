@@ -818,7 +818,7 @@ export default function AbaProdutos() {
               display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem"
             }}>
               {/* Botões de ação perigosa - Task #2 e #3 */}
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+              <div style={{ display: "flex", gap: "0.5rem" }} data-test="footer-actions">
                 {/* Botão Desabilitar - Task #3 */}
                 <button 
                   className="btn" 
