@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 
-const API = "http://localhost:3001";
+const API = "http://localhost:3002";
 const MARCA_PADRAO = "Alphahall"; // Marca padrão
 
 interface Kit {
