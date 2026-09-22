@@ -628,9 +628,87 @@ export default function AbaKits() {
             <div style={{
               padding: "1rem 1.5rem",
               borderTop: "1px solid var(--border)",
-              display: "flex", justifyContent: "flex-end", gap: "0.75rem",
-              alignItems: "center",
+              display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem",
             }}>
+              {/* Botões de ação perigosa - Task #4 e #5 */}
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                {/* Botão Desabilitar - Task #5 */}
+                <button 
+                  className="btn" 
+                  onClick={async () => {
+                    if (!confirm(`Desabilitar "${modal.kit.nome}"?\n\nEle não vai aparecer no Luna Catálogo, mas continua no painel de disparo.`)) {
+                      return;
+                    }
+                    
+                    try {
+                      const res = await fetch(`${API}/api/catalogo/v2/produto/${modal.kit.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ visivel: false })
+                      });
+                      const data = await res.json();
+                      
+                      if (data.ok) {
+                        alert('✅ Kit desabilitado! Não aparecerá mais no catálogo web.');
+                        fecharModal();
+                        carregar();
+                      } else {
+                        alert('❌ Erro ao desabilitar: ' + data.erro);
+                      }
+                    } catch (err) {
+                      alert('❌ Erro ao desabilitar kit: ' + err);
+                    }
+                  }}
+                  style={{ 
+                    background: "rgba(251,191,36,0.1)", 
+                    color: "#f59e0b",
+                    border: "1px solid rgba(251,191,36,0.3)",
+                    fontWeight: 600
+                  }}
+                >
+                  👁️‍🗨️ Desabilitar
+                </button>
+
+                {/* Botão Excluir - Task #4 */}
+                <button 
+                  className="btn" 
+                  onClick={async () => {
+                    if (!confirm(`⚠️ TEM CERTEZA que deseja EXCLUIR "${modal.kit.nome}"?\n\nIsso vai deletar TODA a pasta com thumbnails e imagens!\n\nEsta ação NÃO pode ser desfeita!`)) {
+                      return;
+                    }
+                    
+                    const nomePasta = modal.kit.nome.replace(/[<>:"/\\|?*]/g, '').trim();
+                    
+                    try {
+                      const res = await fetch(`${API}/api/catalogo/kit/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}`, {
+                        method: 'DELETE'
+                      });
+                      const data = await res.json();
+                      
+                      if (data.ok) {
+                        alert('✅ Kit excluído com sucesso!');
+                        fecharModal();
+                        carregar();
+                      } else {
+                        alert('❌ Erro ao excluir: ' + data.erro);
+                      }
+                    } catch (err) {
+                      alert('❌ Erro ao excluir kit: ' + err);
+                    }
+                  }}
+                  style={{ 
+                    background: "rgba(239,68,68,0.1)", 
+                    color: "#ef4444",
+                    border: "1px solid rgba(239,68,68,0.3)",
+                    fontWeight: 600
+                  }}
+                >
+                  🗑️ Excluir Kit
+                </button>
+              </div>
+
+              <div style={{ flex: 1 }} />
+
               <button className="btn btn-primary" onClick={fecharModal}>
                 ✅ Fechar
               </button>
