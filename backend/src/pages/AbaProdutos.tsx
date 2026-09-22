@@ -366,12 +366,15 @@ export default function AbaProdutos() {
               display: "flex", alignItems: "center", justifyContent: "space-between"
             }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{modal.produto.nome}</h2>
-              <button
-                onClick={fecharModal}
-                style={{ background: "none", border: "none", color: "var(--text2)", cursor: "pointer", fontSize: 20, lineHeight: 1 }}
-              >
-                ✕
-              </button>
+              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                <span style={{ fontSize: 10, color: "#00ff00", fontWeight: 700 }}>BUILD-v2026-09-22-FINAL</span>
+                <button
+                  onClick={fecharModal}
+                  style={{ background: "none", border: "none", color: "var(--text2)", cursor: "pointer", fontSize: 20, lineHeight: 1 }}
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {/* Scroll container */}
