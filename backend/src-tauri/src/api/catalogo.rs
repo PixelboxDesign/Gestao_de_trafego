@@ -394,6 +394,7 @@ pub async fn salvar_info(
             .map(|s| s.trim().to_string())
             .filter(|s| !s.is_empty())
             .collect(),
+        visivel: true, // Por padrão, novos kits são visíveis
     };
 
     let json_str = match serde_json::to_string_pretty(&info) {
