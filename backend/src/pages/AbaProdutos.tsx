@@ -827,8 +827,6 @@ export default function AbaProdutos() {
                       return;
                     }
                     
-                    const nomePasta = modal.produto.nome.replace(/[<>:"/\\|?*]/g, '').trim();
-                    
                     try {
                       const res = await fetch(`${API}/api/catalogo/v2/produto/${modal.produto.id}`, {
                         method: 'PUT',
