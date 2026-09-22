@@ -355,9 +355,9 @@ export default function AbaProdutos() {
             border: "1px solid var(--border)",
             width: "100%", maxWidth: 620,
             display: "flex", flexDirection: "column",
-            overflow: "hidden",
             boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
             maxHeight: "90vh",
+            minHeight: 0,
           }}>
             {/* Header do modal */}
             <div style={{
@@ -378,7 +378,7 @@ export default function AbaProdutos() {
             </div>
 
             {/* Scroll container */}
-            <div style={{ overflowY: "auto", flex: 1 }}>
+            <div style={{ overflowY: "auto", flex: 1, minHeight: 0 }}>
 
               {/* Thumbnail */}
               {modal.produto.tem_thumb && (
@@ -808,7 +808,7 @@ export default function AbaProdutos() {
                 </div>
 
                 <p style={{ fontSize: 11, color: "var(--text2)", fontStyle: "italic", margin: 0, paddingTop: "0.5rem", borderTop: "1px solid var(--border)" }}>
-                  💡 Todos os campos podem ser editados diretamente acima. Clique no botão ✏️ ao lado de cada campo.
+                  Todos os campos podem ser editados diretamente acima. Clique no botao ao lado de cada campo.
                 </p>
 
               </div>
@@ -818,18 +818,14 @@ export default function AbaProdutos() {
             <div style={{
               padding: "1rem 1.5rem",
               borderTop: "1px solid var(--border)",
-              display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem"
+              display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem",
+              flexShrink: 0,
             }}>
-              {/* Botões de ação perigosa - Task #2 e #3 */}
-              <div style={{ display: "flex", gap: "0.5rem" }} data-test="footer-actions">
-                {/* Botão Desabilitar - Task #3 */}
-                <button 
-                  className="btn" 
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  className="btn"
                   onClick={async () => {
-                    if (!confirm(`Desabilitar "${modal.produto.nome}"?\n\nEle não vai aparecer no Luna Catálogo, mas continua no painel de disparo.`)) {
-                      return;
-                    }
-                    
+                    if (!confirm('Desabilitar este produto?\n\nEle NAO vai aparecer no Luna Catalogo, mas continua no painel de disparo.')) return;
                     try {
                       const res = await fetch(`${API}/api/catalogo/v2/produto/${modal.produto.id}`, {
                         method: 'PUT',
@@ -837,66 +833,31 @@ export default function AbaProdutos() {
                         body: JSON.stringify({ visivel: false })
                       });
                       const data = await res.json();
-                      
-                      if (data.ok) {
-                        alert('✅ Produto desabilitado! Não aparecerá mais no catálogo web.');
-                        fecharModal();
-                        carregar();
-                      } else {
-                        alert('❌ Erro ao desabilitar: ' + data.erro);
-                      }
-                    } catch (err) {
-                      alert('❌ Erro ao desabilitar produto: ' + err);
-                    }
+                      if (data.ok) { alert('Produto desabilitado!'); fecharModal(); carregar(); }
+                      else alert('Erro: ' + data.erro);
+                    } catch (err) { alert('Erro: ' + err); }
                   }}
-                  style={{ 
-                    background: "rgba(251,191,36,0.1)", 
-                    color: "#f59e0b",
-                    border: "1px solid rgba(251,191,36,0.3)",
-                    fontWeight: 600
-                  }}
+                  style={{ background: "rgba(251,191,36,0.15)", color: "#f59e0b", border: "1px solid #f59e0b", fontWeight: 700, padding: "0.5rem 1rem" }}
                 >
-                  👁️‍🗨️ Desabilitar
+                  Desabilitar
                 </button>
-
-                {/* Botão Excluir (vermelho) - Task #2 */}
-                <button 
-                  className="btn" 
+                <button
+                  className="btn"
                   onClick={async () => {
-                    if (!confirm(`⚠️ TEM CERTEZA que deseja EXCLUIR "${modal.produto.nome}"?\n\nIsso vai deletar TODA a pasta com thumbnails e imagens!\n\nEsta ação NÃO pode ser desfeita!`)) {
-                      return;
-                    }
-                    
+                    if (!confirm('TEM CERTEZA que deseja EXCLUIR este produto?\n\nIsso vai deletar TODA a pasta!\n\nEsta acao NAO pode ser desfeita!')) return;
                     const nomePasta = modal.produto.nome.replace(/[<>:"/\\|?*]/g, '').trim();
-                    
                     try {
-                      const res = await fetch(`${API}/api/catalogo/produto/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}`, {
-                        method: 'DELETE'
-                      });
+                      const res = await fetch(`${API}/api/catalogo/produto/${MARCA_PADRAO}/${encodeURIComponent(nomePasta)}`, { method: 'DELETE' });
                       const data = await res.json();
-                      
-                      if (data.ok) {
-                        alert('✅ Produto excluído com sucesso!');
-                        fecharModal();
-                        carregar(); // Recarrega a lista
-                      } else {
-                        alert('❌ Erro ao excluir: ' + data.erro);
-                      }
-                    } catch (err) {
-                      alert('❌ Erro ao excluir produto: ' + err);
-                    }
+                      if (data.ok) { alert('Produto excluido!'); fecharModal(); carregar(); }
+                      else alert('Erro: ' + data.erro);
+                    } catch (err) { alert('Erro: ' + err); }
                   }}
-                  style={{ 
-                    background: "rgba(239,68,68,0.1)", 
-                    color: "#ef4444",
-                    border: "1px solid rgba(239,68,68,0.3)",
-                    fontWeight: 600
-                  }}
+                  style={{ background: "rgba(239,68,68,0.15)", color: "#ef4444", border: "1px solid #ef4444", fontWeight: 700, padding: "0.5rem 1rem" }}
                 >
-                  🗑️ Excluir Produto
+                  Excluir Produto
                 </button>
               </div>
-
               <div style={{ flex: 1 }} />
 
               <button className="btn btn-primary" onClick={fecharModal}>
