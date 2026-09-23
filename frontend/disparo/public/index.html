@@ -1206,16 +1206,36 @@
     </div>
 
     <!-- Footer -->
-    <div class="modal-footer">
-      <span id="modal-save-success" class="save-success" style="display:none">
-        ✓ Salvo com sucesso!
-      </span>
-      <button class="btn btn-secondary" onclick="fecharModalKit()">
-        Cancelar
-      </button>
-      <button class="btn btn-primary" id="modal-save-btn" onclick="salvarKit()">
-        💾 Salvar
-      </button>
+    <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;gap:.75rem">
+      <!-- Botões de ação perigosa -->
+      <div style="display:flex;gap:.5rem">
+        <button
+          class="btn"
+          style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);font-weight:600"
+          onclick="desabilitarKit()"
+        >
+          👁️‍🗨️ Desabilitar
+        </button>
+        <button
+          class="btn"
+          style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);font-weight:600"
+          onclick="excluirKit()"
+        >
+          🗑️ Excluir Kit
+        </button>
+      </div>
+      <!-- Botões padrão -->
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <span id="modal-save-success" class="save-success" style="display:none">
+          ✓ Salvo com sucesso!
+        </span>
+        <button class="btn btn-secondary" onclick="fecharModalKit()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" id="modal-save-btn" onclick="salvarKit()">
+          💾 Salvar
+        </button>
+      </div>
     </div>
 
   </div>
@@ -1533,16 +1553,36 @@
     </div>
 
     <!-- Footer -->
-    <div class="modal-footer">
-      <span id="modal-produto-save-success" class="save-success" style="display:none">
-        ✓ Salvo com sucesso!
-      </span>
-      <button class="btn btn-secondary" onclick="fecharModalProduto()">
-        Cancelar
-      </button>
-      <button class="btn btn-primary" id="modal-produto-save-btn" onclick="salvarProduto()">
-        💾 Salvar
-      </button>
+    <div class="modal-footer" style="display:flex;justify-content:space-between;align-items:center;gap:.75rem">
+      <!-- Botões de ação perigosa -->
+      <div style="display:flex;gap:.5rem">
+        <button
+          class="btn"
+          style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);font-weight:600"
+          onclick="desabilitarProduto()"
+        >
+          👁️‍🗨️ Desabilitar
+        </button>
+        <button
+          class="btn"
+          style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);font-weight:600"
+          onclick="excluirProduto()"
+        >
+          🗑️ Excluir Produto
+        </button>
+      </div>
+      <!-- Botões padrão -->
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <span id="modal-produto-save-success" class="save-success" style="display:none">
+          ✓ Salvo com sucesso!
+        </span>
+        <button class="btn btn-secondary" onclick="fecharModalProduto()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" id="modal-produto-save-btn" onclick="salvarProduto()">
+          💾 Salvar
+        </button>
+      </div>
     </div>
 
   </div>
@@ -4361,6 +4401,105 @@ async function deletarProdutoImagemCarrossel(arquivo) {
   } catch (err) {
     console.error('Erro ao deletar imagem:', err);
     alert('❌ Erro ao deletar: ' + err.message);
+  }
+}
+
+
+// ─── Desabilitar / Excluir Produto ───────────────────────────────────────────
+
+async function desabilitarProduto() {
+  if (!produtoAtual) return;
+  if (!confirm(`Desabilitar "${produtoAtual.nome}"?\n\nEle não vai aparecer no Luna Catálogo, mas continua visível aqui no painel.`)) return;
+
+  const marca = produtoAtual.marca || 'Alphahall';
+  try {
+    const res = await fetch(`/api/catalogo/v2/produto/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visivel: false })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast('✅ Produto desabilitado — não aparecerá no catálogo web.', 'success');
+      fecharModalProduto();
+      await carregarProdutos();
+    } else {
+      alert('❌ Erro ao desabilitar: ' + (data.erro || JSON.stringify(data)));
+    }
+  } catch (err) {
+    alert('❌ Erro ao desabilitar produto: ' + err.message);
+  }
+}
+
+async function excluirProduto() {
+  if (!produtoAtual) return;
+  if (!confirm(`⚠️ TEM CERTEZA que deseja EXCLUIR "${produtoAtual.nome}"?\n\nIsso vai deletar TODA a pasta com thumbnails e imagens!\n\nEsta ação NÃO pode ser desfeita!`)) return;
+
+  const marca = produtoAtual.marca || 'Alphahall';
+  const nomePasta = produtoAtual.nome.replace(/[<>:"/\\|?*]/g, '').trim();
+  try {
+    const res = await fetch(`/api/catalogo/produto/${encodeURIComponent(marca)}/${encodeURIComponent(nomePasta)}`, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast('✅ Produto excluído com sucesso!', 'success');
+      fecharModalProduto();
+      await carregarProdutos();
+    } else {
+      alert('❌ Erro ao excluir: ' + (data.erro || JSON.stringify(data)));
+    }
+  } catch (err) {
+    alert('❌ Erro ao excluir produto: ' + err.message);
+  }
+}
+
+// ─── Desabilitar / Excluir Kit ────────────────────────────────────────────────
+
+async function desabilitarKit() {
+  if (!kitAtual) return;
+  if (!confirm(`Desabilitar "${kitAtual.nome}"?\n\nEle não vai aparecer no Luna Catálogo, mas continua visível aqui no painel.`)) return;
+
+  const marca = kitAtual.marca || 'Alphahall';
+  try {
+    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visivel: false })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast('✅ Kit desabilitado — não aparecerá no catálogo web.', 'success');
+      fecharModalKit();
+      await carregarKits();
+    } else {
+      alert('❌ Erro ao desabilitar: ' + (data.erro || JSON.stringify(data)));
+    }
+  } catch (err) {
+    alert('❌ Erro ao desabilitar kit: ' + err.message);
+  }
+}
+
+async function excluirKit() {
+  if (!kitAtual) return;
+  if (!confirm(`⚠️ TEM CERTEZA que deseja EXCLUIR "${kitAtual.nome}"?\n\nIsso vai deletar TODA a pasta com thumbnails e imagens!\n\nEsta ação NÃO pode ser desfeita!`)) return;
+
+  const marca = kitAtual.marca || 'Alphahall';
+  const nomePasta = kitAtual.nome.replace(/[<>:"/\\|?*]/g, '').trim();
+  try {
+    const res = await fetch(`/api/catalogo/kit/${encodeURIComponent(marca)}/${encodeURIComponent(nomePasta)}`, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    if (data.ok) {
+      showToast('✅ Kit excluído com sucesso!', 'success');
+      fecharModalKit();
+      await carregarKits();
+    } else {
+      alert('❌ Erro ao excluir: ' + (data.erro || JSON.stringify(data)));
+    }
+  } catch (err) {
+    alert('❌ Erro ao excluir kit: ' + err.message);
   }
 }
 
