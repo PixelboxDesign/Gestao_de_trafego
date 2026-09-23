@@ -35,6 +35,7 @@
 
 | Versão | Data | Título | Commit original | Commit atual | Amends |
 |---|---|---|---|---|---|
+| [v22-botoes-desabilitar-excluir](#checkpoint-v22-botoes-desabilitar-excluir) | 23/09/2026 | 🔘 Botões Desabilitar/Habilitar + Excluir nos Modais de Kit e Produto | `8a820f6` | `2326423` | — |
 | [v21-produto-thumbnail-fix](#checkpoint-v21-produto-thumbnail-fix) | 15/05/2026 | 🖼️ FIX: Upload de Thumbnail para Produtos | `fe044fb` | `fe044fb` | — |
 | [v20-thumbnails-kits-componentes](#checkpoint-v20-thumbnails-kits-componentes) | 09/09/2026 | 🖼️ Thumbnails Componentes nos Kits + Fix Carregamento Tauri | `bb64fd8` | `bb64fd8` | — |
 | [v19-catalogo-web-service](#checkpoint-v19-catalogo-web-service) | 09/09/2026 | 📦 Catálogo Web como Serviço Independente | `84857ba` | `84857ba` | — |
@@ -49,6 +50,156 @@
 | [v10-thumb-carrossel](#checkpoint-v10-thumb-carrossel) | 25/08/2026 | Sistema de Thumbnails Otimizadas + Carrossel de Imagens | `e9a40b1` | `e9a40b1` | — |
 
 > ⚠️ **Regra de restauração:** Sempre use o **Commit atual** para rollback. Quando há amends, o commit original deixa de existir no Git e é substituído pelo mais recente.
+
+---
+
+## 🔘 CHECKPOINT v22-botoes-desabilitar-excluir
+
+**Título:** Botões Desabilitar/Habilitar + Excluir nos Modais de Kit e Produto  
+**Data:** 23/09/2026 | **Commits:** `8a820f6` → `4fd7093` → `2326423` | **Status:** ✅ ESTÁVEL | **Prioridade:** 🟢 FUNCIONAL
+
+### 🎯 RESUMO EXECUTIVO
+
+**Problema resolvido:** Os modais de edição de produto e kit no painel de disparo (`luna-disparo.onrender.com`) não tinham os botões de ação para Desabilitar e Excluir — apenas "Cancelar" e "Salvar" apareciam no footer.
+
+**Funcionalidades implementadas:**
+- ✅ Botão **Desabilitar/Habilitar** (toggle amarelo/verde) no footer do modal de produto
+- ✅ Botão **Desabilitar/Habilitar** (toggle amarelo/verde) no footer do modal de kit
+- ✅ Botão **Excluir Produto** (vermelho) no footer do modal de produto
+- ✅ Botão **Excluir Kit** (vermelho) no footer do modal de kit
+- ✅ Card visual com borda/tint amarelo + badge "Desabilitado" para itens com `visivel: false`
+- ✅ Backend: campo `visivel` adicionado ao `AtualizarProdutoRequest` — salva no `info.json`
+- ✅ Parse robusto de resposta: usa `.text()` + `JSON.parse()` em try/catch para evitar erros em respostas não-JSON
+
+---
+
+### 🐛 PROBLEMAS ENCONTRADOS E RESOLVIDOS
+
+#### 1. Botões não apareciam em produção
+
+**Causa:** O painel de disparo **não é** uma SPA React buildada — é um arquivo HTML estático em `frontend/disparo/public/index.html` servido diretamente pelo `server.js` Express. As alterações feitas nos arquivos `AbaProdutos.tsx` e `AbaKits.tsx` (pasta `backend/src/pages/`) **nunca chegam ao Render** porque o Render serve apenas o arquivo HTML estático.
+
+**Solução:** Editar diretamente `frontend/disparo/public/index.html`.
+
+#### 2. Erro "Nenhum campo para atualizar" no Desabilitar
+
+**Causa:** `AtualizarProdutoRequest` no `catalogo_db.rs` não tinha o campo `visivel`. O backend recebia `{ visivel: false }`, não reconhecia nenhum campo e retornava erro 400 com texto puro.
+
+**Solução:** Adicionado `visivel: Option<bool>` ao struct. Quando presente, lê o `info.json` da pasta do produto/kit no filesystem, atualiza o campo `visivel` e salva de volta. Retorna `{ ok: true }` sem tocar no banco SQL.
+
+#### 3. Erro "Unexpected end of JSON input" no Excluir
+
+**Causa:** Frontend usava `.json()` diretamente na resposta — quando o backend retornava erro com corpo vazio ou texto puro, o parse quebrava.
+
+**Solução:** Todas as 4 funções de ação agora usam `.text()` seguido de `JSON.parse()` em try/catch. Se não for JSON válido, exibe o texto puro do erro.
+
+#### 4. Erro "carregarKits is not defined"
+
+**Causa:** A função de recarregar kits se chama `carregarCatalogo()` — não `carregarKits()`.
+
+**Solução:** Substituído em todas as ocorrências das funções de kit.
+
+---
+
+### ✅ COMPORTAMENTO FINAL
+
+#### Footer dos modais
+
+**Modal de Kit:**
+```
+[ 👁️‍🗨️ Desabilitar ] [ 🗑️ Excluir Kit ]  ···  [ Cancelar ] [ 💾 Salvar ]
+```
+
+**Modal de Produto:**
+```
+[ 👁️‍🗨️ Desabilitar ] [ 🗑️ Excluir Produto ]  ···  [ Cancelar ] [ 💾 Salvar ]
+```
+
+Quando item está desabilitado (`visivel: false`), o botão muda para:
+```
+[ ✅ Habilitar ] (verde)
+```
+
+#### Cards desabilitados
+
+- Borda amarela `rgba(245,158,11,0.5)`
+- Tint amarelo sutil no fundo do card
+- Nome do item em amarelo `#f59e0b`
+- Footer do card com fundo/cor amarelo
+- Badge "👁️‍🗨️ Desabilitado" sobre a imagem
+
+---
+
+### 🔧 FLUXO TÉCNICO
+
+#### Desabilitar/Habilitar
+
+```
+1. Usuário clica "Desabilitar" no modal
+2. Frontend: PUT /api/catalogo/v2/produto/:marca/:nome  { visivel: false }
+3. Proxy Express repassa ao backend local via Cloudflare Tunnel
+4. Backend Rust (catalogo_db.rs):
+   a) Lê info.json em catalogos/Alphahall/produtos/{nome}/
+   b) Atualiza campo visivel = false
+   c) Salva info.json
+   d) Retorna { ok: true }
+5. Frontend fecha modal, recarrega lista
+6. Card do produto/kit fica com visual amarelo
+```
+
+#### Excluir
+
+```
+1. Usuário clica "Excluir Produto" + confirma double-confirm
+2. Frontend: DELETE /api/catalogo/produto/:marca/:nome
+3. Backend Rust (catalogo.rs → deletar_produto):
+   a) Valida path (canonicalize + starts_with base)
+   b) fs::remove_dir_all() na pasta inteira
+   c) Retorna { ok: true }
+4. Frontend fecha modal, recarrega lista
+5. Produto some da grid
+```
+
+---
+
+### 📝 ARQUIVOS MODIFICADOS
+
+```
+frontend/disparo/public/index.html     ← Botões HTML + CSS + funções JS
+backend/src-tauri/src/api/catalogo_db.rs  ← Campo visivel no AtualizarProdutoRequest
+```
+
+**Arquivos NÃO modificados (já estavam corretos):**
+```
+backend/src-tauri/src/api/catalogo.rs   ← deletar_produto() e deletar_kit() já existiam
+backend/src-tauri/src/api/mod.rs        ← Rotas DELETE já registradas
+```
+
+---
+
+### ⚠️ DEPENDÊNCIA DE BACKEND LOCAL
+
+As ações Desabilitar e Excluir dependem do **backend Rust rodando localmente** (porta 3001) exposto via Cloudflare Tunnel. Se o backend estiver offline, as operações falham com erro 503 no proxy.
+
+O `catalogo_db.rs` foi atualizado e **requer recompilação** (`cargo build --release`) para o campo `visivel` funcionar na rota PUT.
+
+---
+
+### ✅ CHECKLIST DE VALIDAÇÃO
+
+```
+# Frontend (Render)
+- [ ] Modal de produto: botões Desabilitar/Habilitar + Excluir no footer
+- [ ] Modal de kit: botões Desabilitar/Habilitar + Excluir no footer
+- [ ] Card desabilitado: visual amarelo + badge
+- [ ] Botão alterna entre Desabilitar (amarelo) e Habilitar (verde)
+
+# Backend (local)
+- [ ] PUT /api/catalogo/v2/produto/:marca/:nome com { visivel: false } → salva no info.json
+- [ ] PUT /api/catalogo/v2/kit/:marca/:nome com { visivel: false } → salva no info.json
+- [ ] DELETE /api/catalogo/produto/:marca/:nome → remove pasta
+- [ ] DELETE /api/catalogo/kit/:marca/:nome → remove pasta
+```
 
 ---
 
