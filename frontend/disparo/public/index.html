@@ -3610,66 +3610,72 @@ async function salvarKit() {
   const descricao = document.getElementById('modal-kit-descricao').value.trim();
   const skuKit = document.getElementById('modal-kit-sku').value.trim();
 
+  if (!novoNome) { alert('O nome não pode ficar vazio.'); return; }
+
   btn.disabled = true;
   btn.textContent = 'Salvando...';
 
   try {
-    // 1. Atualizar dados do kit via API v2
     const marca = kitAtual.marca || 'Alphahall';
-    
-    // Converte preço para número
     const precoLimpo = preco.replace('R$ ', '').replace(',', '.');
     const precoNumero = parseFloat(precoLimpo) || 0;
-    
+
     const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        preco: precoNumero,  // Envia como número, não string
+        preco: precoNumero,
         codigo_sku: skuKit,
-        descricao: descricao
+        descricao: descricao,
+        novo_nome: novoNome !== kitAtual.nome ? novoNome : undefined,
       })
     });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err || 'Erro ao salvar');
+    const texto = await res.text();
+    let data;
+    try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto || 'Resposta inválida' }; }
+
+    if (!data.ok) throw new Error(data.erro || 'Erro ao salvar');
+
+    // Atualiza dados locais com o novo nome retornado pelo backend
+    const nomeAtualizado = data.novo_nome || novoNome;
+    const nomeAnterior = kitAtual.nome;
+
+    kitAtual.preco = precoNumero;
+    kitAtual.codigo_sku = skuKit;
+    kitAtual.descricao = descricao;
+    kitAtual.nome = nomeAtualizado;
+
+    // Atualiza o card no grid sem recarregar tudo
+    const card = document.querySelector(`.kit-card[data-kit-nome="${escAttr(nomeAnterior)}"]`);
+    if (card) {
+      card.setAttribute('data-kit-nome', nomeAtualizado);
+      const nomeEl = card.querySelector('.kit-nome');
+      if (nomeEl) nomeEl.textContent = nomeAtualizado;
     }
 
-    // 2. Upload de thumbnail (se selecionou)
+    // Upload de thumbnail (se selecionou)
     if (arquivoThumb) {
       const formData = new FormData();
       formData.append('imagem', arquivoThumb);
-
-      const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}?tipo=kit`, {
+      const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(marca)}/${encodeURIComponent(nomeAtualizado)}?tipo=kit`, {
         method: 'POST',
         body: formData
       });
-
       if (!uploadRes.ok) {
         const err = await uploadRes.text();
         throw new Error('Erro no upload da thumb: ' + err);
       }
     }
 
-    // Atualiza dados locais
-    kitAtual.preco = preco.replace('R$ ', '').replace(',', '.');
-    kitAtual.codigo_sku = skuKit;
-    kitAtual.descricao = descricao;
-
-    // Mostra sucesso
     showToast('✔️ Kit salvo com sucesso', 'success');
     document.getElementById('modal-save-success').style.display = 'block';
-    setTimeout(() => {
-      document.getElementById('modal-save-success').style.display = 'none';
-    }, 2000);
+    setTimeout(() => { document.getElementById('modal-save-success').style.display = 'none'; }, 2000);
 
-    // Limpa arquivo thumb selecionado
     arquivoThumb = null;
     document.getElementById('file-name-thumb').textContent = '';
     document.getElementById('modal-kit-file-thumb').value = '';
 
-    // Recarrega catálogo
     await carregarCatalogo();
 
   } catch (e) {
@@ -4320,33 +4326,44 @@ async function salvarProduto() {
   if (!produtoAtual) return;
 
   const btn = document.getElementById('modal-produto-save-btn');
+  const novoNome = document.getElementById('modal-produto-nome-edit').value.trim();
   const descricao = document.getElementById('modal-produto-descricao').value.trim();
+
+  if (!novoNome) { alert('O nome não pode ficar vazio.'); return; }
 
   btn.disabled = true;
   btn.textContent = 'Salvando...';
 
   try {
     const marca = produtoAtual.marca || 'Alphahall';
-    
-    // 1. Atualiza descrição
-    const res = await fetch(`/api/catalogo/v2/produto/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}`, {
+    const nomeAnterior = produtoAtual.nome;
+
+    // 1. Salva dados (incluindo novo_nome se mudou)
+    const res = await fetch(`/api/catalogo/v2/produto/${encodeURIComponent(marca)}/${encodeURIComponent(nomeAnterior)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ descricao: descricao })
+      body: JSON.stringify({
+        descricao: descricao,
+        novo_nome: novoNome !== nomeAnterior ? novoNome : undefined,
+      })
     });
 
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(err || 'Erro ao salvar');
-    }
+    const texto = await res.text();
+    let data;
+    try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto || 'Resposta inválida' }; }
 
-    // 2. Upload de thumbnail (se selecionou) - IGUAL AOS KITS!
+    if (!data.ok) throw new Error(data.erro || 'Erro ao salvar');
+
+    // Pega o nome atualizado retornado pelo backend
+    const nomeAtualizado = data.novo_nome || novoNome;
+
+    // 2. Upload de thumbnail (se selecionou)
     if (arquivoProdutoThumb) {
       console.log('[SALVAR-PRODUTO] Fazendo upload da thumbnail...');
       const formData = new FormData();
       formData.append('imagem', arquivoProdutoThumb);
 
-      const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}?tipo=produto`, {
+      const uploadRes = await fetch(`/api/catalogo/upload-thumb/${encodeURIComponent(marca)}/${encodeURIComponent(nomeAtualizado)}?tipo=produto`, {
         method: 'POST',
         body: formData
       });
@@ -4355,39 +4372,40 @@ async function salvarProduto() {
         const err = await uploadRes.text();
         throw new Error('Erro no upload da thumb: ' + err);
       }
-      
-      console.log('[SALVAR-PRODUTO] Thumbnail uploaded com sucesso!');
-      
-      // Atualiza visualmente
+
       produtoAtual.tem_thumb = true;
       const ext = arquivoProdutoThumb.name.split('.').pop();
       produtoAtual.thumb_ext = ext;
-      
+
       document.getElementById('modal-produto-img-wrap').innerHTML = `
         <div class="modal-img-preview">
-          <img src="/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}/thumb.${ext}?tipo=produto&t=${Date.now()}" alt="${esc(produtoAtual.nome)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
+          <img src="/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(nomeAtualizado)}/thumb.${ext}?tipo=produto&t=${Date.now()}" alt="${esc(nomeAtualizado)}" style="max-height:200px;max-width:100%;object-fit:contain;border-radius:8px"/>
         </div>`;
-      
+
       document.getElementById('produto-thumb-btn-text').textContent = '🔄 Alterar Thumbnail';
       document.getElementById('btn-deletar-produto-thumb').style.display = 'block';
-      
-      // Limpa input
+
       document.getElementById('modal-produto-file-thumb').value = '';
       document.getElementById('file-name-produto-thumb').textContent = '';
       arquivoProdutoThumb = null;
     }
 
     // Atualiza dados locais
+    produtoAtual.nome = nomeAtualizado;
     produtoAtual.descricao = descricao;
 
-    // Mostra sucesso
+    // Atualiza o card no grid sem recarregar tudo
+    const card = document.querySelector(`.kit-card[data-produto-nome="${escAttr(nomeAnterior)}"]`);
+    if (card) {
+      card.setAttribute('data-produto-nome', nomeAtualizado);
+      const nomeEl = card.querySelector('.kit-nome');
+      if (nomeEl) nomeEl.textContent = nomeAtualizado;
+    }
+
     showToast('✔️ Produto salvo com sucesso', 'success');
     document.getElementById('modal-produto-save-success').style.display = 'block';
-    setTimeout(() => {
-      document.getElementById('modal-produto-save-success').style.display = 'none';
-    }, 2000);
+    setTimeout(() => { document.getElementById('modal-produto-save-success').style.display = 'none'; }, 2000);
 
-    // Recarrega catálogo
     await carregarProdutos();
 
   } catch (e) {

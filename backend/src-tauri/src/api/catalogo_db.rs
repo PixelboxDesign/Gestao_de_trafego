@@ -597,6 +597,7 @@ pub struct AtualizarProdutoRequest {
     pub descricao_tamanho: Option<String>,
     pub descricao_composicao: Option<String>,
     pub visivel: Option<bool>,
+    pub novo_nome: Option<String>,
 }
 
 /// PUT /api/catalogo/produto/:id — atualiza campos do produto
@@ -605,6 +606,44 @@ pub async fn atualizar_produto(
     Path((_marca, nome)): Path<(String, String)>,
     Json(payload): Json<AtualizarProdutoRequest>,
 ) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
+
+    // ── Renomear pasta (filesystem) se novo_nome foi enviado ──────────────────
+    let nome_efetivo = if let Some(ref novo_nome) = payload.novo_nome {
+        let novo_nome_clean = novo_nome.trim().to_string();
+        if !novo_nome_clean.is_empty() && novo_nome_clean != nome {
+            // Valida caracteres
+            if novo_nome_clean.contains(['/', '\\', ':', '*', '?', '"', '<', '>', '|']) {
+                return Ok(Json(serde_json::json!({
+                    "ok": false,
+                    "erro": "Nome inválido. Evite: / \\ : * ? \" < > |"
+                })));
+            }
+            let nome_pasta_atual = nome
+                .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
+                .trim().to_string();
+            let nome_pasta_novo = novo_nome_clean
+                .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
+                .trim().to_string();
+            let base = std::path::PathBuf::from("f:\\luna_cosmeticos\\catalogos\\Alphahall\\produtos");
+            let pasta_atual = base.join(&nome_pasta_atual);
+            let pasta_nova  = base.join(&nome_pasta_novo);
+            if pasta_nova.exists() {
+                return Ok(Json(serde_json::json!({
+                    "ok": false,
+                    "erro": format!("Já existe um produto com o nome '{}'", nome_pasta_novo)
+                })));
+            }
+            if pasta_atual.exists() {
+                tokio::fs::rename(&pasta_atual, &pasta_nova).await
+                    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao renomear pasta: {}", e)))?;
+            }
+            novo_nome_clean
+        } else {
+            nome.clone()
+        }
+    } else {
+        nome.clone()
+    };
 
     // Se veio campo `visivel`, salva no info.json (filesystem)
     if let Some(visivel) = payload.visivel {
@@ -646,7 +685,7 @@ pub async fn atualizar_produto(
             || payload.descricao_composicao.is_some();
 
         if !tem_outros_campos {
-            return Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Visibilidade atualizada com sucesso" })));
+            return Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Visibilidade atualizada com sucesso", "novo_nome": nome_efetivo })));
         }
     }
 
@@ -681,9 +720,14 @@ pub async fn atualizar_produto(
         updates.push("descricao_composicao = ?");
         values.push(comp.clone());
     }
+    // Atualiza nome no banco se foi renomeado
+    if nome_efetivo != nome {
+        updates.push("nome = ?");
+        values.push(nome_efetivo.clone());
+    }
 
     if updates.is_empty() {
-        return Err((StatusCode::BAD_REQUEST, "Nenhum campo para atualizar".to_string()));
+        return Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Produto renomeado com sucesso", "novo_nome": nome_efetivo })));
     }
 
     let query_str = format!(
@@ -702,7 +746,7 @@ pub async fn atualizar_produto(
         .await
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao atualizar produto: {}", e)))?;
 
-    Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Produto atualizado com sucesso" })))
+    Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Produto atualizado com sucesso", "novo_nome": nome_efetivo })))
 }
 
 pub async fn atualizar_kit(
@@ -711,9 +755,46 @@ pub async fn atualizar_kit(
     Json(payload): Json<AtualizarProdutoRequest>,
 ) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
 
+    // ── Renomear pasta (filesystem) se novo_nome foi enviado ──────────────────
+    let nome_efetivo = if let Some(ref novo_nome) = payload.novo_nome {
+        let novo_nome_clean = novo_nome.trim().to_string();
+        if !novo_nome_clean.is_empty() && novo_nome_clean != nome {
+            if novo_nome_clean.contains(['/', '\\', ':', '*', '?', '"', '<', '>', '|']) {
+                return Ok(Json(serde_json::json!({
+                    "ok": false,
+                    "erro": "Nome inválido. Evite: / \\ : * ? \" < > |"
+                })));
+            }
+            let nome_pasta_atual = nome
+                .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
+                .trim().to_string();
+            let nome_pasta_novo = novo_nome_clean
+                .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
+                .trim().to_string();
+            let base = std::path::PathBuf::from("f:\\luna_cosmeticos\\catalogos\\Alphahall\\kits");
+            let pasta_atual = base.join(&nome_pasta_atual);
+            let pasta_nova  = base.join(&nome_pasta_novo);
+            if pasta_nova.exists() {
+                return Ok(Json(serde_json::json!({
+                    "ok": false,
+                    "erro": format!("Já existe um kit com o nome '{}'", nome_pasta_novo)
+                })));
+            }
+            if pasta_atual.exists() {
+                tokio::fs::rename(&pasta_atual, &pasta_nova).await
+                    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao renomear pasta: {}", e)))?;
+            }
+            novo_nome_clean
+        } else {
+            nome.clone()
+        }
+    } else {
+        nome.clone()
+    };
+
     // Se veio campo `visivel`, salva no info.json (filesystem)
     if let Some(visivel) = payload.visivel {
-        let nome_pasta = nome
+        let nome_pasta = nome_efetivo
             .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
             .trim()
             .to_string();
@@ -745,7 +826,7 @@ pub async fn atualizar_kit(
             || payload.descricao.is_some();
 
         if !tem_outros_campos {
-            return Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Visibilidade atualizada com sucesso" })));
+            return Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Kit atualizado com sucesso", "novo_nome": nome_efetivo })));
         }
     }
 
@@ -767,9 +848,14 @@ pub async fn atualizar_kit(
         updates.push("descricao = ?");
         values.push(desc.clone());
     }
+    // Atualiza nome no banco se foi renomeado
+    if nome_efetivo != nome {
+        updates.push("nome = ?");
+        values.push(nome_efetivo.clone());
+    }
 
     if updates.is_empty() {
-        return Err((StatusCode::BAD_REQUEST, "Nenhum campo para atualizar".to_string()));
+        return Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Kit renomeado com sucesso", "novo_nome": nome_efetivo })));
     }
 
     let query_str = format!(
@@ -788,5 +874,5 @@ pub async fn atualizar_kit(
         .await
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao atualizar kit: {}", e)))?;
 
-    Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Kit atualizado com sucesso" })))
+    Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Kit atualizado com sucesso", "novo_nome": nome_efetivo })))
 }
