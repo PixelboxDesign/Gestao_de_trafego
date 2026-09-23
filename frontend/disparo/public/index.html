@@ -398,6 +398,7 @@
       gap: .75rem;
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
     }
 
     .catalogo-toolbar input {
@@ -411,6 +412,50 @@
     }
 
     .catalogo-toolbar input::placeholder { color: var(--text2); }
+
+    /* ━━ Filtro chips ━━ */
+    .filtro-grupo {
+      display: flex;
+      align-items: center;
+      gap: .25rem;
+    }
+    .filtro-label {
+      font-size: 11px;
+      color: var(--text2);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-right: .15rem;
+      white-space: nowrap;
+    }
+    .filtro-chip {
+      padding: .3rem .65rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .filtro-chip:hover { border-color: var(--primary); color: var(--text); }
+    .filtro-chip.ativo {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .filtro-chip.ativo-amarelo {
+      background: rgba(245,158,11,0.2);
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+    .filtro-chip.ativo-verde {
+      background: rgba(34,197,94,0.15);
+      border-color: #22c55e;
+      color: #22c55e;
+    }
 
     .catalogo-grid {
       display: grid;
@@ -1029,11 +1074,28 @@
         type="text"
         id="catalogo-busca"
         placeholder="Buscar kit..."
-        onkeyup="filtrarKits(this.value)"
+        onkeyup="aplicarFiltrosKits()"
       />
       <button class="btn btn-secondary" onclick="carregarCatalogo()">
         🔄 Atualizar
       </button>
+
+      <!-- Filtro: Visibilidade -->
+      <div class="filtro-grupo">
+        <span class="filtro-label">Visibilidade:</span>
+        <button class="filtro-chip ativo" id="kit-vis-todos"    onclick="setFiltroKitVis('todos')">Todos</button>
+        <button class="filtro-chip"        id="kit-vis-hab"     onclick="setFiltroKitVis('habilitado')">✅ Habilitados</button>
+        <button class="filtro-chip"        id="kit-vis-des"     onclick="setFiltroKitVis('desabilitado')">👁️‍🗨️ Desabilitados</button>
+      </div>
+
+      <!-- Filtro: Thumbnail -->
+      <div class="filtro-grupo">
+        <span class="filtro-label">Thumbnail:</span>
+        <button class="filtro-chip ativo" id="kit-thumb-todos"  onclick="setFiltroKitThumb('todos')">Todos</button>
+        <button class="filtro-chip"       id="kit-thumb-com"    onclick="setFiltroKitThumb('com')">🖼️ Com thumb</button>
+        <button class="filtro-chip"       id="kit-thumb-sem"    onclick="setFiltroKitThumb('sem')">❌ Sem thumb</button>
+      </div>
+
       <span style="margin-left:auto;font-size:12px;color:var(--text2)" id="catalogo-count">
         Carregando...
       </span>
@@ -1053,11 +1115,28 @@
         type="text"
         id="produtos-busca"
         placeholder="Buscar produto..."
-        onkeyup="filtrarProdutos(this.value)"
+        onkeyup="aplicarFiltrosProdutos()"
       />
       <button class="btn btn-secondary" onclick="carregarProdutos()">
         🔄 Atualizar
       </button>
+
+      <!-- Filtro: Visibilidade -->
+      <div class="filtro-grupo">
+        <span class="filtro-label">Visibilidade:</span>
+        <button class="filtro-chip ativo" id="prod-vis-todos"   onclick="setFiltroProdVis('todos')">Todos</button>
+        <button class="filtro-chip"       id="prod-vis-hab"     onclick="setFiltroProdVis('habilitado')">✅ Habilitados</button>
+        <button class="filtro-chip"       id="prod-vis-des"     onclick="setFiltroProdVis('desabilitado')">👁️‍🗨️ Desabilitados</button>
+      </div>
+
+      <!-- Filtro: Thumbnail -->
+      <div class="filtro-grupo">
+        <span class="filtro-label">Thumbnail:</span>
+        <button class="filtro-chip ativo" id="prod-thumb-todos" onclick="setFiltroProdThumb('todos')">Todos</button>
+        <button class="filtro-chip"       id="prod-thumb-com"   onclick="setFiltroProdThumb('com')">🖼️ Com thumb</button>
+        <button class="filtro-chip"       id="prod-thumb-sem"   onclick="setFiltroProdThumb('sem')">❌ Sem thumb</button>
+      </div>
+
       <span style="margin-left:auto;font-size:12px;color:var(--text2)" id="produtos-count">
         Carregando...
       </span>
@@ -2983,13 +3062,99 @@ function renderKits(lista) {
   initLazyLoad();
 }
 
-function filtrarKits(busca) {
-  const termo = busca.toLowerCase().trim();
-  const filtrados = termo
-    ? kitsData.filter(k => k.nome.toLowerCase().includes(termo))
-    : kitsData;
-  renderKits(filtrados);
+// ─── Estado dos filtros ───────────────────────────────────────────────────────
+let filtroKitVis   = 'todos';   // 'todos' | 'habilitado' | 'desabilitado'
+let filtroKitThumb = 'todos';   // 'todos' | 'com' | 'sem'
+let filtroProdVis   = 'todos';
+let filtroProdThumb = 'todos';
+
+// ─── Filtros de kits ──────────────────────────────────────────────────────────
+
+function setFiltroKitVis(valor) {
+  filtroKitVis = valor;
+  ['todos','hab','des'].forEach(id => {
+    const btn = document.getElementById('kit-vis-' + id);
+    if (!btn) return;
+    btn.className = 'filtro-chip';
+    if ((id === 'todos' && valor === 'todos') ||
+        (id === 'hab'   && valor === 'habilitado') ||
+        (id === 'des'   && valor === 'desabilitado')) {
+      btn.classList.add(id === 'des' ? 'ativo-amarelo' : id === 'hab' ? 'ativo-verde' : 'ativo');
+    }
+  });
+  aplicarFiltrosKits();
 }
+
+function setFiltroKitThumb(valor) {
+  filtroKitThumb = valor;
+  ['todos','com','sem'].forEach(id => {
+    const btn = document.getElementById('kit-thumb-' + id);
+    if (!btn) return;
+    btn.className = 'filtro-chip' + (id === valor || (id === 'todos' && valor === 'todos') ? ' ativo' : '');
+  });
+  aplicarFiltrosKits();
+}
+
+function aplicarFiltrosKits() {
+  const busca = (document.getElementById('catalogo-busca')?.value || '').toLowerCase().trim();
+  let lista = kitsData;
+
+  if (busca) lista = lista.filter(k => k.nome.toLowerCase().includes(busca));
+
+  if (filtroKitVis === 'habilitado')    lista = lista.filter(k => k.visivel !== false);
+  if (filtroKitVis === 'desabilitado')  lista = lista.filter(k => k.visivel === false);
+
+  if (filtroKitThumb === 'com')  lista = lista.filter(k => k.tem_thumb || k.caminho_thumb_bd);
+  if (filtroKitThumb === 'sem')  lista = lista.filter(k => !k.tem_thumb && !k.caminho_thumb_bd);
+
+  renderKits(lista);
+}
+
+function filtrarKits(busca) { aplicarFiltrosKits(); }
+
+// ─── Filtros de produtos ──────────────────────────────────────────────────────
+
+function setFiltroProdVis(valor) {
+  filtroProdVis = valor;
+  ['todos','hab','des'].forEach(id => {
+    const btn = document.getElementById('prod-vis-' + id);
+    if (!btn) return;
+    btn.className = 'filtro-chip';
+    if ((id === 'todos' && valor === 'todos') ||
+        (id === 'hab'   && valor === 'habilitado') ||
+        (id === 'des'   && valor === 'desabilitado')) {
+      btn.classList.add(id === 'des' ? 'ativo-amarelo' : id === 'hab' ? 'ativo-verde' : 'ativo');
+    }
+  });
+  aplicarFiltrosProdutos();
+}
+
+function setFiltroProdThumb(valor) {
+  filtroProdThumb = valor;
+  ['todos','com','sem'].forEach(id => {
+    const btn = document.getElementById('prod-thumb-' + id);
+    if (!btn) return;
+    btn.className = 'filtro-chip' + (id === valor || (id === 'todos' && valor === 'todos') ? ' ativo' : '');
+  });
+  aplicarFiltrosProdutos();
+}
+
+function aplicarFiltrosProdutos() {
+  const busca = (document.getElementById('produtos-busca')?.value || '').toLowerCase().trim();
+  let lista = produtosData;
+
+  if (busca) lista = lista.filter(p => p.nome.toLowerCase().includes(busca));
+
+  if (filtroProdVis === 'habilitado')    lista = lista.filter(p => p.visivel !== false);
+  if (filtroProdVis === 'desabilitado')  lista = lista.filter(p => p.visivel === false);
+
+  if (filtroProdThumb === 'com')  lista = lista.filter(p => p.tem_thumb || p.caminho_thumb_bd);
+  if (filtroProdThumb === 'sem')  lista = lista.filter(p => !p.tem_thumb && !p.caminho_thumb_bd);
+
+  renderProdutos(lista);
+}
+
+function filtrarProdutos(busca) { aplicarFiltrosProdutos(); }
 
 function abrirModalKit(nomeKit, marca) {
   console.log('[DEBUG] abrirModalKit chamado com:', nomeKit, marca);
@@ -3625,14 +3790,6 @@ function renderProdutos(lista) {
 
   // Inicializa lazy loading
   initLazyLoad();
-}
-
-function filtrarProdutos(busca) {
-  const termo = busca.toLowerCase().trim();
-  const filtrados = termo
-    ? produtosData.filter(p => p.nome.toLowerCase().includes(termo))
-    : produtosData;
-  renderProdutos(filtrados);
 }
 
 function abrirModalProduto(nomeProduto, marca) {
