@@ -596,6 +596,7 @@ pub struct AtualizarProdutoRequest {
     pub descricao_peso: Option<String>,
     pub descricao_tamanho: Option<String>,
     pub descricao_composicao: Option<String>,
+    pub visivel: Option<bool>,
 }
 
 /// PUT /api/catalogo/produto/:id — atualiza campos do produto
@@ -604,6 +605,51 @@ pub async fn atualizar_produto(
     Path((_marca, nome)): Path<(String, String)>,
     Json(payload): Json<AtualizarProdutoRequest>,
 ) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
+
+    // Se veio campo `visivel`, salva no info.json (filesystem)
+    if let Some(visivel) = payload.visivel {
+        let nome_pasta = nome
+            .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
+            .trim()
+            .to_string();
+        let info_path = std::path::PathBuf::from("f:\\luna_cosmeticos\\catalogos\\Alphahall\\produtos")
+            .join(&nome_pasta)
+            .join("info.json");
+
+        // Lê o info.json atual (ou cria um vazio)
+        let mut info: serde_json::Value = if let Ok(conteudo) = tokio::fs::read_to_string(&info_path).await {
+            serde_json::from_str(&conteudo).unwrap_or(serde_json::json!({}))
+        } else {
+            serde_json::json!({})
+        };
+
+        info["visivel"] = serde_json::json!(visivel);
+
+        let json_str = serde_json::to_string_pretty(&info)
+            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+        // Cria a pasta se não existir
+        if let Some(parent) = info_path.parent() {
+            let _ = tokio::fs::create_dir_all(parent).await;
+        }
+
+        tokio::fs::write(&info_path, json_str)
+            .await
+            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao salvar info.json: {}", e)))?;
+
+        // Se só veio visivel (sem outros campos), retorna aqui
+        let tem_outros_campos = payload.codigo_sku.is_some()
+            || payload.preco.is_some()
+            || payload.descricao.is_some()
+            || payload.descricao_peso.is_some()
+            || payload.descricao_tamanho.is_some()
+            || payload.descricao_composicao.is_some();
+
+        if !tem_outros_campos {
+            return Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Visibilidade atualizada com sucesso" })));
+        }
+    }
+
     let state = state.lock().await;
     let pool = &state.db;
 
@@ -647,7 +693,6 @@ pub async fn atualizar_produto(
 
     let mut query = sqlx::query(&query_str);
     
-    // Bind dos valores
     for value in values {
         query = query.bind(value);
     }
@@ -665,10 +710,48 @@ pub async fn atualizar_kit(
     Path((_marca, nome)): Path<(String, String)>,
     Json(payload): Json<AtualizarProdutoRequest>,
 ) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
+
+    // Se veio campo `visivel`, salva no info.json (filesystem)
+    if let Some(visivel) = payload.visivel {
+        let nome_pasta = nome
+            .replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "")
+            .trim()
+            .to_string();
+        let info_path = std::path::PathBuf::from("f:\\luna_cosmeticos\\catalogos\\Alphahall\\kits")
+            .join(&nome_pasta)
+            .join("info.json");
+
+        let mut info: serde_json::Value = if let Ok(conteudo) = tokio::fs::read_to_string(&info_path).await {
+            serde_json::from_str(&conteudo).unwrap_or(serde_json::json!({}))
+        } else {
+            serde_json::json!({})
+        };
+
+        info["visivel"] = serde_json::json!(visivel);
+
+        let json_str = serde_json::to_string_pretty(&info)
+            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+        if let Some(parent) = info_path.parent() {
+            let _ = tokio::fs::create_dir_all(parent).await;
+        }
+
+        tokio::fs::write(&info_path, json_str)
+            .await
+            .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao salvar info.json: {}", e)))?;
+
+        let tem_outros_campos = payload.codigo_sku.is_some()
+            || payload.preco.is_some()
+            || payload.descricao.is_some();
+
+        if !tem_outros_campos {
+            return Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Visibilidade atualizada com sucesso" })));
+        }
+    }
+
     let state = state.lock().await;
     let pool = &state.db;
 
-    // Constrói a query dinamicamente baseado nos campos presentes
     let mut updates = Vec::new();
     let mut values: Vec<String> = Vec::new();
 
@@ -696,7 +779,6 @@ pub async fn atualizar_kit(
 
     let mut query = sqlx::query(&query_str);
     
-    // Bind dos valores
     for value in values {
         query = query.bind(value);
     }

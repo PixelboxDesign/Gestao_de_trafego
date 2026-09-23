@@ -4418,7 +4418,9 @@ async function desabilitarProduto() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ visivel: false })
     });
-    const data = await res.json();
+    const texto = await res.text();
+    let data;
+    try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto || 'Resposta inválida do servidor' }; }
     if (data.ok) {
       showToast('✅ Produto desabilitado — não aparecerá no catálogo web.', 'success');
       fecharModalProduto();
@@ -4441,7 +4443,9 @@ async function excluirProduto() {
     const res = await fetch(`/api/catalogo/produto/${encodeURIComponent(marca)}/${encodeURIComponent(nomePasta)}`, {
       method: 'DELETE'
     });
-    const data = await res.json();
+    const texto = await res.text();
+    let data;
+    try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto || 'Resposta inválida do servidor' }; }
     if (data.ok) {
       showToast('✅ Produto excluído com sucesso!', 'success');
       fecharModalProduto();
@@ -4467,7 +4471,9 @@ async function desabilitarKit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ visivel: false })
     });
-    const data = await res.json();
+    const texto = await res.text();
+    let data;
+    try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto || 'Resposta inválida do servidor' }; }
     if (data.ok) {
       showToast('✅ Kit desabilitado — não aparecerá no catálogo web.', 'success');
       fecharModalKit();
@@ -4490,7 +4496,9 @@ async function excluirKit() {
     const res = await fetch(`/api/catalogo/kit/${encodeURIComponent(marca)}/${encodeURIComponent(nomePasta)}`, {
       method: 'DELETE'
     });
-    const data = await res.json();
+    const texto = await res.text();
+    let data;
+    try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto || 'Resposta inválida do servidor' }; }
     if (data.ok) {
       showToast('✅ Kit excluído com sucesso!', 'success');
       fecharModalKit();
