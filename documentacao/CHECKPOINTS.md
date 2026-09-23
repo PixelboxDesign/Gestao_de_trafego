@@ -35,6 +35,7 @@
 
 | Versão | Data | Título | Commit original | Commit atual | Amends |
 |---|---|---|---|---|---|
+| [v23-rename-kit-produto](#checkpoint-v23-rename-kit-produto) | 23/09/2026 | ✏️ Renomear Kit/Produto — Atualiza Nome, Pasta e Card em Tempo Real | `0fba0bb` | `0fba0bb` | — |
 | [v22-botoes-desabilitar-excluir](#checkpoint-v22-botoes-desabilitar-excluir) | 23/09/2026 | 🔘 Botões Desabilitar/Habilitar + Excluir nos Modais de Kit e Produto | `8a820f6` | `2326423` | — |
 | [v21-produto-thumbnail-fix](#checkpoint-v21-produto-thumbnail-fix) | 15/05/2026 | 🖼️ FIX: Upload de Thumbnail para Produtos | `fe044fb` | `fe044fb` | — |
 | [v20-thumbnails-kits-componentes](#checkpoint-v20-thumbnails-kits-componentes) | 09/09/2026 | 🖼️ Thumbnails Componentes nos Kits + Fix Carregamento Tauri | `bb64fd8` | `bb64fd8` | — |
@@ -50,6 +51,141 @@
 | [v10-thumb-carrossel](#checkpoint-v10-thumb-carrossel) | 25/08/2026 | Sistema de Thumbnails Otimizadas + Carrossel de Imagens | `e9a40b1` | `e9a40b1` | — |
 
 > ⚠️ **Regra de restauração:** Sempre use o **Commit atual** para rollback. Quando há amends, o commit original deixa de existir no Git e é substituído pelo mais recente.
+
+---
+
+## ✏️ CHECKPOINT v23-rename-kit-produto
+
+**Título:** Renomear Kit/Produto — Atualiza Nome, Pasta e Card em Tempo Real  
+**Data:** 23/09/2026 | **Commit:** `0fba0bb` | **Status:** ✅ ESTÁVEL | **Prioridade:** 🟢 FUNCIONAL
+
+### 🎯 RESUMO EXECUTIVO
+
+**Problema resolvido:** Ao editar o nome no header do modal de kit ou produto e clicar em Salvar, o nome aparecia como salvo mas o card na grid **não atualizava** — continuava exibindo o nome antigo. Além disso, a pasta no filesystem **não era renomeada**, causando inconsistência entre o banco de dados e a estrutura de arquivos.
+
+**Funcionalidades implementadas:**
+- ✅ Editar o nome no header do modal → clicar Salvar → pasta renomeada no filesystem
+- ✅ Nome atualizado no banco de dados SQL (`relacao_produtos_kits_disparo_luna`)
+- ✅ Card na grid atualiza o nome imediatamente (sem reload completo)
+- ✅ Validação de caracteres inválidos (`/ \ : * ? " < > |`)
+- ✅ Verificação de conflito (pasta destino já existe)
+- ✅ Funciona para kits (`catalogos/Alphahall/kits/`) e produtos (`catalogos/Alphahall/produtos/`)
+- ✅ Upload de thumbnail após rename usa o nome novo (não o antigo)
+
+---
+
+### 🔍 DIAGNÓSTICO DO PROBLEMA ORIGINAL
+
+**Frontend (`salvarKit`):** lia o `novoNome` do campo `modal-kit-nome-edit` mas **não o incluía** no body da requisição PUT — enviava apenas `preco`, `codigo_sku`, `descricao`.
+
+**Frontend (`salvarProduto`):** nem lia o campo de nome do modal — só enviava `descricao`.
+
+**Backend (`atualizar_produto` / `atualizar_kit`):** `AtualizarProdutoRequest` não tinha campo `novo_nome`. Nenhum rename de pasta era feito.
+
+---
+
+### ✅ SOLUÇÃO IMPLEMENTADA
+
+#### Backend (`catalogo_db.rs`)
+
+**Struct atualizado:**
+```rust
+pub struct AtualizarProdutoRequest {
+    // ... campos anteriores ...
+    pub novo_nome: Option<String>,  // ← NOVO
+}
+```
+
+**Lógica de rename em `atualizar_produto` e `atualizar_kit`:**
+```rust
+let nome_efetivo = if let Some(ref novo_nome) = payload.novo_nome {
+    // 1. Valida caracteres proibidos
+    // 2. Verifica se pasta destino já existe → retorna erro
+    // 3. tokio::fs::rename(pasta_atual, pasta_nova)
+    // 4. Retorna novo_nome_clean como nome efetivo
+} else { nome.clone() };
+
+// SQL UPDATE inclui nome = ? se houve rename
+if nome_efetivo != nome { updates.push("nome = ?"); }
+
+// Response sempre retorna novo_nome para o frontend
+Json({ "ok": true, "novo_nome": nome_efetivo })
+```
+
+**Caminhos de pasta:**
+- Produtos: `f:\luna_cosmeticos\catalogos\Alphahall\produtos\{nome}`
+- Kits: `f:\luna_cosmeticos\catalogos\Alphahall\kits\{nome}`
+
+---
+
+#### Frontend (`index.html`)
+
+**`salvarKit()`:**
+```javascript
+body: JSON.stringify({
+  preco: precoNumero,
+  codigo_sku: skuKit,
+  descricao: descricao,
+  novo_nome: novoNome !== kitAtual.nome ? novoNome : undefined,
+})
+
+// Após resposta OK:
+const nomeAtualizado = data.novo_nome || novoNome;
+kitAtual.nome = nomeAtualizado;
+
+// Atualiza card no DOM diretamente:
+const card = document.querySelector(`.kit-card[data-kit-nome="${escAttr(nomeAnterior)}"]`);
+card.setAttribute('data-kit-nome', nomeAtualizado);
+card.querySelector('.kit-nome').textContent = nomeAtualizado;
+```
+
+**`salvarProduto()`:** mesma lógica com `data-produto-nome` e `produtoAtual.nome`.
+
+---
+
+### ⚠️ DEPENDÊNCIA DE BACKEND LOCAL
+
+Esta feature **requer recompilação e restart do backend Rust** para funcionar. O executável foi recompilado (`cargo build --release`) e reiniciado na sessão de implementação. Se o servidor reiniciar com binário antigo, a renomeação de pasta não ocorre.
+
+**Para recompilar:**
+```bash
+cd f:\luna_cosmeticos\backend\src-tauri
+cargo build --release
+# Matar processo antigo e iniciar novo:
+.\target\release\luna-server.exe
+```
+
+---
+
+### 📝 ARQUIVOS MODIFICADOS
+
+```
+frontend/disparo/public/index.html          ← salvarKit() e salvarProduto() atualizados
+backend/src-tauri/src/api/catalogo_db.rs    ← novo_nome + fs::rename + UPDATE nome
+```
+
+---
+
+### ✅ CHECKLIST DE VALIDAÇÃO
+
+```
+# Testar rename de produto
+1. Abrir aba Produtos em luna-disparo.onrender.com
+2. Clicar em um produto → modal abre
+3. Editar o nome no campo do header
+4. Clicar Salvar
+5. ✅ Card na grid deve mostrar o novo nome
+6. ✅ Pasta em catalogos/Alphahall/produtos/ deve ter sido renomeada
+7. ✅ Banco de dados deve ter o novo nome
+
+# Testar rename de kit
+1. Mesma sequência na aba Kits
+
+# Testar validação
+1. Tentar salvar nome com ":" → erro "Nome inválido"
+2. Tentar salvar nome de pasta que já existe → erro "Já existe um produto/kit com esse nome"
+3. Tentar salvar com nome vazio → bloqueado no frontend
+```
 
 ---
 
