@@ -876,3 +876,164 @@ pub async fn atualizar_kit(
 
     Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Kit atualizado com sucesso", "novo_nome": nome_efetivo })))
 }
+
+// ─── Criação de Produto/Kit ───────────────────────────────────────────────────
+
+#[derive(Debug, Deserialize)]
+pub struct CriarProdutoRequest {
+    pub nome: String,
+    pub marca: Option<String>,
+    pub preco: Option<f64>,
+    pub descricao: Option<String>,
+    pub codigo_sku: Option<String>,
+}
+
+/// POST /api/catalogo/criar-produto — cria pasta no filesystem + insere no banco
+pub async fn criar_produto(
+    State(state): State<Arc<Mutex<AppState>>>,
+    Json(payload): Json<CriarProdutoRequest>,
+) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
+    let nome = payload.nome.trim().to_string();
+    if nome.is_empty() {
+        return Ok(Json(serde_json::json!({ "ok": false, "erro": "Nome não pode ser vazio" })));
+    }
+    if nome.contains(['/', '\\', ':', '*', '?', '"', '<', '>', '|']) {
+        return Ok(Json(serde_json::json!({ "ok": false, "erro": "Nome inválido. Evite: / \\ : * ? \" < > |" })));
+    }
+
+    let marca = payload.marca.as_deref().unwrap_or("Alphahall").to_string();
+    let nome_pasta = nome.replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "").trim().to_string();
+
+    // Cria pasta no filesystem
+    let pasta = std::path::PathBuf::from(format!("f:\\luna_cosmeticos\\catalogos\\{}\\produtos", marca))
+        .join(&nome_pasta);
+
+    if pasta.exists() {
+        return Ok(Json(serde_json::json!({ "ok": false, "erro": format!("Produto '{}' já existe", nome_pasta) })));
+    }
+
+    tokio::fs::create_dir_all(&pasta).await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao criar pasta: {}", e)))?;
+
+    // Cria info.json inicial
+    let info = serde_json::json!({ "visivel": true });
+    let _ = tokio::fs::write(pasta.join("info.json"), serde_json::to_string_pretty(&info).unwrap()).await;
+
+    // Insere no banco de dados
+    let state = state.lock().await;
+    let pool = &state.db;
+
+    sqlx::query(
+        "INSERT INTO relacao_produtos_kits_disparo_luna (nome, tipo, preco, descricao, codigo_sku, eh_kit)
+         VALUES (?, 'produto_individual', ?, ?, ?, 0)"
+    )
+    .bind(&nome)
+    .bind(payload.preco.unwrap_or(0.0))
+    .bind(payload.descricao.as_deref().unwrap_or(""))
+    .bind(payload.codigo_sku.as_deref().unwrap_or(""))
+    .execute(pool)
+    .await
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao inserir no banco: {}", e)))?;
+
+    Ok(Json(serde_json::json!({ "ok": true, "nome": nome, "mensagem": "Produto criado com sucesso" })))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CriarKitRequest {
+    pub nome: String,
+    pub marca: Option<String>,
+    pub preco: Option<f64>,
+    pub descricao: Option<String>,
+    pub codigo_sku: Option<String>,
+    pub componentes: Option<Vec<ComponenteInput>>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct ComponenteInput {
+    pub produto_id: String,
+    pub nome: String,
+    pub sku: Option<String>,
+    pub quantidade: i32,
+}
+
+/// POST /api/catalogo/criar-kit — cria pasta no filesystem + insere no banco
+pub async fn criar_kit(
+    State(state): State<Arc<Mutex<AppState>>>,
+    Json(payload): Json<CriarKitRequest>,
+) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
+    let nome = payload.nome.trim().to_string();
+    if nome.is_empty() {
+        return Ok(Json(serde_json::json!({ "ok": false, "erro": "Nome não pode ser vazio" })));
+    }
+    if nome.contains(['/', '\\', ':', '*', '?', '"', '<', '>', '|']) {
+        return Ok(Json(serde_json::json!({ "ok": false, "erro": "Nome inválido. Evite: / \\ : * ? \" < > |" })));
+    }
+
+    let marca = payload.marca.as_deref().unwrap_or("Alphahall").to_string();
+    let nome_pasta = nome.replace(&['<', '>', ':', '"', '/', '\\', '|', '?', '*'][..], "").trim().to_string();
+
+    // Cria pasta no filesystem
+    let pasta = std::path::PathBuf::from(format!("f:\\luna_cosmeticos\\catalogos\\{}\\kits", marca))
+        .join(&nome_pasta);
+
+    if pasta.exists() {
+        return Ok(Json(serde_json::json!({ "ok": false, "erro": format!("Kit '{}' já existe", nome_pasta) })));
+    }
+
+    tokio::fs::create_dir_all(&pasta).await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao criar pasta: {}", e)))?;
+
+    let info = serde_json::json!({ "visivel": true });
+    let _ = tokio::fs::write(pasta.join("info.json"), serde_json::to_string_pretty(&info).unwrap()).await;
+
+    // Serializa componentes para JSON
+    let componentes_json = serde_json::to_string(&payload.componentes.unwrap_or_default()).unwrap_or("[]".to_string());
+
+    // Insere no banco
+    let state = state.lock().await;
+    let pool = &state.db;
+
+    sqlx::query(
+        "INSERT INTO relacao_produtos_kits_disparo_luna (nome, tipo, preco, descricao, codigo_sku, eh_kit, componentes)
+         VALUES (?, 'kit_composto', ?, ?, ?, 1, ?)"
+    )
+    .bind(&nome)
+    .bind(payload.preco.unwrap_or(0.0))
+    .bind(payload.descricao.as_deref().unwrap_or(""))
+    .bind(payload.codigo_sku.as_deref().unwrap_or(""))
+    .bind(&componentes_json)
+    .execute(pool)
+    .await
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao inserir no banco: {}", e)))?;
+
+    Ok(Json(serde_json::json!({ "ok": true, "nome": nome, "mensagem": "Kit criado com sucesso" })))
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AtualizarComponentesRequest {
+    pub componentes: Vec<ComponenteInput>,
+}
+
+/// PUT /api/catalogo/v2/kit/:marca/:nome/componentes — atualiza lista de componentes
+pub async fn atualizar_componentes_kit(
+    State(state): State<Arc<Mutex<AppState>>>,
+    Path((_marca, nome)): Path<(String, String)>,
+    Json(payload): Json<AtualizarComponentesRequest>,
+) -> Result<Json<serde_json::Value>, (StatusCode, String)> {
+    let componentes_json = serde_json::to_string(&payload.componentes)
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    let state = state.lock().await;
+    let pool = &state.db;
+
+    sqlx::query(
+        "UPDATE relacao_produtos_kits_disparo_luna SET componentes = ? WHERE nome = ? AND tipo = 'kit_composto'"
+    )
+    .bind(&componentes_json)
+    .bind(&nome)
+    .execute(pool)
+    .await
+    .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Erro ao atualizar componentes: {}", e)))?;
+
+    Ok(Json(serde_json::json!({ "ok": true, "mensagem": "Componentes atualizados com sucesso" })))
+}

@@ -1079,6 +1079,9 @@
       <button class="btn btn-secondary" onclick="carregarCatalogo()">
         🔄 Atualizar
       </button>
+      <button class="btn btn-primary" onclick="abrirModalNovoKit()" style="white-space:nowrap">
+        ➕ Novo Kit
+      </button>
 
       <!-- Filtro: Visibilidade -->
       <div class="filtro-grupo">
@@ -1119,6 +1122,9 @@
       />
       <button class="btn btn-secondary" onclick="carregarProdutos()">
         🔄 Atualizar
+      </button>
+      <button class="btn btn-primary" onclick="abrirModalNovoProduto()" style="white-space:nowrap">
+        ➕ Novo Produto
       </button>
 
       <!-- Filtro: Visibilidade -->
@@ -1262,7 +1268,10 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label" id="componentes-label">📦 Produtos que compõem este kit</label>
+        <label class="form-label" id="componentes-label" style="display:flex;align-items:center;justify-content:space-between">
+          <span>📦 Produtos que compõem este kit</span>
+          <button class="btn btn-secondary" style="padding:.25rem .65rem;font-size:11px" onclick="abrirSeletorProduto('editar-kit')">➕ Adicionar</button>
+        </label>
         <div id="skus-itens-container"></div>
       </div>
 
@@ -1693,6 +1702,91 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- Modal Novo Produto -->
+<div id="modal-novo-produto" class="modal-overlay" style="display:none" onclick="if(event.target===this) fecharModalNovoProduto()">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">➕ Novo Produto</div>
+      <button class="modal-close" onclick="fecharModalNovoProduto()">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem">
+      <div class="form-group">
+        <label class="form-label">Nome do Produto *</label>
+        <input type="text" id="novo-produto-nome" class="form-input" placeholder="Ex: Shampoo Hidratante 500ml" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Preço</label>
+        <input type="number" id="novo-produto-preco" class="form-input" placeholder="0.00" step="0.01" min="0" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">SKU</label>
+        <input type="text" id="novo-produto-sku" class="form-input" placeholder="Ex: PROD-001" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <textarea id="novo-produto-descricao" class="form-textarea" rows="3" placeholder="Descrição do produto..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end;gap:.5rem">
+      <button class="btn btn-secondary" onclick="fecharModalNovoProduto()">Cancelar</button>
+      <button class="btn btn-primary" id="btn-criar-produto" onclick="criarProduto()">✅ Criar Produto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Novo Kit -->
+<div id="modal-novo-kit" class="modal-overlay" style="display:none" onclick="if(event.target===this) fecharModalNovoKit()">
+  <div class="modal-box" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title">➕ Novo Kit</div>
+      <button class="modal-close" onclick="fecharModalNovoKit()">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem">
+      <div class="form-group">
+        <label class="form-label">Nome do Kit *</label>
+        <input type="text" id="novo-kit-nome" class="form-input" placeholder="Ex: Kit Cronograma Completo" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Preço</label>
+        <input type="number" id="novo-kit-preco" class="form-input" placeholder="0.00" step="0.01" min="0" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">SKU</label>
+        <input type="text" id="novo-kit-sku" class="form-input" placeholder="Ex: KIT-001" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <textarea id="novo-kit-descricao" class="form-textarea" rows="2" placeholder="Descrição do kit..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;justify-content:space-between">
+          <span>📦 Produtos do Kit</span>
+          <button class="btn btn-secondary" style="padding:.25rem .65rem;font-size:11px" onclick="abrirSeletorProduto('novo-kit')">➕ Adicionar Produto</button>
+        </label>
+        <div id="novo-kit-componentes" style="display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem"></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end;gap:.5rem">
+      <button class="btn btn-secondary" onclick="fecharModalNovoKit()">Cancelar</button>
+      <button class="btn btn-primary" id="btn-criar-kit" onclick="criarKit()">✅ Criar Kit</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Seletor de Produto (usado tanto no novo kit quanto na edição) -->
+<div id="modal-seletor-produto" class="modal-overlay" style="display:none" onclick="if(event.target===this) fecharSeletorProduto()">
+  <div class="modal-box" style="max-width:500px">
+    <div class="modal-header">
+      <div class="modal-title">🔍 Selecionar Produto</div>
+      <button class="modal-close" onclick="fecharSeletorProduto()">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:.75rem">
+      <input type="text" id="seletor-busca" class="form-input" placeholder="Buscar produto por nome..." oninput="filtrarSeletorProdutos(this.value)" />
+      <div id="seletor-lista" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:.35rem"></div>
+    </div>
   </div>
 </div>
 
@@ -3408,40 +3502,6 @@ function renderSkusItens(skus) {
   `).join('');
 }
 
-function renderComponentesKit(componentes) {
-  const container = document.getElementById('skus-itens-container');
-  
-  if (componentes.length === 0) {
-    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic">Nenhum componente cadastrado.</p>';
-    return;
-  }
-  
-  container.innerHTML = `<div class="component-list">` + componentes.map((comp, idx) => `
-    <div class="component-item">
-      <div class="component-badge">
-        ${comp.quantidade}x
-      </div>
-      <div class="component-info">
-        <div class="component-name">
-          ${esc(comp.nome)}
-        </div>
-        ${comp.sku ? `<div class="component-sku">
-          <span style="color:var(--text2)">SKU:</span>
-          <code>${esc(comp.sku)}</code>
-        </div>` : '<div class="component-sku"><span style="color:var(--text2);font-style:italic">Sem SKU</span></div>'}
-      </div>
-      <button
-        onclick="verDetalhesComponente('${escAttr(comp.sku || '')}')"
-        class="inline-action-btn"
-        title="Ver detalhes"
-        ${!comp.sku ? 'disabled style="opacity:.4;cursor:not-allowed"' : ''}
-      >
-        👁️ Ver
-      </button>
-    </div>
-  `).join('') + `</div>`;
-}
-
 function adicionarSkuItem() {
   const inputs = document.querySelectorAll('.sku-item-input');
   const skusAtuais = Array.from(inputs).map(inp => inp.value);
@@ -4754,6 +4814,275 @@ async function excluirKit() {
     }
   } catch (err) {
     alert('❌ Erro ao excluir kit: ' + err.message);
+  }
+}
+
+// ─── Estado para criação/edição de componentes ───────────────────────────────
+let componentesNovoKit = [];   // Para o modal "Novo Kit"
+let componentesEdicaoKit = []; // Para o modal de edição de kit existente
+let seletorContexto = '';      // 'novo-kit' ou 'editar-kit'
+
+// ─── Modal Novo Produto ───────────────────────────────────────────────────────
+
+function abrirModalNovoProduto() {
+  document.getElementById('novo-produto-nome').value = '';
+  document.getElementById('novo-produto-preco').value = '';
+  document.getElementById('novo-produto-sku').value = '';
+  document.getElementById('novo-produto-descricao').value = '';
+  document.getElementById('modal-novo-produto').style.display = 'flex';
+}
+
+function fecharModalNovoProduto() {
+  document.getElementById('modal-novo-produto').style.display = 'none';
+}
+
+async function criarProduto() {
+  const nome = document.getElementById('novo-produto-nome').value.trim();
+  if (!nome) { alert('O nome é obrigatório.'); return; }
+
+  const btn = document.getElementById('btn-criar-produto');
+  btn.disabled = true;
+  btn.textContent = 'Criando...';
+
+  try {
+    const res = await fetch('/api/catalogo/criar-produto', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome,
+        preco: parseFloat(document.getElementById('novo-produto-preco').value) || 0,
+        codigo_sku: document.getElementById('novo-produto-sku').value.trim(),
+        descricao: document.getElementById('novo-produto-descricao').value.trim(),
+      })
+    });
+    const texto = await res.text();
+    let data;
+    try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto }; }
+
+    if (data.ok) {
+      showToast('✅ Produto criado com sucesso!', 'success');
+      fecharModalNovoProduto();
+      await carregarProdutos();
+      // Abre o modal de edição para o produto recém criado
+      setTimeout(() => {
+        const p = produtosData.find(x => x.nome === nome);
+        if (p) abrirModalProduto(p.nome, p.marca || 'Alphahall');
+      }, 300);
+    } else {
+      alert('❌ Erro: ' + (data.erro || JSON.stringify(data)));
+    }
+  } catch (err) {
+    alert('❌ Erro ao criar produto: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✅ Criar Produto';
+  }
+}
+
+// ─── Modal Novo Kit ───────────────────────────────────────────────────────────
+
+function abrirModalNovoKit() {
+  componentesNovoKit = [];
+  document.getElementById('novo-kit-nome').value = '';
+  document.getElementById('novo-kit-preco').value = '';
+  document.getElementById('novo-kit-sku').value = '';
+  document.getElementById('novo-kit-descricao').value = '';
+  renderComponentesNovoKit();
+  document.getElementById('modal-novo-kit').style.display = 'flex';
+}
+
+function fecharModalNovoKit() {
+  document.getElementById('modal-novo-kit').style.display = 'none';
+}
+
+function renderComponentesNovoKit() {
+  const container = document.getElementById('novo-kit-componentes');
+  if (componentesNovoKit.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic">Nenhum produto adicionado ainda.</p>';
+    return;
+  }
+  container.innerHTML = componentesNovoKit.map((c, idx) => `
+    <div style="display:flex;align-items:center;gap:.5rem;padding:.5rem .75rem;background:var(--bg3);border-radius:6px;border:1px solid var(--border)">
+      <input type="number" value="${c.quantidade}" min="1" style="width:52px;padding:.25rem .4rem;background:var(--bg2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:12px;text-align:center" onchange="alterarQtdNovoKit(${idx}, this.value)" />
+      <span style="flex:1;font-size:13px;font-weight:600">${esc(c.nome)}</span>
+      ${c.sku ? `<span style="font-size:10px;color:var(--text2);font-family:monospace">${esc(c.sku)}</span>` : ''}
+      <button onclick="removerComponenteNovoKit(${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:16px;line-height:1" title="Remover">✕</button>
+    </div>
+  `).join('');
+}
+
+function alterarQtdNovoKit(idx, val) {
+  componentesNovoKit[idx].quantidade = parseInt(val) || 1;
+}
+
+function removerComponenteNovoKit(idx) {
+  componentesNovoKit.splice(idx, 1);
+  renderComponentesNovoKit();
+}
+
+async function criarKit() {
+  const nome = document.getElementById('novo-kit-nome').value.trim();
+  if (!nome) { alert('O nome é obrigatório.'); return; }
+
+  const btn = document.getElementById('btn-criar-kit');
+  btn.disabled = true;
+  btn.textContent = 'Criando...';
+
+  try {
+    const res = await fetch('/api/catalogo/criar-kit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome,
+        preco: parseFloat(document.getElementById('novo-kit-preco').value) || 0,
+        codigo_sku: document.getElementById('novo-kit-sku').value.trim(),
+        descricao: document.getElementById('novo-kit-descricao').value.trim(),
+        componentes: componentesNovoKit,
+      })
+    });
+    const texto = await res.text();
+    let data;
+    try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto }; }
+
+    if (data.ok) {
+      showToast('✅ Kit criado com sucesso!', 'success');
+      fecharModalNovoKit();
+      await carregarCatalogo();
+      setTimeout(() => {
+        const k = kitsData.find(x => x.nome === nome);
+        if (k) abrirModalKit(k.nome, k.marca || 'Alphahall');
+      }, 300);
+    } else {
+      alert('❌ Erro: ' + (data.erro || JSON.stringify(data)));
+    }
+  } catch (err) {
+    alert('❌ Erro ao criar kit: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✅ Criar Kit';
+  }
+}
+
+// ─── Seletor de Produto ───────────────────────────────────────────────────────
+
+function abrirSeletorProduto(contexto) {
+  seletorContexto = contexto;
+  document.getElementById('seletor-busca').value = '';
+  renderSeletorProdutos(produtosData);
+  document.getElementById('modal-seletor-produto').style.display = 'flex';
+}
+
+function fecharSeletorProduto() {
+  document.getElementById('modal-seletor-produto').style.display = 'none';
+}
+
+function filtrarSeletorProdutos(busca) {
+  const lista = busca.trim()
+    ? produtosData.filter(p => p.nome.toLowerCase().includes(busca.toLowerCase()))
+    : produtosData;
+  renderSeletorProdutos(lista);
+}
+
+function renderSeletorProdutos(lista) {
+  const container = document.getElementById('seletor-lista');
+  if (lista.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);text-align:center;padding:1rem">Nenhum produto encontrado.</p>';
+    return;
+  }
+  container.innerHTML = lista.map(p => `
+    <div onclick="selecionarProduto(${JSON.stringify(escAttr(p.nome))}, ${JSON.stringify(escAttr(p.sku || ''))}, ${JSON.stringify(escAttr(p.produto_id || String(p.id || 0)))})"
+      style="display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;background:var(--bg3);border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:border-color .15s"
+      onmouseenter="this.style.borderColor='var(--primary)'" onmouseleave="this.style.borderColor='var(--border)'">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600">${esc(p.nome)}</div>
+        ${p.sku ? `<div style="font-size:10px;color:var(--text2);font-family:monospace">SKU: ${esc(p.sku)}</div>` : ''}
+      </div>
+      <span style="font-size:11px;color:var(--primary);font-weight:700">➕</span>
+    </div>
+  `).join('');
+}
+
+function selecionarProduto(nome, sku, produtoId) {
+  const comp = { produto_id: produtoId, nome, sku: sku || null, quantidade: 1 };
+
+  if (seletorContexto === 'novo-kit') {
+    // Evita duplicata
+    if (!componentesNovoKit.find(c => c.nome === nome)) {
+      componentesNovoKit.push(comp);
+      renderComponentesNovoKit();
+    }
+    fecharSeletorProduto();
+
+  } else if (seletorContexto === 'editar-kit') {
+    if (!componentesEdicaoKit.find(c => c.nome === nome)) {
+      componentesEdicaoKit.push(comp);
+      renderComponentesEdicaoKit();
+      // Salva imediatamente no backend
+      salvarComponentesKit();
+    }
+    fecharSeletorProduto();
+  }
+}
+
+// ─── Edição de componentes no modal de kit existente ─────────────────────────
+
+function renderComponentesKit(componentes) {
+  componentesEdicaoKit = componentes.map(c => ({ ...c }));
+  renderComponentesEdicaoKit();
+}
+
+function renderComponentesEdicaoKit() {
+  const container = document.getElementById('skus-itens-container');
+  if (componentesEdicaoKit.length === 0) {
+    container.innerHTML = '<p style="font-size:12px;color:var(--text2);font-style:italic">Nenhum componente. Clique em Adicionar.</p>';
+    return;
+  }
+  container.innerHTML = `<div class="component-list">` + componentesEdicaoKit.map((comp, idx) => `
+    <div class="component-item" style="display:flex;align-items:center;gap:.5rem">
+      <input type="number" value="${comp.quantidade}" min="1"
+        style="width:52px;padding:.25rem .4rem;background:var(--bg2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:12px;text-align:center"
+        onchange="alterarQtdEdicaoKit(${idx}, this.value)" />
+      <div class="component-info" style="flex:1">
+        <div class="component-name">${esc(comp.nome)}</div>
+        ${comp.sku ? `<div class="component-sku"><span style="color:var(--text2)">SKU:</span> <code>${esc(comp.sku)}</code></div>` : '<div class="component-sku"><span style="color:var(--text2);font-style:italic">Sem SKU</span></div>'}
+      </div>
+      <button onclick="removerComponenteEdicaoKit(${idx})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:18px;line-height:1;padding:.25rem" title="Remover">✕</button>
+    </div>
+  `).join('') + `</div>`;
+}
+
+function alterarQtdEdicaoKit(idx, val) {
+  componentesEdicaoKit[idx].quantidade = parseInt(val) || 1;
+  salvarComponentesKit();
+}
+
+function removerComponenteEdicaoKit(idx) {
+  if (!confirm(`Remover "${componentesEdicaoKit[idx].nome}" do kit?`)) return;
+  componentesEdicaoKit.splice(idx, 1);
+  renderComponentesEdicaoKit();
+  salvarComponentesKit();
+}
+
+async function salvarComponentesKit() {
+  if (!kitAtual) return;
+  const marca = kitAtual.marca || 'Alphahall';
+  try {
+    const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}/componentes`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ componentes: componentesEdicaoKit })
+    });
+    const texto = await res.text();
+    let data;
+    try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto }; }
+    if (!data.ok) {
+      console.error('Erro ao salvar componentes:', data.erro);
+    } else {
+      // Atualiza kitAtual em memória
+      kitAtual.componentes = componentesEdicaoKit.map(c => ({ ...c }));
+    }
+  } catch (err) {
+    console.error('Erro ao salvar componentes:', err);
   }
 }
 
