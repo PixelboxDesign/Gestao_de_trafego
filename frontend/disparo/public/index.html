@@ -498,6 +498,33 @@
       gap: .4rem;
     }
 
+    /* ━━ Card desabilitado ━━ */
+    .card-desabilitado {
+      border-color: rgba(245,158,11,0.5) !important;
+      box-shadow: 0 0 0 1px rgba(245,158,11,0.3), inset 0 0 0 1000px rgba(245,158,11,0.04);
+    }
+    .card-desabilitado .kit-nome {
+      color: #f59e0b !important;
+    }
+    .card-desabilitado .kit-footer {
+      background: rgba(245,158,11,0.1);
+      color: #f59e0b;
+      border-top-color: rgba(245,158,11,0.3);
+    }
+    .card-disabled-overlay {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: rgba(245,158,11,0.85);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 4px;
+      pointer-events: none;
+      letter-spacing: 0.03em;
+    }
+
     /* ━━ Modal ━━ */
     .modal-overlay {
       position: fixed;
@@ -1211,8 +1238,9 @@
       <div style="display:flex;gap:.5rem">
         <button
           class="btn"
+          id="btn-visibilidade-kit"
           style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);font-weight:600"
-          onclick="desabilitarKit()"
+          onclick="toggleVisibilidadeKit()"
         >
           👁️‍🗨️ Desabilitar
         </button>
@@ -1558,8 +1586,9 @@
       <div style="display:flex;gap:.5rem">
         <button
           class="btn"
+          id="btn-visibilidade-produto"
           style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.4);font-weight:600"
-          onclick="desabilitarProduto()"
+          onclick="toggleVisibilidadeProduto()"
         >
           👁️‍🗨️ Desabilitar
         </button>
@@ -2893,18 +2922,19 @@ function renderKits(lista) {
 
   grid.innerHTML = lista.map(kit => {
     const temThumb = kit.caminho_thumb_bd || kit.tem_thumb;
-    const marca = kit.marca || 'Alphahall'; // Fallback para Alphahall se marca estiver vazia
+    const marca = kit.marca || 'Alphahall';
     const thumbUrl = kit.caminho_thumb_bd 
       ? `/api/catalogo/files/${encodeURIComponent(kit.caminho_thumb_bd)}` 
       : kit.tem_thumb 
         ? `/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(kit.nome)}/thumb.${kit.thumb_ext}` 
         : null;
+    const desabilitado = kit.visivel === false;
     
-    console.log('[DEBUG] Renderizando kit:', kit.nome, '- marca:', marca, '- data-kit-marca:', escAttr(marca));
+    console.log('[DEBUG] Renderizando kit:', kit.nome, '- marca:', marca, '- visivel:', kit.visivel);
     
     return `
-    <div class="kit-card" data-kit-nome="${escAttr(kit.nome)}" data-kit-marca="${escAttr(marca)}">
-      <div class="kit-img-area">
+    <div class="kit-card${desabilitado ? ' card-desabilitado' : ''}" data-kit-nome="${escAttr(kit.nome)}" data-kit-marca="${escAttr(marca)}">
+      <div class="kit-img-area" style="position:relative">
         ${temThumb
           ? `<img 
               loading="lazy" 
@@ -2915,6 +2945,7 @@ function renderKits(lista) {
             />`
           : `<span class="kit-img-placeholder">📦</span>`
         }
+        ${desabilitado ? `<div class="card-disabled-overlay">👁️‍🗨️ Desabilitado</div>` : ''}
       </div>
       <div class="kit-info">
         <h3 class="kit-nome">${esc(kit.nome)}</h3>
@@ -3026,6 +3057,20 @@ function abrirModalKit(nomeKit, marca) {
     console.log('[DEBUG] 12. Renderizando carrossel...');
     const imagensCarrossel = kitAtual.imagens_carrossel || [];
     renderCarrossel(imagensCarrossel);
+
+    // Atualiza botão Desabilitar/Habilitar conforme estado atual
+    const btnVisKit = document.getElementById('btn-visibilidade-kit');
+    if (kitAtual.visivel === false) {
+      btnVisKit.textContent = '✅ Habilitar';
+      btnVisKit.style.background = 'rgba(34,197,94,0.15)';
+      btnVisKit.style.color = '#22c55e';
+      btnVisKit.style.border = '1px solid rgba(34,197,94,0.4)';
+    } else {
+      btnVisKit.textContent = '👁️‍🗨️ Desabilitar';
+      btnVisKit.style.background = 'rgba(245,158,11,0.15)';
+      btnVisKit.style.color = '#f59e0b';
+      btnVisKit.style.border = '1px solid rgba(245,158,11,0.4)';
+    }
     
     console.log('[DEBUG] 13. Mostrando modal...');
     document.getElementById('modal-kit').style.display = 'flex';
@@ -3521,18 +3566,19 @@ function renderProdutos(lista) {
 
   grid.innerHTML = lista.map(produto => {
     const temThumb = produto.caminho_thumb_bd || produto.tem_thumb;
-    const marca = produto.marca || 'Alphahall'; // Fallback para Alphahall se marca estiver vazia
+    const marca = produto.marca || 'Alphahall';
     const thumbUrl = produto.caminho_thumb_bd 
       ? `/api/catalogo/files/${encodeURIComponent(produto.caminho_thumb_bd)}` 
       : produto.tem_thumb 
         ? `/api/catalogo/imagem/${encodeURIComponent(marca)}/${encodeURIComponent(produto.nome)}/thumb.${produto.thumb_ext}?tipo=produto` 
         : null;
+    const desabilitado = produto.visivel === false;
     
-    console.log('[DEBUG] Renderizando produto:', produto.nome, '- marca:', marca, '- data-produto-marca:', escAttr(marca));
+    console.log('[DEBUG] Renderizando produto:', produto.nome, '- marca:', marca, '- visivel:', produto.visivel);
     
     return `
-    <div class="kit-card" data-produto-nome="${escAttr(produto.nome)}" data-produto-marca="${escAttr(marca)}">
-      <div class="kit-img-area">
+    <div class="kit-card${desabilitado ? ' card-desabilitado' : ''}" data-produto-nome="${escAttr(produto.nome)}" data-produto-marca="${escAttr(marca)}">
+      <div class="kit-img-area" style="position:relative">
         ${temThumb
           ? `<img 
               loading="lazy" 
@@ -3543,6 +3589,7 @@ function renderProdutos(lista) {
             />`
           : `<span class="kit-img-placeholder">🧴</span>`
         }
+        ${desabilitado ? `<div class="card-disabled-overlay">👁️‍🗨️ Desabilitado</div>` : ''}
       </div>
       <div class="kit-info">
         <h3 class="kit-nome">${esc(produto.nome)}</h3>
@@ -3656,6 +3703,20 @@ function abrirModalProduto(nomeProduto, marca) {
 
   // Renderiza carrossel do produto
   renderProdutoCarrossel(produtoAtual.imagens_carrossel || []);
+
+  // Atualiza botão Desabilitar/Habilitar conforme estado atual
+  const btnVisProd = document.getElementById('btn-visibilidade-produto');
+  if (produtoAtual.visivel === false) {
+    btnVisProd.textContent = '✅ Habilitar';
+    btnVisProd.style.background = 'rgba(34,197,94,0.15)';
+    btnVisProd.style.color = '#22c55e';
+    btnVisProd.style.border = '1px solid rgba(34,197,94,0.4)';
+  } else {
+    btnVisProd.textContent = '👁️‍🗨️ Desabilitar';
+    btnVisProd.style.background = 'rgba(245,158,11,0.15)';
+    btnVisProd.style.color = '#f59e0b';
+    btnVisProd.style.border = '1px solid rgba(245,158,11,0.4)';
+  }
 
   document.getElementById('modal-produto').style.display = 'flex';
 }
@@ -4407,29 +4468,34 @@ async function deletarProdutoImagemCarrossel(arquivo) {
 
 // ─── Desabilitar / Excluir Produto ───────────────────────────────────────────
 
-async function desabilitarProduto() {
+async function toggleVisibilidadeProduto() {
   if (!produtoAtual) return;
-  if (!confirm(`Desabilitar "${produtoAtual.nome}"?\n\nEle não vai aparecer no Luna Catálogo, mas continua visível aqui no painel.`)) return;
+  const novoEstado = produtoAtual.visivel === false ? true : false;
+  const acao = novoEstado ? 'habilitar' : 'desabilitar';
+  const msg = novoEstado
+    ? `Habilitar "${produtoAtual.nome}"?\n\nEle voltará a aparecer no Luna Catálogo.`
+    : `Desabilitar "${produtoAtual.nome}"?\n\nEle não vai aparecer no Luna Catálogo, mas continua visível aqui no painel.`;
+  if (!confirm(msg)) return;
 
   const marca = produtoAtual.marca || 'Alphahall';
   try {
     const res = await fetch(`/api/catalogo/v2/produto/${encodeURIComponent(marca)}/${encodeURIComponent(produtoAtual.nome)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ visivel: false })
+      body: JSON.stringify({ visivel: novoEstado })
     });
     const texto = await res.text();
     let data;
     try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto || 'Resposta inválida do servidor' }; }
     if (data.ok) {
-      showToast('✅ Produto desabilitado — não aparecerá no catálogo web.', 'success');
+      showToast(novoEstado ? '✅ Produto habilitado!' : '✅ Produto desabilitado — não aparecerá no catálogo web.', 'success');
       fecharModalProduto();
       await carregarProdutos();
     } else {
-      alert('❌ Erro ao desabilitar: ' + (data.erro || JSON.stringify(data)));
+      alert('❌ Erro ao ' + acao + ': ' + (data.erro || JSON.stringify(data)));
     }
   } catch (err) {
-    alert('❌ Erro ao desabilitar produto: ' + err.message);
+    alert('❌ Erro ao ' + acao + ' produto: ' + err.message);
   }
 }
 
@@ -4460,29 +4526,34 @@ async function excluirProduto() {
 
 // ─── Desabilitar / Excluir Kit ────────────────────────────────────────────────
 
-async function desabilitarKit() {
+async function toggleVisibilidadeKit() {
   if (!kitAtual) return;
-  if (!confirm(`Desabilitar "${kitAtual.nome}"?\n\nEle não vai aparecer no Luna Catálogo, mas continua visível aqui no painel.`)) return;
+  const novoEstado = kitAtual.visivel === false ? true : false;
+  const acao = novoEstado ? 'habilitar' : 'desabilitar';
+  const msg = novoEstado
+    ? `Habilitar "${kitAtual.nome}"?\n\nEle voltará a aparecer no Luna Catálogo.`
+    : `Desabilitar "${kitAtual.nome}"?\n\nEle não vai aparecer no Luna Catálogo, mas continua visível aqui no painel.`;
+  if (!confirm(msg)) return;
 
   const marca = kitAtual.marca || 'Alphahall';
   try {
     const res = await fetch(`/api/catalogo/v2/kit/${encodeURIComponent(marca)}/${encodeURIComponent(kitAtual.nome)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ visivel: false })
+      body: JSON.stringify({ visivel: novoEstado })
     });
     const texto = await res.text();
     let data;
     try { data = JSON.parse(texto); } catch { data = { ok: false, erro: texto || 'Resposta inválida do servidor' }; }
     if (data.ok) {
-      showToast('✅ Kit desabilitado — não aparecerá no catálogo web.', 'success');
+      showToast(novoEstado ? '✅ Kit habilitado!' : '✅ Kit desabilitado — não aparecerá no catálogo web.', 'success');
       fecharModalKit();
-      await carregarKits();
+      await carregarCatalogo();
     } else {
-      alert('❌ Erro ao desabilitar: ' + (data.erro || JSON.stringify(data)));
+      alert('❌ Erro ao ' + acao + ': ' + (data.erro || JSON.stringify(data)));
     }
   } catch (err) {
-    alert('❌ Erro ao desabilitar kit: ' + err.message);
+    alert('❌ Erro ao ' + acao + ' kit: ' + err.message);
   }
 }
 
@@ -4502,7 +4573,7 @@ async function excluirKit() {
     if (data.ok) {
       showToast('✅ Kit excluído com sucesso!', 'success');
       fecharModalKit();
-      await carregarKits();
+      await carregarCatalogo();
     } else {
       alert('❌ Erro ao excluir: ' + (data.erro || JSON.stringify(data)));
     }
