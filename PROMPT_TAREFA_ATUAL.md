@@ -6,13 +6,12 @@ Antes de fazer qualquer coisa, leia os arquivos nesta ordem:
 
 1. `documentacao/readme.md` — visão geral do sistema
 2. `documentacao/ARQUITETURA_SISTEMA.md` — portas, estrutura, deploy
-3. `documentacao/CHECKPOINTS.md` — histórico de versões
-4. `backend/src/pages/AbaProdutos.tsx` — componente que tem o problema atual
-5. `backend/src/pages/AbaKits.tsx` — componente de kits (referência de como funciona)
-6. `backend/src-tauri/src/api/catalogo.rs` — rotas do backend (excluir/desabilitar)
-7. `backend/src-tauri/src/api/catalogo_db.rs` — listagem de produtos/kits
-8. `backend/src-tauri/src/api/mod.rs` — registro de rotas
-9. Este arquivo por último — `PROMPT_TAREFA_ATUAL.md`
+3. `documentacao/CHECKPOINTS.md` — histórico de versões (v22 a v24 são os mais recentes)
+4. `frontend/disparo/public/index.html` — painel admin (HTML estático)
+5. `backend/src-tauri/src/api/catalogo_db.rs` — rotas v2 do backend
+6. `backend/src-tauri/src/api/catalogo.rs` — rotas v1 do backend
+7. `backend/src-tauri/src/api/mod.rs` — registro de rotas
+8. Este arquivo por último — `PROMPT_TAREFA_ATUAL.md`
 
 ---
 
@@ -21,115 +20,100 @@ Antes de fazer qualquer coisa, leia os arquivos nesta ordem:
 Sistema Luna Cosméticos — painel administrativo + catálogo web.
 
 ### Componentes principais:
-- **Disparo** (painel admin): `backend/src/pages/` — hospedado no Render em https://luna-disparo.onrender.com
-- **Backend API**: `backend/src-tauri/src/` — roda localmente na máquina do usuário, exposto via Cloudflare Tunnel
-- **Catálogo web**: `frontend/catalogo/src/` — site público de catálogo
+- **Painel Disparo** (admin): `frontend/disparo/public/index.html` — HTML estático servido por `frontend/disparo/server.js` — hospedado no Render em https://luna-disparo.onrender.com
+- **Backend API**: `backend/src-tauri/src/` — Rust/Axum, roda localmente na máquina, exposto via Cloudflare Tunnel
+- **Catálogo web**: `frontend/catalogo/src/` — site público React
+
+### ⚠️ ATENÇÃO CRÍTICA: O painel NÃO é React buildado
+O painel admin é um único arquivo HTML estático (`frontend/disparo/public/index.html`).
+Os arquivos em `backend/src/pages/*.tsx` (AbaProdutos.tsx, AbaKits.tsx etc.) NÃO são usados em produção.
+Para alterar o painel, edite APENAS `frontend/disparo/public/index.html`.
 
 ### Portas CORRETAS (NUNCA usar 3000 — está ocupada com outro projeto):
 - Backend API: **3001** (ou 3002 se 3001 ocupada)
-- Disparo dev: **1420** (Vite)
+- Disparo dev: **5173** (Vite, não usado em prod)
 - Catálogo dev: **5174**
 
 ### Deploy:
-- O Render faz o **próprio build** a partir do código-fonte em `backend/src/`
-- O Render usa `npm run build` no diretório `backend/`
-- **NÃO** usar a pasta `dist/` commitada — o Render ignora e faz o build dele mesmo
-- Para fazer deploy: commitar o código-fonte e fazer push. O Render detecta e builda automaticamente
+- Render usa `frontend/disparo/` com `buildCommand: npm install` e `startCommand: node server.js`
+- O server.js serve arquivos de `frontend/disparo/public/`
+- Para deployar: commitar `index.html` e fazer push → Render detecta e redeploya
 - Dashboard Render: https://dashboard.render.com/web/srv-d9roha7avr4c739pjlu0
 
 ---
 
-## TAREFA PENDENTE — BOTÕES EXCLUIR E DESABILITAR NO MODAL DE PRODUTO
+## ESTADO ATUAL DO SISTEMA (v24)
 
-### O que foi pedido:
-No **painel de disparo** (`luna-disparo.onrender.com`), na **aba Produtos**, quando o usuário clica em um card de produto e abre o modal de edição, devem aparecer dois botões no **footer do modal**:
+### Funcionalidades implementadas e funcionando:
 
-1. **Botão "Desabilitar"** (amarelo) — marca o produto com `visivel: false` no info.json. O produto continua aparecendo no painel de disparo mas **NÃO aparece no Luna Catálogo** (site público)
-2. **Botão "Excluir Produto"** (vermelho) — deleta a pasta inteira do produto com `fs::remove_dir_all()` no backend
+#### Aba Kits (`frontend/disparo/public/index.html`)
+- ✅ Grid de kits com thumbnail, preço, componentes
+- ✅ Filtros: visibilidade (Todos/Habilitados/Desabilitados) + thumbnail (Todos/Com/Sem)
+- ✅ Botão "➕ Novo Kit" → modal de criação com seleção de produtos
+- ✅ Modal de edição: nome editável (renomeia pasta + banco), preço, SKU, descrição
+- ✅ Modal de edição: seção de componentes com adicionar/remover/alterar quantidade (salva automaticamente)
+- ✅ Botão "👁️‍🗨️ Desabilitar/Habilitar" — alterna visível no catálogo web
+- ✅ Botão "🗑️ Excluir Kit" — deleta pasta inteira + remove do banco
+- ✅ Card amarelo para kits desabilitados
 
-### Estado atual:
-- O modal de produto abre normalmente
-- Os botões **NÃO aparecem** no modal em produção (Render)
-- O código dos botões **ESTÁ** no arquivo `backend/src/pages/AbaProdutos.tsx` no footer do modal
-- O Render faz o build e deploya, mas os botões não aparecem
+#### Aba Produtos
+- ✅ Grid de produtos com thumbnail, preço, descrição
+- ✅ Filtros: visibilidade + thumbnail
+- ✅ Botão "➕ Novo Produto" → modal de criação → abre modal de edição completo
+- ✅ Modal de edição: nome editável (renomeia pasta + banco), SKU, preço, peso, descrição, composição
+- ✅ Upload de thumbnail e carrossel de imagens
+- ✅ Botão "👁️‍🗨️ Desabilitar/Habilitar"
+- ✅ Botão "🗑️ Excluir Produto"
+- ✅ Card amarelo para produtos desabilitados
 
-### DIAGNÓSTICO DO PROBLEMA:
-O modal que aparece na screenshot tem "Cancelar" e "Salvar" — esses botões **não existem** no `AbaProdutos.tsx`. Isso indica que o modal que está sendo aberto **pode não ser** o do `AbaProdutos.tsx`. Precisa investigar qual componente está sendo renderizado quando o usuário clica em um produto na aba Produtos.
-
-**Suspeita principal**: O `AbaCatalogo.tsx` tem sub-abas "Kits" e "Produtos". A sub-aba "Produtos" renderiza `<AbaProdutos />`. Mas talvez o usuário esteja clicando em outra aba ou o componente errado está sendo montado.
-
-### O que precisa fazer:
-1. **Investigar** por que o modal com "Cancelar" e "Salvar" está aparecendo ao invés do modal do `AbaProdutos.tsx`
-2. **Confirmar** qual componente tem "Cancelar" e "Salvar" no footer
-3. **Adicionar** os botões Desabilitar e Excluir no componente correto
-4. **Commitar apenas o código-fonte** (não commitar dist/) e fazer push
-5. O Render vai buildar automaticamente
-
-### Rotas backend já implementadas:
-- `DELETE /api/catalogo/produto/:marca/:nome` → `catalogo::deletar_produto()` em `backend/src-tauri/src/api/catalogo.rs`
-- `DELETE /api/catalogo/kit/:marca/:nome` → `catalogo::deletar_kit()`
-- `PUT /api/catalogo/v2/produto/:id` → aceita `{ visivel: false }` para desabilitar
-
----
-
-## OUTRAS TASKS JÁ CONCLUÍDAS (não mexer):
-
-- ✅ Normalização de contagem: backend filtra apenas produtos/kits com pasta física existente
-- ✅ Campo `visivel` no backend (catalogo_db.rs)
-- ✅ Filtro `visivel=false` no Luna Catálogo (frontend/catalogo/src/components/CatalogViewport.tsx)
-- ✅ Rotas DELETE registradas em mod.rs
-- ✅ Botões já implementados no AbaKits.tsx (funciona como referência)
+### Backend (roda localmente em localhost:3001):
+- ✅ `GET /api/catalogo/v2/kits` — lista kits (filtra pastas inexistentes)
+- ✅ `GET /api/catalogo/v2/produtos-individuais` — lista produtos
+- ✅ `PUT /api/catalogo/v2/kit/:marca/:nome` — atualiza kit (nome, preço, SKU, visivel, renomeia pasta)
+- ✅ `PUT /api/catalogo/v2/produto/:marca/:nome` — atualiza produto (idem)
+- ✅ `PUT /api/catalogo/v2/kit/:marca/:nome/componentes` — atualiza componentes
+- ✅ `POST /api/catalogo/criar-kit` — cria pasta + insere no banco
+- ✅ `POST /api/catalogo/criar-produto` — cria pasta + insere no banco
+- ✅ `DELETE /api/catalogo/kit/:marca/:nome` — deleta pasta inteira
+- ✅ `DELETE /api/catalogo/produto/:marca/:nome` — deleta pasta inteira
+- ✅ `POST /api/catalogo/upload-thumb/:marca/:kit?tipo=kit|produto` — upload de thumbnail
 
 ---
 
-## ALERTAS CRÍTICOS PARA NÃO ERRAR:
+## TAREFAS PENDENTES
 
-### ❌ NÃO commitar a pasta dist/
-O Render faz o próprio build. Commitar dist/ não resolve nada e só confunde.
+Nenhuma tarefa pendente definida no momento.
+Aguardando novas instruções do usuário.
+
+---
+
+## ALERTAS CRÍTICOS:
+
+### ❌ NÃO commitar a pasta dist/ do backend
+O Render builda do código-fonte. dist/ é ignorada.
 
 ### ❌ NÃO usar porta 3000
-Porta 3000 está ocupada com outro projeto (PixelBox). Sempre usar 3001 ou 3002.
+Porta 3000 está ocupada com outro projeto (PixelBox).
 
-### ❌ NÃO confundir Disparo com Catálogo
-- **Disparo** = painel admin em `backend/src/pages/` → luna-disparo.onrender.com
-- **Catálogo** = site público em `frontend/catalogo/src/` → outro serviço
+### ❌ NÃO editar AbaProdutos.tsx ou AbaKits.tsx para o painel
+O painel é o index.html estático. Os .tsx são código morto em produção.
 
 ### ❌ NÃO fazer múltiplas mudanças ao mesmo tempo
-Fazer uma coisa de cada vez. Confirmar que funcionou antes de partir para a próxima.
+Uma coisa de cada vez. Confirmar que funcionou antes de avançar.
 
----
-
-## ESTRUTURA DE PASTAS IMPORTANTE:
-
-```
-f:\luna_cosmeticos\
-├── backend/
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── AbaProdutos.tsx   ← ARQUIVO COM O PROBLEMA
-│   │   │   ├── AbaKits.tsx       ← REFERÊNCIA (já tem botões)
-│   │   │   └── AbaCatalogo.tsx   ← monta AbaProdutos e AbaKits
-│   │   └── App.tsx
-│   ├── src-tauri/src/api/
-│   │   ├── catalogo.rs           ← funções deletar_produto, deletar_kit
-│   │   ├── catalogo_db.rs        ← listar produtos/kits
-│   │   └── mod.rs                ← registro de rotas
-│   └── dist/                     ← IGNORAR, Render builda do zero
-├── frontend/
-│   └── catalogo/src/             ← Luna Catálogo (site público)
-├── documentacao/
-│   ├── readme.md
-│   ├── ARQUITETURA_SISTEMA.md
-│   └── CHECKPOINTS.md
-└── PROMPT_TAREFA_ATUAL.md        ← ESTE ARQUIVO
+### ✅ Backend requer recompilação para mudanças em Rust
+```bash
+cd f:\luna_cosmeticos\backend\src-tauri
+cargo build --release
+# Matar processo antigo (verificar PID com netstat -ano | findstr :3001)
+# Iniciar novo: .\target\release\luna-server.exe
 ```
 
 ---
 
-## COMMITS RELEVANTES:
-- `06d6a7d` - normalizar contagem
-- `9266885` - botão excluir produto (primeira tentativa)
-- `2c54f57` - botão desabilitar produto
-- `4783b87` - botões no modal de kit
-- `a755064` - campo visivel + filtro catálogo
-- `5bbfdc0` - último commit (reescrita do AbaProdutos)
+## COMMITS RECENTES:
+- `8269c7f` — feat: criar produto/kit + selecionar/remover componentes do kit (v24)
+- `6a8dad5` — docs: checkpoint v23
+- `0fba0bb` — feat: renomear nome e pasta ao salvar kit ou produto (v23)
+- `244cdeb` — feat: filtros de visibilidade e thumbnail (v22+)
+- `2326423` — feat: toggle Habilitar/Desabilitar + card visual amarelo (v22)

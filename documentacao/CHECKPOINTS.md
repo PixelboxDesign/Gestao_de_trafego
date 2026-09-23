@@ -35,6 +35,7 @@
 
 | Versão | Data | Título | Commit original | Commit atual | Amends |
 |---|---|---|---|---|---|
+| [v24-criar-produto-kit-componentes](#checkpoint-v24-criar-produto-kit-componentes) | 23/09/2026 | ➕ Criar Produto/Kit + Edição de Componentes do Kit | `8269c7f` | `8269c7f` | — |
 | [v23-rename-kit-produto](#checkpoint-v23-rename-kit-produto) | 23/09/2026 | ✏️ Renomear Kit/Produto — Atualiza Nome, Pasta e Card em Tempo Real | `0fba0bb` | `0fba0bb` | — |
 | [v22-botoes-desabilitar-excluir](#checkpoint-v22-botoes-desabilitar-excluir) | 23/09/2026 | 🔘 Botões Desabilitar/Habilitar + Excluir nos Modais de Kit e Produto | `8a820f6` | `2326423` | — |
 | [v21-produto-thumbnail-fix](#checkpoint-v21-produto-thumbnail-fix) | 15/05/2026 | 🖼️ FIX: Upload de Thumbnail para Produtos | `fe044fb` | `fe044fb` | — |
@@ -51,6 +52,130 @@
 | [v10-thumb-carrossel](#checkpoint-v10-thumb-carrossel) | 25/08/2026 | Sistema de Thumbnails Otimizadas + Carrossel de Imagens | `e9a40b1` | `e9a40b1` | — |
 
 > ⚠️ **Regra de restauração:** Sempre use o **Commit atual** para rollback. Quando há amends, o commit original deixa de existir no Git e é substituído pelo mais recente.
+
+---
+
+## ➕ CHECKPOINT v24-criar-produto-kit-componentes
+
+**Título:** Criar Produto/Kit + Edição de Componentes do Kit  
+**Data:** 23/09/2026 | **Commit:** `8269c7f` | **Status:** ✅ ESTÁVEL | **Prioridade:** 🟢 FUNCIONAL
+
+### 🎯 RESUMO EXECUTIVO
+
+Três funcionalidades novas adicionadas ao painel de disparo:
+
+1. **Botão "➕ Novo Produto"** na toolbar da aba Produtos — abre modal de criação, cria pasta no filesystem e insere no banco, depois abre o modal de edição completo
+2. **Botão "➕ Novo Kit"** na toolbar da aba Kits — abre modal de criação com seleção de produtos componentes
+3. **Edição de componentes no modal de kit existente** — botão Adicionar (abre seletor de produto), botão ✕ por componente para remover, campo de quantidade editável — salva automaticamente no backend
+
+---
+
+### 🔧 ARQUITETURA
+
+#### Backend — 3 novas rotas (`catalogo_db.rs` + `mod.rs`)
+
+| Método | Rota | Função | O que faz |
+|---|---|---|---|
+| POST | `/api/catalogo/criar-produto` | `criar_produto()` | Cria pasta em `catalogos/Alphahall/produtos/`, cria `info.json`, insere no banco como `produto_individual` |
+| POST | `/api/catalogo/criar-kit` | `criar_kit()` | Cria pasta em `catalogos/Alphahall/kits/`, cria `info.json`, insere no banco como `kit_composto` com JSON de componentes |
+| PUT | `/api/catalogo/v2/kit/:marca/:nome/componentes` | `atualizar_componentes_kit()` | Atualiza o campo `componentes` (JSON) no banco para o kit informado |
+
+**Structs novos:**
+```rust
+CriarProdutoRequest  { nome, marca?, preco?, descricao?, codigo_sku? }
+CriarKitRequest      { nome, marca?, preco?, descricao?, codigo_sku?, componentes? }
+ComponenteInput      { produto_id, nome, sku?, quantidade }
+AtualizarComponentesRequest { componentes: Vec<ComponenteInput> }
+```
+
+---
+
+#### Frontend — `index.html`
+
+**Novos modais HTML:**
+- `#modal-novo-produto` — formulário: nome, preço, SKU, descrição
+- `#modal-novo-kit` — formulário + lista de componentes com botão "Adicionar Produto"
+- `#modal-seletor-produto` — busca + lista clicável de produtos existentes
+
+**Modificações no modal de kit existente (`#modal-kit`):**
+- Label "📦 Produtos que compõem este kit" ganhou botão "➕ Adicionar" inline
+- Cada componente agora tem: campo de quantidade editável + botão ✕ para remover
+
+**Novas funções JS:**
+```javascript
+abrirModalNovoProduto() / fecharModalNovoProduto() / criarProduto()
+abrirModalNovoKit()     / fecharModalNovoKit()     / criarKit()
+abrirSeletorProduto(contexto)  // 'novo-kit' ou 'editar-kit'
+fecharSeletorProduto()
+filtrarSeletorProdutos(busca)
+renderSeletorProdutos(lista)
+selecionarProduto(nome, sku, produtoId)
+renderComponentesKit(componentes)      // Versão nova com edição
+renderComponentesEdicaoKit()
+alterarQtdEdicaoKit(idx, val)
+removerComponenteEdicaoKit(idx)
+salvarComponentesKit()                 // PUT /v2/kit/.../componentes
+renderComponentesNovoKit()
+alterarQtdNovoKit(idx, val)
+removerComponenteNovoKit(idx)
+```
+
+**Estado global adicionado:**
+```javascript
+let componentesNovoKit = [];    // Componentes do modal "Novo Kit"
+let componentesEdicaoKit = [];  // Componentes do kit em edição
+let seletorContexto = '';       // 'novo-kit' ou 'editar-kit'
+```
+
+---
+
+### 🔄 FLUXOS
+
+#### Criar Novo Produto
+```
+1. Clica "➕ Novo Produto" na toolbar
+2. Preenche nome (obrigatório), preço, SKU, descrição
+3. Clica "✅ Criar Produto"
+4. Backend: cria pasta + info.json + INSERT no banco
+5. Frontend: fecha modal, recarrega lista, abre modal de edição do produto criado
+```
+
+#### Criar Novo Kit
+```
+1. Clica "➕ Novo Kit" na toolbar
+2. Preenche nome, preço, SKU, descrição
+3. Clica "➕ Adicionar Produto" → seletor abre
+4. Busca e clica em produto → adicionado à lista com quantidade 1
+5. Ajusta quantidades se necessário
+6. Clica "✅ Criar Kit"
+7. Backend: cria pasta + info.json + INSERT com componentes JSON
+8. Frontend: fecha modal, recarrega lista, abre modal de edição do kit
+```
+
+#### Editar Componentes de Kit Existente
+```
+1. Abre modal de kit existente
+2. Seção "📦 Produtos que compõem este kit" mostra componentes editáveis
+3. Alterar quantidade → salva automaticamente no backend
+4. Clica ✕ num componente → remove + salva automaticamente
+5. Clica "➕ Adicionar" → seletor abre → seleciona produto → salva automaticamente
+```
+
+---
+
+### ⚠️ DEPENDÊNCIA DE BACKEND LOCAL
+
+Requer o novo executável compilado (`cargo build --release`) rodando localmente. Recompilado e reiniciado nesta sessão.
+
+---
+
+### 📝 ARQUIVOS MODIFICADOS
+
+```
+frontend/disparo/public/index.html          ← Novos modais + botões + funções JS
+backend/src-tauri/src/api/catalogo_db.rs    ← 3 novas funções + structs
+backend/src-tauri/src/api/mod.rs            ← 3 novas rotas registradas
+```
 
 ---
 
